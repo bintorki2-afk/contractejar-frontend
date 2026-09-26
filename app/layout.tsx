@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -10,6 +10,7 @@ import { SentryInit } from "@/components/sentry-init";
 import WebsiteClosedScreen from "@/features/website-status/components/website-closed-screen";
 import { getWebsiteStatus } from "@/features/website-status/services/get-website-status";
 import { getWebsiteClosedView } from "@/features/website-status/utils/get-website-closed-view";
+import PwaRegister from "@/components/pwa-register";
 import GtmScripts from "@/features/analytics/components/gtm-scripts";
 import GtmNoScript from "@/features/analytics/components/gtm-noscript";
 import CookieNotice from "@/features/analytics/components/cookie-notice";
@@ -49,8 +50,25 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
     },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title,
+      statusBarStyle: "default",
+    },
+    icons: {
+      icon: [
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
   };
 }
+
+export const viewport: Viewport = {
+  themeColor: "#0db38b",
+};
 
 const RTL_LOCALES = new Set(["ar", "fa", "he", "ur"]);
 
@@ -77,6 +95,30 @@ export default async function RootLayout({
     ? null
     : await getWebsiteClosedView(websiteStatus, locale);
 
+  // Organization + WebSite structured data (JSON-LD): يعرّف كيان «عقد إيجار»
+  // (الاسم/الشعار/التواصل) لمحركات البحث ومحرّكات AI ليظهر كمصدر موثوق.
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "عقد إيجار",
+    url: SITE_URL,
+    logo: `${SITE_URL}/icons/icon-512.png`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+966597500014",
+      contactType: "customer service",
+      areaServed: "SA",
+      availableLanguage: ["ar"],
+    },
+  };
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "عقد إيجار",
+    url: SITE_URL,
+    inLanguage: "ar",
+  };
+
   return (
     <html
       lang={locale}
@@ -87,7 +129,16 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <GtmNoScript />
         <GtmScripts />
+        <PwaRegister />
         <SentryInit />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         {closedView ? (
           <WebsiteClosedScreen view={closedView} />
         ) : (

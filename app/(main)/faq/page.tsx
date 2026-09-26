@@ -7,6 +7,7 @@ import FaqPageSection from "@/features/faq/components/faq-page-section";
 import SupportSection from "@/features/support/components/support-section";
 import { faqKeys } from "@/features/faq/query-keys";
 import { getCommonQuestions } from "@/features/faq/services/get-common-questions";
+import type { CommonQuestion } from "@/features/faq/types/common-question";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,8 +25,31 @@ export default async function FaqPage() {
     queryFn: getCommonQuestions,
   });
 
+  // FAQPage structured data (JSON-LD): يمكّن قوقل ومحرّكات AI من اقتباس
+  // الأسئلة والأجوبة مباشرة في النتائج والردود.
+  const questions =
+    queryClient.getQueryData<CommonQuestion[]>(faqKeys.list()) ?? [];
+  const faqJsonLd =
+    questions.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: questions.map((q) => ({
+            "@type": "Question",
+            name: q.question,
+            acceptedAnswer: { "@type": "Answer", text: q.answer },
+          })),
+        }
+      : null;
+
   return (
     <>
+      {faqJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      ) : null}
       <HydrationBoundary state={dehydrate(queryClient)}>
         <FaqPageSection />
       </HydrationBoundary>
