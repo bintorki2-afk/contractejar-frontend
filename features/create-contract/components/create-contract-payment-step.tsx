@@ -19,6 +19,7 @@ import CreateContractPaymentNavigation from "@/features/create-contract/componen
 import CreateContractPaymentSummary from "@/features/create-contract/components/create-contract-payment-summary";
 import CreateContractReviewOrderDialog from "@/features/create-contract/components/create-contract-review-order-dialog";
 import CreateContractSaveLaterDialog from "@/features/create-contract/components/create-contract-save-later-dialog";
+import { SAVE_DRAFT_ENABLED } from "@/features/create-contract/config";
 import CreateContractSavePropertyDialog from "@/features/create-contract/components/create-contract-save-property-dialog";
 import { useApplyContractCoupon } from "@/features/create-contract/hooks/use-apply-contract-coupon";
 import { useContractFinanceSummary } from "@/features/create-contract/hooks/use-contract-finance-summary";
@@ -361,7 +362,9 @@ export default function CreateContractPaymentStep({
             isSaving={isSavingDraft}
             onPrevious={onBack}
             onPay={() => void paymentFlow.handlePrimaryAction()}
-            onSave={() => setSaveLaterDialogOpen(true)}
+            onSave={
+              SAVE_DRAFT_ENABLED ? () => setSaveLaterDialogOpen(true) : undefined
+            }
           />
         </div>
       </div>

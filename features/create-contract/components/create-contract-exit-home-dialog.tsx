@@ -19,6 +19,7 @@ type CreateContractExitHomeDialogProps = {
   orderNumber?: string | number | null;
   isSaving?: boolean;
   isExiting?: boolean;
+  showSaveOption?: boolean;
   onSaveThenExit: () => void;
   onExitWithoutSaving: () => void;
 };
@@ -58,6 +59,7 @@ export default function CreateContractExitHomeDialog({
   orderNumber,
   isSaving = false,
   isExiting = false,
+  showSaveOption = true,
   onSaveThenExit,
   onExitWithoutSaving,
 }: CreateContractExitHomeDialogProps) {
@@ -108,14 +110,16 @@ export default function CreateContractExitHomeDialog({
         </div>
 
         <div className="mt-7 flex flex-col gap-3">
-          <Button
-            type="button"
-            disabled={isBusy}
-            onClick={onSaveThenExit}
-            className="h-12 w-full rounded-xl bg-brand text-[15px] font-bold text-white hover:bg-brand/90"
-          >
-            {isSaving ? labels.saving : labels.saveThenExit}
-          </Button>
+          {showSaveOption ? (
+            <Button
+              type="button"
+              disabled={isBusy}
+              onClick={onSaveThenExit}
+              className="h-12 w-full rounded-xl bg-brand text-[15px] font-bold text-white hover:bg-brand/90"
+            >
+              {isSaving ? labels.saving : labels.saveThenExit}
+            </Button>
+          ) : null}
 
           <Button
             type="button"

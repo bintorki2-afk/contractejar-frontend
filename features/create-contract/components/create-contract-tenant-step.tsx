@@ -15,6 +15,7 @@ import CreateContractTenantIndividualDataPhase from "@/features/create-contract/
 import CreateContractTenantOrganizationDataPhase from "@/features/create-contract/components/create-contract-tenant-organization-data-phase";
 import CreateContractTenantStatusSelect from "@/features/create-contract/components/create-contract-tenant-status-select";
 import { useCreateContractTenantStep } from "@/features/create-contract/hooks/use-create-contract-tenant-step";
+import { SAVE_DRAFT_ENABLED } from "@/features/create-contract/config";
 import { useSaveContractDraft } from "@/features/create-contract/hooks/use-save-contract-draft";
 import { useSubmitContractStep4 } from "@/features/create-contract/hooks/use-submit-contract-step4";
 import { useSubmitContractStep5 } from "@/features/create-contract/hooks/use-submit-contract-step5";
@@ -158,7 +159,7 @@ export default function CreateContractTenantStep({
     goToNextPhase();
   }
 
-  const showSaveLaterActions = Boolean(contractSession);
+  const showSaveLaterActions = SAVE_DRAFT_ENABLED && Boolean(contractSession);
 
   function handleOpenSaveLater() {
     if (isSavingDraft || isSubmitting) {

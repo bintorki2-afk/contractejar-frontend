@@ -19,7 +19,17 @@ type SubmitOrderResult = {
   orderNumber: string;
 };
 
-function generateOrderNumber(): string {
+/**
+ * The order number shown to the customer must match the 6-digit number in the
+ * dashboard (the backend contract uuid), so support can match them. Use that
+ * real number; only fall back to a generated reference if it isn't available.
+ */
+function resolveOrderNumber(): string {
+  const uuid = useCreateContractDraftStore.getState().contractSession?.uuid;
+  if (uuid != null && /^\d{4,7}$/.test(String(uuid).trim())) {
+    return String(uuid).trim();
+  }
+
   const now = new Date();
   const yy = String(now.getFullYear()).slice(-2);
   const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -105,7 +115,7 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
   }: {
     contactWhatsapp: string;
   }): Promise<SubmitOrderResult> {
-    const orderNumber = generateOrderNumber();
+    const orderNumber = resolveOrderNumber();
     const contractTypeLabel = contractType === "residential" ? "سكني" : "تجاري";
 
     const overviewSection = {

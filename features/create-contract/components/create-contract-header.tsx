@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { FaWhatsapp } from "react-icons/fa";
 
 import CreateContractExitHomeDialog from "@/features/create-contract/components/create-contract-exit-home-dialog";
+import { SAVE_DRAFT_ENABLED } from "@/features/create-contract/config";
+import { isDisplayableOrderNumber } from "@/features/create-contract/utils/is-displayable-order-number";
 import { useSaveContractDraft } from "@/features/create-contract/hooks/use-save-contract-draft";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
@@ -46,13 +48,18 @@ export default function CreateContractHeader({
   const contractUuid = useCreateContractDraftStore(
     (state) => state.contractSession?.uuid ?? null,
   );
+  // Only show the real backend order number (6-digit uuid), never the temporary
+  // placeholder id a fresh session starts with.
+  const displayOrderNumber = isDisplayableOrderNumber(contractUuid)
+    ? String(contractUuid)
+    : null;
 
   async function handleCopyRequest() {
-    if (!contractUuid) {
+    if (!displayOrderNumber) {
       return;
     }
 
-    const text = `${labels.requestPrefix} #${contractUuid}`;
+    const text = `${labels.requestPrefix} #${displayOrderNumber}`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -99,19 +106,15 @@ export default function CreateContractHeader({
     setIsDeleting(true);
 
     try {
-      const result = await deleteContract(contractId);
-
-      if (!result.ok) {
-        toast.error(result.error || tDelete("deleteDialog.error"));
-        return;
-      }
-
-      toast.success(result.message || tDelete("deleteDialog.success"));
+      // Best-effort cleanup of the abandoned draft. Never block leaving on it:
+      // the site is account-less, so the customer must always be able to exit
+      // to home even if the delete request fails.
+      await deleteContract(contractId).catch(() => null);
+    } finally {
+      setIsDeleting(false);
       setExitDialogOpen(false);
       scheduleCreateContractDraftResetOnUnmount();
       router.push("/");
-    } finally {
-      setIsDeleting(false);
     }
   }
 
@@ -139,7 +142,7 @@ export default function CreateContractHeader({
           <span className="truncate">{pageTitle}</span>
         </span>
 
-        {contractUuid ? (
+        {displayOrderNumber ? (
           <button
             type="button"
             onClick={() => void handleCopyRequest()}
@@ -147,7 +150,7 @@ export default function CreateContractHeader({
           >
             <Copy className="size-3.5 shrink-0 sm:size-4" aria-hidden />
             <span className="truncate">
-              {labels.requestPrefix} #{contractUuid}
+              {labels.requestPrefix} #{displayOrderNumber}
             </span>
           </button>
         ) : null}
@@ -197,9 +200,10 @@ export default function CreateContractHeader({
         labels={labels.exitHomeDialog}
         open={exitDialogOpen}
         onOpenChange={setExitDialogOpen}
-        orderNumber={contractId}
+        orderNumber={displayOrderNumber}
         isSaving={isSaving}
         isExiting={isDeleting}
+        showSaveOption={SAVE_DRAFT_ENABLED}
         onSaveThenExit={() => void handleSaveThenExit()}
         onExitWithoutSaving={() => void handleExitWithoutSaving()}
       />
