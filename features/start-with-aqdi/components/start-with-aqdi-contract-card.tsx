@@ -62,7 +62,7 @@ export default function StartWithAqdiContractCard({
           "mt-4 flex size-6 items-center justify-center rounded-full border-2",
           selected
             ? "border-brand-secondary  bg-brand-secondary  text-white shadow-xl shadow-brand-secondary"
-            : "border-[#d1d5db] bg-white"
+            : "border-[#d1d5db] bg-white dark:border-[#262d2c] dark:bg-[#151c1b]"
         )}
         aria-hidden="true"
       >

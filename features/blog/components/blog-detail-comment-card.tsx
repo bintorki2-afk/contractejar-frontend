@@ -34,7 +34,7 @@ export default function BlogDetailCommentCard({
   labels,
 }: BlogDetailCommentCardProps) {
   return (
-    <article className="rounded-[32px] bg-[#f9f9f9] p-6 md:p-8">
+    <article className="rounded-[32px] bg-[#f9f9f9] p-6 md:p-8 dark:bg-[#141d1a]">
       <div className="flex items-start justify-between gap-4">
         <BlogDetailCommentStarRating rating={comment.rating} />
         <QuoteIcon />
@@ -58,7 +58,7 @@ export default function BlogDetailCommentCard({
           {comment.authorName}
         </span>
       </div>
-      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-foreground/75">
+      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-foreground/75 dark:bg-[#151c1b]">
             {comment.role}
           </span>
 </div>

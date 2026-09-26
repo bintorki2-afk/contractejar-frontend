@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import NavbarMobileSheet from "@/features/shared/components/navbar-mobile-sheet";
 import NavbarNavLink from "@/features/shared/components/navbar-nav-link";
+import ThemeToggle from "@/features/shared/theme/theme-toggle";
 import StartWithAqdiDialog from "@/features/start-with-aqdi/components/start-with-aqdi-dialog";
 import type { StartWithAqdiDialogLabels } from "@/features/start-with-aqdi/types/start-with-aqdi-dialog-labels";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,7 @@ export default function NavbarMain({
         className={cn(
           "flex items-center justify-between gap-4 lg:rounded-full rounded-2xl bg-white px-5 py-3",
           "md:px-8 md:py-4",
+          "dark:bg-[#151c1b] dark:border dark:border-[#232b2a]",
         )}
       >
         <Link href="/" className="flex min-w-0 items-center gap-3">
@@ -97,7 +99,7 @@ export default function NavbarMain({
             <p className="text-xl font-bold leading-tight text-brand">
               {brandName}
             </p>
-            <p className="truncate text-sm font-medium text-gray-600">
+            <p className="truncate text-sm font-medium text-gray-600 dark:text-white/55">
               {brandTagline}
             </p>
           </div>
@@ -113,6 +115,7 @@ export default function NavbarMain({
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle className="size-12" />
           <StartWithAqdiDialog labels={dialogLabels}>
             <Button className="group h-12 gap-3 rounded-full bg-brand px-5 pe-2 text-sm font-semibold text-white hover:bg-brand/90">
               <span>{cta}</span>
@@ -126,8 +129,10 @@ export default function NavbarMain({
           </StartWithAqdiDialog>
         </div>
 
-        <NavbarMobileSheet
-          aboutUs={aboutUs}
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle />
+          <NavbarMobileSheet
+            aboutUs={aboutUs}
           blog={blog}
           faq={faq}
           httpsSecurity={httpsSecurity}
@@ -146,7 +151,8 @@ export default function NavbarMain({
           myAccount={myAccount}
           notifications={notifications}
           dialogLabels={dialogLabels}
-        />
+          />
+        </div>
       </div>
     </div>
   );

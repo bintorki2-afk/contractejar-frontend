@@ -46,7 +46,7 @@ export default function NavbarNavLink({
   }
 
   const className = cn(
-    "inline-flex items-center gap-2 font-bold text-black transition-colors hover:text-brand",
+    "inline-flex items-center gap-2 font-bold text-black dark:text-white/85 transition-colors hover:text-brand",
     active ? "text-brand" : "",
   );
 

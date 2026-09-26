@@ -39,7 +39,7 @@ export default function ServicesShowcaseCard({
           <span className="block">{titleLine1}</span>
           <span className="block">{titleLine2}</span>
         </h3>
-        <p className=" leading-7 text-black">{description}</p>
+        <p className=" leading-7 text-black dark:text-white/90">{description}</p>
 
 
 
@@ -47,7 +47,7 @@ export default function ServicesShowcaseCard({
         <div className="mt-1">
           <p className="text-3xl font-bold text-brand">{statsValue}</p>
           <div className="flex items-center gap-2 ">
-          <p className="text-xs text-black">{statsText}</p>
+          <p className="text-xs text-black dark:text-white/90">{statsText}</p>
 <Image src="/images/ejar.png" alt="stats" width={50} height={50} className="w-10 object-contain" />
           </div>
         </div>

@@ -23,7 +23,7 @@ export default function StartWithAqdiDialogHeader({
           height={56}
           className="h-14 w-auto object-contain"
         />
-        <div className="h-10 w-px bg-[#e5e5e5]" aria-hidden="true" />
+        <div className="h-10 w-px bg-[#e5e5e5] dark:bg-[#262d2c]" aria-hidden="true" />
         <Image
           src="/images/ejar.png"
           alt={ejarLogoAlt}

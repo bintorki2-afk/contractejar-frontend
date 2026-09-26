@@ -14,6 +14,10 @@ import PwaRegister from "@/components/pwa-register";
 import GtmScripts from "@/features/analytics/components/gtm-scripts";
 import GtmNoScript from "@/features/analytics/components/gtm-noscript";
 import CookieNotice from "@/features/analytics/components/cookie-notice";
+import {
+  ThemeProvider,
+  THEME_NO_FLASH_SCRIPT,
+} from "@/features/shared/theme/theme-provider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aqdi.sa";
 
@@ -127,6 +131,10 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <script
+          // Applies the saved (or system) theme before first paint — no flash.
+          dangerouslySetInnerHTML={{ __html: THEME_NO_FLASH_SCRIPT }}
+        />
         <GtmNoScript />
         <GtmScripts />
         <PwaRegister />
@@ -139,19 +147,21 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
-        {closedView ? (
-          <WebsiteClosedScreen view={closedView} />
-        ) : (
-          <Providers>
-            <DirectionProvider dir={direction} direction={direction}>
-              <NextIntlClientProvider locale={locale} messages={messages}>
-                {children}
-                <CookieNotice />
-                <Toaster position="top-center" />
-              </NextIntlClientProvider>
-            </DirectionProvider>
-          </Providers>
-        )}
+        <ThemeProvider>
+          {closedView ? (
+            <WebsiteClosedScreen view={closedView} />
+          ) : (
+            <Providers>
+              <DirectionProvider dir={direction} direction={direction}>
+                <NextIntlClientProvider locale={locale} messages={messages}>
+                  {children}
+                  <CookieNotice />
+                  <Toaster position="top-center" />
+                </NextIntlClientProvider>
+              </DirectionProvider>
+            </Providers>
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );

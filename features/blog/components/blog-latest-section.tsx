@@ -58,7 +58,7 @@ export default async function BlogLatestSection() {
   const listItems = rest.slice(0, BLOG_LIST_ITEMS_COUNT).map(toPost);
 
   return (
-    <section className="bg-white py-12 md:py-16">
+    <section className="bg-white py-12 md:py-16 dark:bg-[#151c1b]">
       <div className="container min-w-0 space-y-10 md:space-y-12">
         <BlogLatestHeader
           badge={labels.badge}

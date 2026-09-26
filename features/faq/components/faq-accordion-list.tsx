@@ -49,7 +49,7 @@ export default function FaqAccordionList({
               className={cn(
                 "w-full rounded-[1.65rem] px-4 py-3 md:px-6 md:py-4",
                 variant === "section" &&
-                  (isOpen ? "bg-white" : "bg-transparent"),
+                  (isOpen ? "bg-white dark:bg-[#151c1b]" : "bg-transparent"),
                 variant === "page" &&
                   "rounded-2xl px-5 py-4 transition-colors duration-200",
                 variant === "page" &&
@@ -67,7 +67,7 @@ export default function FaqAccordionList({
                       className={cn(
                         "inline-flex size-10 shrink-0 items-center justify-center rounded-xl",
                         variant === "section"
-                          ? "bg-brand-background text-gray-500"
+                          ? "bg-brand-background text-gray-500 dark:text-white/60"
                           : "bg-muted text-muted-foreground",
                       )}
                     >
@@ -80,7 +80,7 @@ export default function FaqAccordionList({
                       "flex-1 text-start font-medium",
                       variant === "section" && "text-lg",
                       variant === "section" &&
-                        (isOpen ? "text-black" : "text-white"),
+                        (isOpen ? "text-black dark:text-white/90" : "text-white"),
                       variant === "page" && "text-base font-semibold md:text-lg",
                       variant === "page" &&
                         (isOpen ? "text-brand" : "text-foreground"),
@@ -118,7 +118,7 @@ export default function FaqAccordionList({
                 className={cn(
                   "pb-1 pt-2 text-base leading-8",
                   variant === "section" &&
-                    "pe-14 ps-12 text-gray-600",
+                    "pe-14 ps-12 text-gray-600 dark:text-white/60",
                   variant === "page" &&
                     "pe-14 ps-14 pt-3 text-sm text-muted-foreground md:text-base",
                 )}

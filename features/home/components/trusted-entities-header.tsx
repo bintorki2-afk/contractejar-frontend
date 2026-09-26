@@ -24,11 +24,11 @@ export default function TrustedEntitiesHeader({
       </div>
 
       <h2 className="text-3xl font-bold leading-tight md:text-4xl 2xl:text-5xl">
-        <span className="text-black">{titlePrefix}</span>{" "}
+        <span className="text-black dark:text-white/90">{titlePrefix}</span>{" "}
         <span className="text-brand-secondary">{titleAccent}</span>
       </h2>
 
-      <p className="text-base leading-relaxed text-gray-600">
+      <p className="text-base leading-relaxed text-gray-600 dark:text-white/60">
         {description}
       </p>
     </div>

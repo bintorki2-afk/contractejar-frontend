@@ -74,7 +74,7 @@ export default function BlogCategoryTabs({
                       "inline-flex size-10 shrink-0 items-center justify-center rounded-full",
                       isActive
                         ? "bg-white text-brand"
-                        : "bg-white text-brand-secondary",
+                        : "bg-white text-brand-secondary dark:bg-[#151c1b]",
                     )}
                   >
                     <Icon className="size-4" aria-hidden="true" />

@@ -160,6 +160,10 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #262d2c;
   --sidebar-ring: #00a880;
+  /* Brand surface tokens themed globally in dark (public pages + flows), so
+     bg-brand-background / bg-brand-background-green follow the dark theme. */
+  --color-brand-background: #101614;
+  --color-brand-background-green: #16352f;
 }
 
 @layer base {

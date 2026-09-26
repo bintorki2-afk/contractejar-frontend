@@ -15,7 +15,7 @@ export default function BlogDetailCommentsSection({
         {labels.tags.map((tag) => (
           <span
             key={tag}
-            className="text-sm font-semibold text-[#bdbdbd]"
+            className="text-sm font-semibold text-[#bdbdbd] dark:text-white/50"
           >
             {tag}
           </span>

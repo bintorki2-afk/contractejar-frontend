@@ -57,7 +57,7 @@ export default function AdvantageCard({
         <Icon className={cn("size-5", styles.icon)} aria-hidden="true" />
       </span>
       <h3 className="text-xl font-bold text-brand">{title}</h3>
-      <p className="max-w-xs text-lg leading-relaxed text-start text-gray-600">
+      <p className="max-w-xs text-lg leading-relaxed text-start text-gray-600 dark:text-white/60">
         {description}
       </p>
     </div>

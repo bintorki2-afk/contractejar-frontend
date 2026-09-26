@@ -13,7 +13,7 @@ export default function HeroFeatureItem({ label, image }: HeroFeatureItemProps) 
         className="size-4 shrink-0 text-brand-secondary"
         aria-hidden="true"
       />
-      <span className="min-w-0 shrink-0 text-sm font-semibold leading-snug text-black md:text-base">
+      <span className="min-w-0 shrink-0 text-sm font-semibold leading-snug text-black dark:text-white/90 md:text-base">
         {label}
       </span>
       {image ? (

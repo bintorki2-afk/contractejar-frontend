@@ -76,7 +76,7 @@ export default function NavbarMobileSheet({
   ];
 
   const topLinkClassName =
-    "text-base font-bold text-black transition-colors hover:text-brand";
+    "text-base font-bold text-black dark:text-white/90 transition-colors hover:text-brand";
 
   function handleNavItemClick(
     event: MouseEvent<HTMLAnchorElement>,
@@ -128,7 +128,7 @@ export default function NavbarMobileSheet({
             />
             <div className="min-w-0 space-y-1">
               <p className="text-xl font-bold text-brand">{brandName}</p>
-              <p className="truncate text-sm text-gray-600 font-medium">
+              <p className="truncate text-sm text-gray-600 dark:text-white/60 font-medium">
                 {brandTagline}
               </p>
             </div>
@@ -152,7 +152,7 @@ export default function NavbarMobileSheet({
                     }
                     className={cn(
                       "inline-flex items-center gap-2 font-bold transition-colors hover:text-brand text-base",
-                      active ? "text-brand" : "text-black",
+                      active ? "text-brand" : "text-black dark:text-white/90",
                     )}
                     {...(item.external
                       ? { target: "_blank", rel: "noopener noreferrer" }

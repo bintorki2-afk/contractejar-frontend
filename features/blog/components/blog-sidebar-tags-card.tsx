@@ -18,7 +18,7 @@ export default function BlogSidebarTagsCard({
           <button
             key={tag}
             type="button"
-            className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#bdbdbd] shadow-[inset_1px_1px_4px_rgba(0,0,0,0.05),inset_-1px_-1px_4px_rgba(255,255,255,0.9)] transition-colors hover:text-brand-secondary"
+            className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#bdbdbd] shadow-[inset_1px_1px_4px_rgba(0,0,0,0.05),inset_-1px_-1px_4px_rgba(255,255,255,0.9)] transition-colors hover:text-brand-secondary dark:bg-[#151c1b] dark:text-white/50"
           >
             {tag}
           </button>

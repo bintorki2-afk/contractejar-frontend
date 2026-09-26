@@ -9,7 +9,7 @@ export default function AboutCoreValuesSection({
   content,
 }: AboutCoreValuesSectionProps) {
   return (
-    <section className="bg-white py-16 md:py-20">
+    <section className="bg-white dark:bg-[#151c1b] py-16 md:py-20">
       <div className="container space-y-12 md:space-y-16">
         <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between md:gap-12">
           <div className="shrink-0 space-y-4">

@@ -4,9 +4,10 @@ import { ArrowRight, Home, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useServicesPageMeta } from "@/features/services/components/services-page-provider";
+import { useTheme } from "@/features/shared/theme/theme-provider";
 import { setServicesFlowDarkMode } from "@/lib/ui/set-services-flow-dark-mode";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,8 @@ export default function ServicesSideBackNav() {
   const { meta } = useServicesPageMeta();
   const router = useRouter();
   const t = useTranslations("services.nav");
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === "dark";
 
   useEffect(() => {
     setServicesFlowDarkMode({
@@ -125,7 +127,7 @@ export default function ServicesSideBackNav() {
           type="button"
           aria-label={isDarkMode ? t("light") : t("dark")}
           aria-pressed={isDarkMode}
-          onClick={() => setIsDarkMode((current) => !current)}
+          onClick={toggleTheme}
           className={cn(
             pillBaseClassName,
             "ms-auto border border-[#e4e4e4] bg-white text-brand hover:bg-brand-background",

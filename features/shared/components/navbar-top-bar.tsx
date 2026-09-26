@@ -34,7 +34,7 @@ export default function NavbarTopBar({
 }: NavbarTopBarProps) {
   const pathname = usePathname();
   const linkClassName =
-    "font-bold text-black transition-colors hover:text-brand";
+    "font-bold text-black dark:text-white/85 transition-colors hover:text-brand";
 
   return (
     <div
@@ -81,7 +81,7 @@ export default function NavbarTopBar({
                 className="text-brand"
               />
               {httpsSecurity}
-              <span className="text-black">{httpfor}</span>
+              <span className="text-black dark:text-white/85">{httpfor}</span>
             </span>
             <span className="inline-flex items-center gap-1.5 font-bold text-brand-secondary">
               <CustomIcon
@@ -90,7 +90,7 @@ export default function NavbarTopBar({
                 className="text-brand"
               />
               {officialLinks}
-              <span className="text-black">{endWith}</span>
+              <span className="text-black dark:text-white/85">{endWith}</span>
             </span>
           </div>
 
@@ -98,7 +98,7 @@ export default function NavbarTopBar({
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 font-bold text-gray-600 transition-colors hover:text-brand"
+            className="inline-flex items-center gap-1.5 font-bold text-gray-600 dark:text-white/60 transition-colors hover:text-brand"
           >
             {whatsappService}
             <FaWhatsapp className="size-6 shrink-0 text-green-500" />

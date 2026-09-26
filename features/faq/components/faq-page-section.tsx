@@ -10,7 +10,7 @@ export default function FaqPageSection() {
   const { data, isLoading, isError } = useCommonQuestions();
 
   return (
-    <section className="min-h-screen bg-white py-16 md:py-24">
+    <section className="min-h-screen bg-white dark:bg-[#151c1b] py-16 md:py-24">
       <div className="container">
         <div className="grid items-start gap-10 lg:grid-cols-[380px_1fr] lg:gap-16">
           <div className="space-y-4 lg:text-start">

@@ -18,12 +18,12 @@ export default function FooterNewsletter({
         type="email"
         placeholder={placeholder}
         className={cn(
-          "h-12 rounded-xl border-[#e5e5e5] bg-brand-background pe-14 ps-10 text-sm",
+          "h-12 rounded-xl border-[#e5e5e5] dark:border-[#262d2c] bg-brand-background pe-14 ps-10 text-sm",
           "placeholder:text-[#9ca3af] focus-visible:border-brand/30 focus-visible:ring-brand/10"
         )}
       />
       <Mail
-        className="pointer-events-none absolute inset-s-4 top-1/2 size-4 -translate-y-1/2 text-black"
+        className="pointer-events-none absolute inset-s-4 top-1/2 size-4 -translate-y-1/2 text-black dark:text-white/90"
         aria-hidden="true"
       />
       <button

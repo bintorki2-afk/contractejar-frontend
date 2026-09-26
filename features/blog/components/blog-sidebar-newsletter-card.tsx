@@ -46,11 +46,11 @@ export default function BlogSidebarNewsletterCard({
       </div>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-        <div className="flex h-14 items-center gap-2 rounded-full bg-white px-2 ps-3">
+        <div className="flex h-14 items-center gap-2 rounded-full bg-white px-2 ps-3 dark:bg-[#151c1b]">
           <Mail className="size-4 shrink-0 text-brand" aria-hidden="true" />
 
           <span
-            className="h-5 w-px shrink-0 bg-[#e0e0e0]"
+            className="h-5 w-px shrink-0 bg-[#e0e0e0] dark:bg-[#262d2c]"
             aria-hidden="true"
           />
 
@@ -65,7 +65,7 @@ export default function BlogSidebarNewsletterCard({
           <button
             type="submit"
             aria-label={submitEmailLabel}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-brand shadow-sm transition-colors hover:text-brand-secondary"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-brand shadow-sm transition-colors hover:text-brand-secondary dark:bg-[#151c1b]"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
           </button>

@@ -18,7 +18,7 @@ export default function AboutBeneficiariesSection({
           <h2 className="text-4xl font-extrabold leading-tight text-brand md:text-5xl">
             {content.title}
           </h2>
-          <p className="text-sm leading-8 text-black md:text-base">
+          <p className="text-sm leading-8 text-black dark:text-white/90 md:text-base">
             {content.description}
           </p>
         </header>

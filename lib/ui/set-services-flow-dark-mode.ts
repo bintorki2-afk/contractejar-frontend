@@ -1,4 +1,9 @@
-/** Apply/clear scoped dark mode for services create flows (property/contract/units). */
+/**
+ * Apply/clear the scoped shell class for services create flows
+ * (property/contract/units). The `.dark` class on <html> is owned by the global
+ * ThemeProvider, so this only toggles the shell element's classes — it must not
+ * touch the document root, or it would fight the global theme.
+ */
 export function setServicesFlowDarkMode(options: {
   enabled: boolean;
   shellClass:
@@ -8,26 +13,11 @@ export function setServicesFlowDarkMode(options: {
     | "create-flow-dark-shell";
 }) {
   const shell = document.querySelector<HTMLElement>("[data-services-layout]");
-  const root = document.documentElement;
 
   if (options.enabled) {
     shell?.classList.add("dark", options.shellClass);
-    root.classList.add("dark");
-    root.dataset.aqdiDarkShell = options.shellClass;
     return;
   }
 
   shell?.classList.remove("dark", options.shellClass);
-
-  if (root.dataset.aqdiDarkShell === options.shellClass) {
-    delete root.dataset.aqdiDarkShell;
-  }
-
-  const stillDark =
-    Boolean(shell?.classList.contains("dark")) ||
-    Boolean(root.dataset.aqdiDarkShell);
-
-  if (!stillDark) {
-    root.classList.remove("dark");
-  }
 }

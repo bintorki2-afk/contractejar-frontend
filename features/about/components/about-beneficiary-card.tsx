@@ -12,7 +12,7 @@ export default function AboutBeneficiaryCard({
   description,
 }: AboutBeneficiaryCardProps) {
   return (
-    <article className="flex flex-col items-center gap-4 rounded-2xl bg-white p-6 text-center md:p-7">
+    <article className="flex flex-col items-center gap-4 rounded-2xl bg-white dark:bg-[#151c1b] p-6 text-center md:p-7">
       <div className="flex size-14 items-center justify-center rounded-full bg-brand-background-green text-brand">
         <CustomIcon src={icon} className="size-7" />
       </div>

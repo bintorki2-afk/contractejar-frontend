@@ -76,7 +76,7 @@ export default function TrustedEntityCard({
           </span>
       </div>
 
-      <p className=" font-medium leading-relaxed text-gray-600">
+      <p className=" font-medium leading-relaxed text-gray-600 dark:text-white/60">
         {description}
       </p>
 

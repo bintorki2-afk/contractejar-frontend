@@ -60,7 +60,7 @@ export default function HeroContent({
             </span>
           )}
         </h1>
-        <p className="max-w-xl text-base leading-relaxed text-black">
+        <p className="max-w-xl text-base leading-relaxed text-black dark:text-white/90">
           {description}
         </p>
       </div>

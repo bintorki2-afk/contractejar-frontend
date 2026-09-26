@@ -47,10 +47,10 @@ export default function PricingCard({
         <h3 className="text-2xl font-extrabold leading-tight text-brand">
           {title}
         </h3>
-        <p className="mt-1 text-xs text-[#7f7f7f]">{description}</p>
+        <p className="mt-1 text-xs text-[#7f7f7f] dark:text-white/50">{description}</p>
       </div>
 
-      <div className="mb-6 border-t border-[#e2e2e2] pt-5">
+      <div className="mb-6 border-t border-[#e2e2e2] dark:border-[#262d2c] pt-5">
         <div className="flex items-end  gap-1.5 text-brand">
           <span className="text-[2.8rem] font-extrabold leading-none">
             {price}
@@ -64,15 +64,15 @@ export default function PricingCard({
         </div>
       </div>
 
-      <div className="mb-5 rounded-[1.55rem] bg-white p-6">
-        <p className="mb-3  text-base font-bold text-black">{benefitsTitle}</p>
+      <div className="mb-5 rounded-[1.55rem] bg-white dark:bg-[#151c1b] p-6">
+        <p className="mb-3  text-base font-bold text-black dark:text-white/90">{benefitsTitle}</p>
         <ul className="space-y-3.5">
           {features.map((feature, index) => (
             <li key={feature} className="flex items-center  gap-1.5">
               <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-secondary text-white">
                 <Check className="size-3" aria-hidden="true" />
               </span>
-              <span className=" text-black font-medium">{feature}</span>
+              <span className=" text-black dark:text-white/90 font-medium">{feature}</span>
               <Image
                 src={featureLogos[index]}
                 alt={feature}

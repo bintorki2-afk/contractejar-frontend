@@ -37,7 +37,7 @@ export default function BlogDetailPageContent({
   relatedReadMoreLabel,
 }: BlogDetailPageContentProps) {
   return (
-    <section className="bg-white py-10 md:py-14">
+    <section className="bg-white py-10 md:py-14 dark:bg-[#151c1b]">
       <div className="container">
         <div className="mx-auto flex max-w-5xl flex-col gap-8">
           <BlogDetailMeta post={post} />

@@ -20,9 +20,9 @@ export default function FooterBottomBar({
 }: FooterBottomBarProps) {
   return (
     <div className={cn("flex flex-col items-start justify-between gap-4 border-t border-border/70 pt-6 md:flex-row md:items-center", className)}>
-      <p className="text-sm font-medium text-gray-600">{copyright}</p>
+      <p className="text-sm font-medium text-gray-600 dark:text-white/60">{copyright}</p>
 
-      <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-white/60 font-medium">
         <Link href={termsHref} className="transition hover:text-brand">
           {terms}
         </Link>

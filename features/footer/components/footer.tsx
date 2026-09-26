@@ -32,7 +32,7 @@ export default async function Footer() {
   const phoneHref = resolveFooterPhoneHref(settings);
 
   return (
-    <footer className="border-t border-border/60 bg-white py-12 md:py-14">
+    <footer className="border-t border-border/60 bg-white dark:bg-[#151c1b] py-12 md:py-14">
       <div className="container space-y-10">
         <FooterTopBar
           followUs={t("followUs")}

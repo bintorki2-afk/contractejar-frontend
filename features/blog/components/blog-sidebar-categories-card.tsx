@@ -24,11 +24,11 @@ export default function BlogSidebarCategoriesCard({
           <li key={item.id}>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-3 rounded-full bg-white px-4 py-3.5 transition-colors hover:bg-white/90"
+              className="flex w-full items-center justify-between gap-3 rounded-full bg-white px-4 py-3.5 transition-colors hover:bg-white/90 dark:bg-[#151c1b]"
             >
-              <span className="flex min-w-0 items-center gap-2.5 text-sm font-semibold text-[#757575]">
+              <span className="flex min-w-0 items-center gap-2.5 text-sm font-semibold text-[#757575] dark:text-white/60">
                 <ClipboardList
-                  className="size-4 shrink-0 text-[#9e9e9e]"
+                  className="size-4 shrink-0 text-[#9e9e9e] dark:text-white/50"
                   aria-hidden="true"
                 />
                 <span className="truncate">{item.label}</span>

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import CreatePropertyWizard from "@/features/create-property/components/create-property-wizard";
 import ServicesPageBackConfig from "@/features/services/components/services-page-back-config";
 import type { CreatePropertyLabels } from "@/features/create-property/types/create-property-labels";
 import type { PropertyTypeId } from "@/features/properties/types/property-type";
 import type { PropertyEditDraftData } from "@/features/create-property/utils/map-property-api-to-draft";
+import { useTheme } from "@/features/shared/theme/theme-provider";
 import { setServicesFlowDarkMode } from "@/lib/ui/set-services-flow-dark-mode";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,8 @@ export default function CreatePropertyPageContent({
   propertyType,
   initialEditDraft,
 }: CreatePropertyPageContentProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === "dark";
   const isEditMode = Boolean(initialEditDraft);
   const pageTitle = isEditMode
     ? propertyType === "residential"
@@ -65,7 +67,7 @@ export default function CreatePropertyPageContent({
           propertyType={propertyType}
           initialEditDraft={initialEditDraft}
           isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode((current) => !current)}
+          onToggleDarkMode={toggleTheme}
         />
       </div>
     </>
