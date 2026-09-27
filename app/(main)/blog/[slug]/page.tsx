@@ -24,7 +24,7 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aqdi.sa";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
 export async function generateMetadata({
   params,

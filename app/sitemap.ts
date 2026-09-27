@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { getAllArticles } from "@/features/blog/data/get-articles";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aqdi.sa";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
 // Public, indexable content routes under app/(main). Auth, service (contract /
 // properties / payment) and per-user routes are intentionally excluded and are
@@ -16,6 +16,8 @@ const STATIC_ROUTES: Array<{
   { path: "/blog", changeFrequency: "daily", priority: 0.8 },
   { path: "/about", changeFrequency: "monthly", priority: 0.5 },
   { path: "/faq", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/service/residential", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/service/commercial", changeFrequency: "monthly", priority: 0.8 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.5 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.5 },
 ];

@@ -1095,3 +1095,29 @@ html.dark textarea::placeholder {
     transform: none !important;
   }
 }
+
+/* ===== Accessibility tools (toggled on <html> by the a11y widget) ===== */
+html.a11y-font-1 { font-size: 112.5%; }
+html.a11y-font-2 { font-size: 125%; }
+html.a11y-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  font-weight: 700 !important;
+}
+html.a11y-contrast body { filter: contrast(1.35) saturate(1.08); }
+html.a11y-motion *,
+html.a11y-motion *::before,
+html.a11y-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+html.a11y-motion .site-bg-glow,
+html.a11y-motion .animate-float,
+html.a11y-motion .animate-aurora,
+html.a11y-motion .animate-aurora-slow,
+html.a11y-motion .animate-shine,
+html.a11y-motion .animate-pulse-ring,
+html.a11y-motion .animate-marquee,
+html.a11y-motion .animate-marquee-vertical { animation: none !important; }

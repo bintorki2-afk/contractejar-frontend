@@ -366,12 +366,12 @@
       "title": "Important links",
       "items": [
         {
-          "label": "Residential contract documentation",
-          "href": "/create-contract?id=residential"
+          "label": "Document a residential lease",
+          "href": "/service/residential"
         },
         {
-          "label": "Commercial contract documentation",
-          "href": "/create-contract?id=commercial"
+          "label": "Document a commercial lease",
+          "href": "/service/commercial"
         }
       ]
     },
@@ -2688,5 +2688,131 @@
     "iosStep1": "Tap the Share button",
     "iosStep2": "then “Add to Home Screen”",
     "dismiss": "Close"
+  },
+  "servicePage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbServices": "Services",
+    "badge": "Documented via the Ejar network",
+    "startCta": "Start the service",
+    "descTitle": "Service overview",
+    "featuresTitle": "Key features",
+    "tabs": {
+      "steps": "How it works",
+      "requirements": "Requirements & documents",
+      "faq": "FAQ"
+    },
+    "sidebar": {
+      "eligibilityTitle": "Who can use it",
+      "responseTitle": "Turnaround time",
+      "feeTitle": "Service fee",
+      "channelTitle": "Alternative channel",
+      "channelValue": "Reach us on WhatsApp",
+      "linksTitle": "Helpful links",
+      "linkFaq": "FAQ",
+      "linkTerms": "Terms & conditions",
+      "linkBlog": "Blog & guides"
+    },
+    "residential": {
+      "title": "Document a residential lease",
+      "description": "Document your residential lease online in a few simple steps — a certified contract that protects both landlord and tenant through the official Ejar network, and we follow up with you on WhatsApp to finalize it.",
+      "features": [
+        "Officially documented via the Ejar network",
+        "No sign-up — just fill in your details and we continue with you",
+        "Done in minutes",
+        "A certified contract that protects everyone's rights"
+      ],
+      "cta": "Create a residential lease",
+      "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
+      "responseTime": "Documented within minutes after the parties approve.",
+      "fee": "From SAR 249 / year",
+      "steps": [
+        "Fill in the property and unit details",
+        "Enter the parties' details (landlord and tenant)",
+        "Financial details, rent amount and term",
+        "Terms and conditions",
+        "Review, pay and document"
+      ],
+      "requirements": [
+        "Valid national ID or residency for the parties",
+        "Title deed or proof of the right to lease",
+        "Property details (deed number and electricity meter number)",
+        "Agreement on the rent amount and contract term"
+      ],
+      "faq": [
+        {
+          "q": "Is the contract officially documented?",
+          "a": "Yes — it is registered and documented through the official Ejar network and serves as an enforceable instrument that protects rights."
+        },
+        {
+          "q": "Do I need an account to create a contract?",
+          "a": "No. Fill in your details directly with no sign-up, and we follow up on WhatsApp to finalize the documentation."
+        },
+        {
+          "q": "How long does it take?",
+          "a": "Just a few minutes after the details are entered and the parties approve."
+        },
+        {
+          "q": "What is the fee?",
+          "a": "Residential documentation fees start from SAR 249 per year."
+        }
+      ]
+    },
+    "commercial": {
+      "title": "Document a commercial lease",
+      "description": "Document your commercial lease online in a few simple steps — a certified contract that protects both landlord and tenant through the official Ejar network, and we follow up with you on WhatsApp to finalize it.",
+      "features": [
+        "Officially documented via the Ejar network",
+        "Fits shops, offices, warehouses and businesses",
+        "Done in minutes",
+        "A certified contract that protects everyone's rights"
+      ],
+      "cta": "Create a commercial lease",
+      "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
+      "responseTime": "Documented within minutes after the parties approve.",
+      "fee": "From SAR 349 / year",
+      "steps": [
+        "Fill in the commercial property and unit details",
+        "Enter the parties' details (landlord and tenant)",
+        "Financial details, rent amount and term",
+        "Terms and conditions",
+        "Review, pay and document"
+      ],
+      "requirements": [
+        "Valid commercial registration (if applicable)",
+        "Valid national ID or residency for the parties",
+        "Title deed or proof of the right to lease",
+        "Property details (deed number and electricity meter number)"
+      ],
+      "faq": [
+        {
+          "q": "Is the commercial contract officially documented?",
+          "a": "Yes — it is registered and documented through the official Ejar network as an enforceable instrument that protects rights."
+        },
+        {
+          "q": "Does it fit shops and offices?",
+          "a": "Yes — it covers shops, offices, warehouses and commercial units of all kinds."
+        },
+        {
+          "q": "Do I need an account?",
+          "a": "No. Fill in your details with no sign-up, and we finalize the documentation with you on WhatsApp."
+        },
+        {
+          "q": "What is the fee?",
+          "a": "Commercial documentation fees start from SAR 349 per year."
+        }
+      ]
+    }
+  },
+  "a11y": {
+    "open": "Accessibility tools",
+    "title": "Accessibility settings",
+    "fontSize": "Text size",
+    "decrease": "Smaller",
+    "increase": "Larger",
+    "contrast": "High contrast",
+    "links": "Highlight links",
+    "motion": "Stop animations",
+    "reset": "Reset",
+    "close": "Close"
   }
 }
