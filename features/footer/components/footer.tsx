@@ -55,7 +55,9 @@ export default async function Footer() {
             title={t("importantLinks.title")}
             items={importantLinks}
           />
-          <FooterLinksColumn title={t("licenses.title")} items={licenses} />
+          {licenses.length > 0 ? (
+            <FooterLinksColumn title={t("licenses.title")} items={licenses} />
+          ) : null}
 
           <FooterSupportColumn
             title={t("support.title")}

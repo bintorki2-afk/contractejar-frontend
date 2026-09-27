@@ -22,19 +22,19 @@ const themeStyles: Record<
   { card: string; link: string; divider: string }
 > = {
   purple: {
-    card: "border-t-[#7c3aed] bg-[#faf5ff]",
-    link: "text-[#7c3aed] hover:text-[#6d28d9]",
-    divider: "border-[#ede9fe]",
+    card: "border-t-[#7c3aed] bg-[#faf5ff] dark:bg-[#151c1b]",
+    link: "text-[#7c3aed] dark:text-[#a78bfa] hover:text-[#6d28d9]",
+    divider: "border-[#ede9fe] dark:border-[#262d2c]",
   },
   blue: {
-    card: "border-t-[#2563eb] bg-[#eff6ff]",
-    link: "text-[#2563eb] hover:text-[#1d4ed8]",
-    divider: "border-[#dbeafe]",
+    card: "border-t-[#2563eb] bg-[#eff6ff] dark:bg-[#151c1b]",
+    link: "text-[#2563eb] dark:text-[#60a5fa] hover:text-[#1d4ed8]",
+    divider: "border-[#dbeafe] dark:border-[#262d2c]",
   },
   teal: {
-    card: "border-t-brand-secondary bg-brand-background-green",
-    link: "text-brand hover:text-brand/80",
-    divider: "border-brand/10",
+    card: "border-t-brand-secondary bg-brand-background-green dark:bg-[#151c1b]",
+    link: "text-brand dark:text-[#48c0b8] hover:text-brand/80",
+    divider: "border-brand/10 dark:border-[#262d2c]",
   },
 };
 
@@ -48,6 +48,12 @@ export default function TrustedEntityCard({
   theme,
 }: TrustedEntityCardProps) {
   const styles = themeStyles[theme];
+  // Only show the "view license" action when a real URL is provided — a "#"
+  // or empty value is a placeholder, so the dead button is hidden instead.
+  const hasLicense =
+    typeof licenseUrl === "string" &&
+    licenseUrl.trim() !== "" &&
+    licenseUrl.trim() !== "#";
 
   return (
     <article
@@ -61,12 +67,12 @@ export default function TrustedEntityCard({
           <h3 className="text-lg font-bold text-foreground">{name}</h3>
           <p className="mt-1 text-xs text-muted-foreground">{nameEn}</p>
         </div>
-          <span className="relative inline-block h-[100px] w-25 shrink-0">
+          <span className="relative inline-block h-[100px] w-25 shrink-0 dark:rounded-xl dark:bg-white dark:p-2">
             <Image
               src={logoSrc}
               alt=""
               fill
-              className="object-contain"
+              className="object-contain dark:p-1"
               sizes="100px"
               aria-hidden="true"
               unoptimized={
@@ -80,21 +86,23 @@ export default function TrustedEntityCard({
         {description}
       </p>
 
-      <div className={cn("mt-auto border-t pt-4", styles.divider)}>
-        <Link
-          href={licenseUrl}
-          className={cn(
-            "inline-flex items-center gap-2 text-sm font-bold transition-colors group",
-            styles.link
-          )}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <CustomIcon src="/icons/doc-markdown.svg" size={16} />
-          <span>{viewLicense}</span>
-          <ArrowUpLeft className="size-3.5 shrink-0 group-hover:-rotate-45 transition-transform duration-300" aria-hidden="true" />
-        </Link>
-      </div>
+      {hasLicense ? (
+        <div className={cn("mt-auto border-t pt-4", styles.divider)}>
+          <Link
+            href={licenseUrl}
+            className={cn(
+              "inline-flex items-center gap-2 text-sm font-bold transition-colors group",
+              styles.link
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <CustomIcon src="/icons/doc-markdown.svg" size={16} />
+            <span>{viewLicense}</span>
+            <ArrowUpLeft className="size-3.5 shrink-0 group-hover:-rotate-45 transition-transform duration-300" aria-hidden="true" />
+          </Link>
+        </div>
+      ) : null}
     </article>
   );
 }

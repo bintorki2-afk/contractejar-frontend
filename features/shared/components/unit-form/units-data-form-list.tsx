@@ -47,13 +47,13 @@ function UnitFormCard({
   const [open, setOpen] = useState(true);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-brand-secondary/30 bg-white dark:border-brand-secondary/50">
+    <div className="overflow-hidden rounded-2xl border border-brand-secondary/30 bg-white dark:bg-[#151c1b] dark:border-brand-secondary/50">
       <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2 dark:border-[#2f403b]">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
           <p className="shrink-0 text-sm font-extrabold text-brand">{title}</p>
 
           {summary ? (
-            <span className="max-w-full truncate rounded-full bg-[#f0f0f0] px-2 py-0.5 text-[11px] font-semibold text-[#666666]">
+            <span className="max-w-full truncate rounded-full bg-[#f0f0f0] dark:bg-[#141d1a] px-2 py-0.5 text-[11px] font-semibold text-[#666666] dark:text-white/60">
               {summary}
             </span>
           ) : null}
@@ -160,7 +160,7 @@ export default function UnitsDataFormList({
             + {addUnitLabel}
           </button>
 
-          <p className="text-center text-xs text-[#7f7f7f]">
+          <p className="text-center text-xs text-[#7f7f7f] dark:text-white/50">
             {unitsCountLabel}: {units.length}
           </p>
         </div>

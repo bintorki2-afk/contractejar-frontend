@@ -376,21 +376,14 @@
     },
     "licenses": {
       "title": "Licenses",
-      "items": [
-        {
-          "label": "Commercial Register: 7000000001"
-        },
-        {
-          "label": "Tax Number: 7000000006"
-        }
-      ]
+      "items": []
     },
     "support": {
       "title": "Need help?",
-      "phone": "+966 51 001 00 001",
+      "phone": "+966 59 750 0014",
       "weekdaysHours": "Monday to Friday from 9:00 AM to 6:00 PM",
       "saturdayHours": "Saturday from 9:00 AM to 2:00 PM",
-      "email": "info@aqdi.sa"
+      "email": ""
     },
     "copyright": "All rights reserved Rental Contract {year} ©",
     "terms": "Terms and Conditions",

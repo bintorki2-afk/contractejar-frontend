@@ -45,8 +45,8 @@ export default function InstrumentTypePopupDialog({
           showCloseButton={false}
           className="gap-0 overflow-hidden rounded-[50px] p-8 sm:min-w-xl sm:p-12"
         >
-        <div className="flex items-start justify-between gap-4 border-b border-[#ececec] pb-4">
-          <DialogTitle className="text-base font-bold leading-snug text-[#333333]">
+        <div className="flex items-start justify-between gap-4 border-b border-[#ececec] dark:border-[#262d2c] pb-4">
+          <DialogTitle className="text-base font-bold leading-snug text-[#333333] dark:text-white/80">
             {title}
           </DialogTitle>
 
@@ -55,7 +55,7 @@ export default function InstrumentTypePopupDialog({
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="shrink-0 text-[#999999] hover:bg-brand-background hover:text-[#666666]"
+              className="shrink-0 text-[#999999] dark:text-white/50 hover:bg-brand-background hover:text-[#666666] dark:hover:text-white/60"
               aria-label={t("close")}
             >
               <X className="size-4" aria-hidden="true" />
@@ -72,13 +72,13 @@ export default function InstrumentTypePopupDialog({
             <p className="text-xl font-extrabold leading-relaxed text-brand md:text-2xl">
               {title}
             </p>
-            <p className="text-sm text-[#7f7f7f]">{t("clarification")}</p>
+            <p className="text-sm text-[#7f7f7f] dark:text-white/50">{t("clarification")}</p>
           </div>
         </div>
 
         <div
           className={cn(
-            "mt-6 rounded-3xl border border-[#ececec] bg-[#fafafa] p-5 text-start text-sm leading-7 text-[#4d4d4d]",
+            "mt-6 rounded-3xl border border-[#ececec] dark:border-[#262d2c] bg-[#fafafa] dark:bg-[#141d1a] p-5 text-start text-sm leading-7 text-[#4d4d4d] dark:text-white/60",
             "[&_p]:mb-3 [&_p:last-child]:mb-0",
             "[&_strong]:font-bold [&_strong]:text-brand-secondary",
           )}

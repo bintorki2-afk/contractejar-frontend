@@ -90,7 +90,7 @@ function FurnishingTypeToggle({
                 "h-12 rounded-xl text-sm font-bold transition-colors",
                 selected
                   ? "bg-brand text-white"
-                  : "border border-[#e8e8e8] bg-white text-[#b0b0b0] hover:border-[#d4d4d4] hover:text-[#8a8a8a] dark:text-[#6b7d78] dark:hover:border-[#3a4d47] dark:hover:text-[#9eb5af]",
+                  : "border border-[#e8e8e8] dark:border-[#262d2c] bg-white dark:bg-[#151c1b] text-[#b0b0b0] hover:border-[#d4d4d4] hover:text-[#8a8a8a] dark:text-[#6b7d78] dark:hover:border-[#3a4d47] dark:hover:text-[#9eb5af]",
               )}
             >
               {furnishingType === "new" ? newLabel : usedLabel}
@@ -259,7 +259,7 @@ export default function UnitDataFormFields({
           </div>
 
           {labels.roomsCount.hint ? (
-            <p className="flex items-start gap-2 text-xs leading-5 text-[#9a9a9a]">
+            <p className="flex items-start gap-2 text-xs leading-5 text-[#9a9a9a] dark:text-white/50">
               <span
                 className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-secondary"
                 aria-hidden="true"

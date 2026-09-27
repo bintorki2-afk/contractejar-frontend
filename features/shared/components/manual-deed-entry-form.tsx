@@ -142,7 +142,7 @@ export default function ManualDeedEntryForm({
           )}
         />
 
-        <p className="text-xs text-[#8a8a8a]">{labels.instrumentNumber.hint}</p>
+        <p className="text-xs text-[#8a8a8a] dark:text-white/50">{labels.instrumentNumber.hint}</p>
       </div>
 
       <div className="space-y-3">
@@ -152,7 +152,7 @@ export default function ManualDeedEntryForm({
             invalid={instrumentDateInvalid}
           />
 
-          <div className="inline-flex shrink-0 items-center rounded-full bg-[#f0f0f0] p-1">
+          <div className="inline-flex shrink-0 items-center rounded-full bg-[#f0f0f0] dark:bg-[#141d1a] p-1">
             {(["hijri", "gregorian"] as const).map((calendarType) => (
               <button
                 key={calendarType}
@@ -162,7 +162,7 @@ export default function ManualDeedEntryForm({
                   "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors sm:px-5",
                   value.typeInstrumentHistory === calendarType
                     ? "bg-brand text-white"
-                    : "text-[#555555] hover:text-[#333333]",
+                    : "text-[#555555] dark:text-white/60 hover:text-[#333333] dark:hover:text-white/80",
                 )}
               >
                 {labels.instrumentDate[calendarType]}

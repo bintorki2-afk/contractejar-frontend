@@ -28,12 +28,12 @@ const themeStyles: Record<
     icon: "text-brand-secondary",
   },
   blue: {
-    iconWrap: "bg-[#eff6ff]",
-    icon: "text-[#2563eb]",
+    iconWrap: "bg-[#eff6ff] dark:bg-[#16233a]",
+    icon: "text-[#2563eb] dark:text-[#60a5fa]",
   },
   purple: {
-    iconWrap: "bg-[#faf5ff]",
-    icon: "text-[#7c3aed]",
+    iconWrap: "bg-[#faf5ff] dark:bg-[#241a34]",
+    icon: "text-[#7c3aed] dark:text-[#a78bfa]",
   },
 };
 

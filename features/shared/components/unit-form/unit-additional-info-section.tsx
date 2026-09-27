@@ -19,7 +19,7 @@ export default function UnitAdditionalInfoSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="overflow-hidden rounded-2xl border-brand/90 border-3 bg-white dark:border-brand-secondary/70">
+    <div className="overflow-hidden rounded-2xl border-brand/90 border-3 bg-white dark:bg-[#151c1b] dark:border-brand-secondary/70">
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}

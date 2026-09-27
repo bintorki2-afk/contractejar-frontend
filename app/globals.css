@@ -178,6 +178,13 @@
   }
 }
 
+/* The brand green (#005848) is too dark to read on the dark background. Lighten
+   brand-colored TEXT and icons (via currentColor) in dark mode for contrast.
+   Buttons that use bg-brand keep the original brand green. */
+.dark .text-brand {
+  color: #35b8a0;
+}
+
 @theme {
   --color-brand: #005848;
   --color-brand-secondary: #00a880;

@@ -42,12 +42,14 @@ export default function FooterSupportColumn({
           </p>
         </div>
 
-        <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-          <Mail className="size-4 text-brand" aria-hidden="true" />
-          <a href={`mailto:${email}`} className="transition hover:text-brand">
-            {email}
-          </a>
-        </p>
+        {email && email.trim() !== "" ? (
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Mail className="size-4 text-brand" aria-hidden="true" />
+            <a href={`mailto:${email}`} className="transition hover:text-brand">
+              {email}
+            </a>
+          </p>
+        ) : null}
       </div>
     </div>
   );

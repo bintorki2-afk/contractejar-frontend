@@ -50,7 +50,7 @@ export default function MeterRegistrationOptions({
       <p
         className={cn(
           "text-sm font-bold",
-          showInvalid ? "text-[#c62828]" : "text-black",
+          showInvalid ? "text-[#c62828]" : "text-black dark:text-white/90",
         )}
       >
         {labels.title}
@@ -73,18 +73,18 @@ export default function MeterRegistrationOptions({
           aria-checked={value === "owner"}
           onClick={() => onChange("owner")}
           className={cn(
-            "relative rounded-2xl border bg-white px-4 py-5 text-start transition-colors",
+            "relative rounded-2xl border bg-white dark:bg-[#151c1b] px-4 py-5 text-start transition-colors",
             value === "owner"
               ? "border-brand-secondary bg-brand-background-green/40"
               : showInvalid
                 ? "border-[#e57373]"
-                : "border-[#e8e8e8]",
+                : "border-[#e8e8e8] dark:border-[#262d2c]",
           )}
         >
           <p className="text-sm font-extrabold text-brand">
             {labels.owner.title}
           </p>
-          <p className="mt-1 text-xs text-[#9a9a9a]">{labels.owner.subtitle}</p>
+          <p className="mt-1 text-xs text-[#9a9a9a] dark:text-white/50">{labels.owner.subtitle}</p>
           <p className="mt-4 text-sm font-bold text-brand-secondary">
             {labels.owner.noFee}
           </p>
@@ -96,12 +96,12 @@ export default function MeterRegistrationOptions({
           aria-checked={value === "tenant"}
           onClick={() => onChange("tenant")}
           className={cn(
-            "relative rounded-2xl border bg-white px-4 pb-5 pt-7 text-start transition-colors",
+            "relative rounded-2xl border bg-white dark:bg-[#151c1b] px-4 pb-5 pt-7 text-start transition-colors",
             value === "tenant"
               ? "border-brand-secondary bg-brand-background-green/40"
               : showInvalid
                 ? "border-[#e57373]"
-                : "border-[#e8e8e8]",
+                : "border-[#e8e8e8] dark:border-[#262d2c]",
           )}
         >
           <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-md bg-[#f3ead7] px-2.5 py-1 text-[10px] font-bold text-[#8a6a3a] whitespace-nowrap dark:bg-[#3a2a1c] dark:text-[#f0b27a]">
@@ -110,7 +110,7 @@ export default function MeterRegistrationOptions({
           <p className="text-sm font-extrabold text-brand">
             {labels.tenant.title}
           </p>
-          <p className="mt-1 text-xs text-[#9a9a9a]">{labels.tenant.subtitle}</p>
+          <p className="mt-1 text-xs text-[#9a9a9a] dark:text-white/50">{labels.tenant.subtitle}</p>
           <p className="mt-4 text-sm font-bold text-brand-secondary">
             {feeFooter}
           </p>
