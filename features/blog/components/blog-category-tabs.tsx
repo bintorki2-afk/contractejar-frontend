@@ -73,7 +73,7 @@ export default function BlogCategoryTabs({
                     className={cn(
                       "inline-flex size-10 shrink-0 items-center justify-center rounded-full",
                       isActive
-                        ? "bg-white text-brand"
+                        ? "bg-white text-brand dark:!text-[#005848]"
                         : "bg-white text-brand-secondary dark:bg-[#151c1b]",
                     )}
                   >

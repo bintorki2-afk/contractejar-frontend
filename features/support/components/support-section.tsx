@@ -51,7 +51,7 @@ export default async function SupportSection({ content }: SupportSectionProps) {
                 href={resolved.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-2 py-2  text-sm font-bold text-brand transition hover:bg-white/95"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-2 py-2  text-sm font-bold text-brand dark:!text-[#005848] transition hover:bg-white/95"
               >
                 <span>{resolved.cta}</span>
                 <span className="inline-flex size-7 items-center justify-center rounded-full bg-brand-secondary text-white">

@@ -18,7 +18,7 @@ export default function BlogArticleCta() {
         </p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link href="/create-contract?id=residential" className="sm:w-auto">
-            <Button className="h-12 w-full gap-3 rounded-full bg-white px-6 text-sm font-semibold text-brand hover:bg-white/90 sm:w-auto">
+            <Button className="h-12 w-full gap-3 rounded-full bg-white px-6 text-sm font-semibold text-brand dark:!text-[#005848] hover:bg-white/90 sm:w-auto">
               <span>أنشئ عقد إيجار سكني</span>
               <ArrowUpLeft className="size-4" aria-hidden="true" />
             </Button>
