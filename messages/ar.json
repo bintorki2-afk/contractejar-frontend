@@ -2831,7 +2831,9 @@
       "cta": "أنشئ عقدك الآن"
     },
     "viewAll": "عرض كل التقييمات",
-    "heroStrip": "من {count, plural, one {عميل واحد} two {عميلين} few {# عملاء} many {# عميلاً} other {# عميل}}"
+    "trustLabel": "آلاف العملاء يثقون بنا",
+    "valueAmount": "+1.7 مليار ريال",
+    "valueLabel": "إجمالي قيمة العقود الموثّقة"
   },
   "reviewsPage": {
     "metaTitle": "آراء العملاء",

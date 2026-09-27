@@ -2831,7 +2831,9 @@
       "cta": "Create your contract"
     },
     "viewAll": "View all reviews",
-    "heroStrip": "from {count, plural, one {# customer} other {# customers}}"
+    "trustLabel": "Thousands of customers trust us",
+    "valueAmount": "SAR 1.7B+",
+    "valueLabel": "in documented contract value"
   },
   "reviewsPage": {
     "metaTitle": "Customer Reviews",
