@@ -41,10 +41,16 @@ export default function ReviewsTicker({
     </Marquee>
   );
 
+  // Edge fade applied via inline CSS (reliable across browsers) so the strip
+  // dissolves at both ends over any background instead of hard-clipping.
+  const fade =
+    "linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%)";
+
   return (
     <div
       dir="rtl"
-      className="w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)]"
+      className="w-full overflow-hidden"
+      style={{ WebkitMaskImage: fade, maskImage: fade }}
     >
       <div className="flex flex-col gap-4">
         {renderRow(rowOne, false)}
