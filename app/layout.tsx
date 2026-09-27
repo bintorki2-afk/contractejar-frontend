@@ -18,6 +18,7 @@ import {
   ThemeProvider,
   THEME_NO_FLASH_SCRIPT,
 } from "@/features/shared/theme/theme-provider";
+import SiteBackground from "@/features/shared/components/site-background";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aqdi.sa";
 
@@ -147,6 +148,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        <SiteBackground />
         <ThemeProvider>
           {closedView ? (
             <WebsiteClosedScreen view={closedView} />

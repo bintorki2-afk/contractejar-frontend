@@ -1003,6 +1003,78 @@ html.dark input::placeholder,
 html.dark textarea::placeholder {
   color: #6b7d78;
 }
+/* ===== Global ambient background (depth instead of a flat fill) ===== */
+.site-bg-base {
+  background:
+    radial-gradient(130% 90% at 50% -20%, rgba(13, 179, 139, 0.08), transparent 55%),
+    radial-gradient(90% 60% at 100% 100%, rgba(13, 179, 139, 0.05), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, #f5faf8 55%, #eef5f2 100%);
+}
+.dark .site-bg-base {
+  background:
+    radial-gradient(120% 80% at 50% -15%, rgba(23, 116, 98, 0.45), transparent 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(13, 179, 139, 0.12), transparent 60%),
+    radial-gradient(80% 50% at 0% 60%, rgba(13, 179, 139, 0.08), transparent 60%),
+    linear-gradient(180deg, #0d1413 0%, #101614 45%, #0b110f 100%);
+}
+
+.site-bg-glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.28;
+}
+.dark .site-bg-glow {
+  opacity: 0.5;
+}
+.site-bg-glow-1 {
+  width: 40rem;
+  height: 40rem;
+  top: -10rem;
+  inset-inline-start: -8rem;
+  background: radial-gradient(circle, rgba(13, 179, 139, 0.6), transparent 70%);
+}
+.site-bg-glow-2 {
+  width: 46rem;
+  height: 46rem;
+  top: 38%;
+  inset-inline-end: -12rem;
+  background: radial-gradient(circle, rgba(23, 116, 98, 0.7), transparent 70%);
+}
+.site-bg-glow-3 {
+  width: 36rem;
+  height: 36rem;
+  bottom: -10rem;
+  inset-inline-start: 22%;
+  background: radial-gradient(circle, rgba(13, 179, 139, 0.5), transparent 70%);
+}
+
+/* Faint dot grid — precise, technical feel; fades out toward the edges. */
+.site-bg-grid {
+  color: rgba(0, 0, 0, 0.04);
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(85% 65% at 50% 25%, #000, transparent 82%);
+  mask-image: radial-gradient(85% 65% at 50% 25%, #000, transparent 82%);
+  transform: translateY(var(--bg-scroll, 0px));
+  will-change: transform;
+}
+.dark .site-bg-grid {
+  color: rgba(255, 255, 255, 0.04);
+}
+
+/* Barely-there film grain — kills the flat "digital" look. */
+.site-bg-grain {
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  transform: translateY(var(--bg-scroll, 0px));
+  will-change: transform;
+}
+.dark .site-bg-grain {
+  opacity: 0.05;
+}
+
 /* Respect users who prefer reduced motion: disable ambient/life animations. */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
@@ -1016,6 +1088,10 @@ html.dark textarea::placeholder {
   }
   .reveal-on-scroll {
     opacity: 1 !important;
+    transform: none !important;
+  }
+  .site-bg-grid,
+  .site-bg-grain {
     transform: none !important;
   }
 }
