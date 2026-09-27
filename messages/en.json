@@ -2678,5 +2678,15 @@
     "message": "We use cookies to improve your experience and measure our advertising campaigns.",
     "accept": "Got it",
     "learnMore": "Learn more"
+  },
+  "installPrompt": {
+    "titleAndroid": "Install our app",
+    "titleIos": "Add us to your Home Screen",
+    "subtitleAndroid": "Faster access in one tap — no app store",
+    "subtitleIos": "Opens full-screen, just like an app",
+    "install": "Install",
+    "iosStep1": "Tap the Share button",
+    "iosStep2": "then “Add to Home Screen”",
+    "dismiss": "Close"
   }
 }

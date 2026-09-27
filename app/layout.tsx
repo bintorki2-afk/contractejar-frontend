@@ -19,6 +19,7 @@ import {
   THEME_NO_FLASH_SCRIPT,
 } from "@/features/shared/theme/theme-provider";
 import SiteBackground from "@/features/shared/components/site-background";
+import InstallPrompt from "@/features/shared/components/install-prompt";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aqdi.sa";
 
@@ -157,6 +158,7 @@ export default async function RootLayout({
               <DirectionProvider dir={direction} direction={direction}>
                 <NextIntlClientProvider locale={locale} messages={messages}>
                   {children}
+                  <InstallPrompt />
                   <CookieNotice />
                   <Toaster position="top-center" />
                 </NextIntlClientProvider>
