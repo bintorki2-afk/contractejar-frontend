@@ -14,6 +14,7 @@ import { trustedEntitiesConfig } from "@/features/home/data/trusted-entities";
 import { getHomeContent } from "@/features/home/services/get-home-content";
 import { resolveHomeContent } from "@/features/home/utils/resolve-home-content";
 import PricingSection from "@/features/pricing/components/pricing-section";
+import ReviewsHeroStrip from "@/features/reviews/components/reviews-hero-strip";
 import ReviewsSection from "@/features/reviews/components/reviews-section";
 import ServicesSection from "@/features/services/components/services-section";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
@@ -128,6 +129,7 @@ export default async function Home() {
   return (
     <main>
       <HeroSection content={content.hero} />
+      <ReviewsHeroStrip />
       <Reveal>
         <TrustedEntitiesSection content={content.authorities} />
       </Reveal>

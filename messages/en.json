@@ -2829,6 +2829,24 @@
       "title": "Be the first to share your experience",
       "description": "Document your contract with Ejar Contract, then leave a review to appear here and reassure others.",
       "cta": "Create your contract"
+    },
+    "viewAll": "View all reviews",
+    "heroStrip": "from {count, plural, one {# customer} other {# customers}}"
+  },
+  "reviewsPage": {
+    "metaTitle": "Customer Reviews",
+    "metaDescription": "Read real experiences from Ejar Contract customers documenting residential and commercial lease contracts, with ratings across Saudi cities.",
+    "title": "Customer reviews",
+    "breadcrumbHome": "Home",
+    "breadcrumb": "Reviews",
+    "results": "{count, plural, one {# review} other {# reviews}}",
+    "noResults": "No reviews match the selected filters.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "filters": {
+      "all": "All",
+      "allCities": "All cities"
     }
   }
 }

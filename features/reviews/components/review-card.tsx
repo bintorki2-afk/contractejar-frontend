@@ -2,11 +2,14 @@ import { Quote } from "lucide-react";
 
 import ReviewStars from "@/features/reviews/components/review-stars";
 import type { Review } from "@/features/reviews/types/review";
+import { cn } from "@/lib/utils";
 
 type ReviewCardProps = {
   review: Review;
   /** Localized label for the contract type, if any. */
   contractTypeLabel?: string;
+  /** Fill the parent width (grid) instead of the fixed ticker width. */
+  fullWidth?: boolean;
 };
 
 /** Return an "initials" avatar seed (first non-space grapheme). */
@@ -15,9 +18,19 @@ function firstLetter(name: string) {
   return trimmed ? Array.from(trimmed)[0] : "?";
 }
 
-export default function ReviewCard({ review, contractTypeLabel }: ReviewCardProps) {
+export default function ReviewCard({
+  review,
+  contractTypeLabel,
+  fullWidth = false,
+}: ReviewCardProps) {
   return (
-    <figure dir="rtl" className="flex h-full w-80 max-w-[85vw] shrink-0 flex-col gap-4 rounded-3xl border border-black/[0.06] bg-white p-6 text-start shadow-sm ring-1 ring-black/[0.02] transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:ring-white/[0.03]">
+    <figure
+      dir="rtl"
+      className={cn(
+        "flex h-full flex-col gap-4 rounded-3xl border border-black/[0.06] bg-white p-6 text-start shadow-sm ring-1 ring-black/[0.02] transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:ring-white/[0.03]",
+        fullWidth ? "w-full" : "w-80 max-w-[85vw] shrink-0",
+      )}
+    >
       <div className="flex items-center justify-between">
         <ReviewStars rating={review.rating} />
         <Quote

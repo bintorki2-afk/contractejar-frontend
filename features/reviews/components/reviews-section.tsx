@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Star } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 
 import ReviewStars from "@/features/reviews/components/review-stars";
 import ReviewsEmptyState from "@/features/reviews/components/reviews-empty-state";
@@ -61,10 +62,21 @@ export default async function ReviewsSection() {
         </div>
 
         {reviews.length > 0 ? (
-          <ReviewsTicker
-            reviews={reviews}
-            contractTypeLabels={contractTypeLabels}
-          />
+          <>
+            <ReviewsTicker
+              reviews={reviews}
+              contractTypeLabels={contractTypeLabels}
+            />
+            <div className="flex justify-center">
+              <Link
+                href="/reviews"
+                className="inline-flex items-center gap-2 rounded-full border border-border/60 px-6 py-3 text-sm font-bold text-brand transition hover:border-brand hover:bg-brand-background"
+              >
+                {t("viewAll")}
+                <ArrowLeft className="size-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </>
         ) : (
           <ReviewsEmptyState
             title={t("empty.title")}
