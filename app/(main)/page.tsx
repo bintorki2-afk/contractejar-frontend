@@ -14,6 +14,7 @@ import { trustedEntitiesConfig } from "@/features/home/data/trusted-entities";
 import { getHomeContent } from "@/features/home/services/get-home-content";
 import { resolveHomeContent } from "@/features/home/utils/resolve-home-content";
 import PricingSection from "@/features/pricing/components/pricing-section";
+import ReviewsSection from "@/features/reviews/components/reviews-section";
 import ServicesSection from "@/features/services/components/services-section";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
 import { resolveSettingsWhatsappNumber } from "@/features/settings/utils/build-whatsapp-href";
@@ -138,6 +139,9 @@ export default async function Home() {
       </Reveal>
       <Reveal>
         <PricingSection content={content.pricing} />
+      </Reveal>
+      <Reveal>
+        <ReviewsSection />
       </Reveal>
       <Reveal>
         <SupportSection content={content.contact} />

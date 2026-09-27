@@ -2814,5 +2814,21 @@
     "motion": "Stop animations",
     "reset": "Reset",
     "close": "Close"
+  },
+  "reviews": {
+    "badge": "Customer reviews",
+    "titlePrefix": "What our",
+    "titleAccent": "customers say",
+    "description": "Real experiences from customers who documented their contracts with Ejar Contract.",
+    "summary": "Based on {count, plural, one {# review} other {# reviews}}",
+    "contractType": {
+      "residential": "Residential",
+      "commercial": "Commercial"
+    },
+    "empty": {
+      "title": "Be the first to share your experience",
+      "description": "Document your contract with Ejar Contract, then leave a review to appear here and reassure others.",
+      "cta": "Create your contract"
+    }
   }
 }
