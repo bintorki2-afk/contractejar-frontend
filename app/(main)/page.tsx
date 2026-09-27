@@ -138,10 +138,10 @@ export default async function Home() {
         <AdvantagesSection content={content.features} />
       </Reveal>
       <Reveal>
-        <PricingSection content={content.pricing} />
+        <ReviewsSection />
       </Reveal>
       <Reveal>
-        <ReviewsSection />
+        <PricingSection content={content.pricing} />
       </Reveal>
       <Reveal>
         <SupportSection content={content.contact} />
