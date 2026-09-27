@@ -48,7 +48,9 @@ export default function ReviewsTicker({
 
   return (
     <div
-      dir="rtl"
+      // The marquee keyframe is authored for LTR; under dir="rtl" it slides the
+      // whole row off-screen. Keep the strip LTR and let each card be RTL.
+      dir="ltr"
       className="w-full overflow-hidden"
       style={{ WebkitMaskImage: fade, maskImage: fade }}
     >

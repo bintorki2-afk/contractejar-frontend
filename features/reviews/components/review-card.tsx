@@ -17,7 +17,7 @@ function firstLetter(name: string) {
 
 export default function ReviewCard({ review, contractTypeLabel }: ReviewCardProps) {
   return (
-    <figure className="flex h-full w-80 max-w-[85vw] shrink-0 flex-col gap-4 rounded-3xl border border-black/[0.06] bg-white p-6 text-start shadow-sm ring-1 ring-black/[0.02] transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:ring-white/[0.03]">
+    <figure dir="rtl" className="flex h-full w-80 max-w-[85vw] shrink-0 flex-col gap-4 rounded-3xl border border-black/[0.06] bg-white p-6 text-start shadow-sm ring-1 ring-black/[0.02] transition-shadow hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:ring-white/[0.03]">
       <div className="flex items-center justify-between">
         <ReviewStars rating={review.rating} />
         <Quote
