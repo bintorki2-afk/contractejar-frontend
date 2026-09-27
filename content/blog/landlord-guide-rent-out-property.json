@@ -5,7 +5,7 @@
   "date": "2026-09-26",
   "readTime": "٦ دقائق قراءة",
   "excerpt": "دليل عملي للملّاك لتأجير العقار بأمان: تجهيز العقار وتحديد الإيجار، فحص المستأجر، صياغة عقد واضح، توثيقه رسميًا، ومتابعة التجديد — لتقليل المخاطر وحماية دخلك.",
-  "coverImage": "/images/blog.jpg",
+  "coverImage": "/images/blog/covers/handover-keys.png",
   "imageAlt": "دليل المالك لتأجير العقار بأمان",
   "sections": [
     {
@@ -66,7 +66,13 @@
     }
   ],
   "sources": [
-    { "label": "الهيئة العامة للعقار — منصة إيجار", "url": "https://rega.gov.sa/en/rega-services/platforms/ejar/" },
-    { "label": "منصة إيجار", "url": "https://www.ejar.sa" }
+    {
+      "label": "الهيئة العامة للعقار — منصة إيجار",
+      "url": "https://rega.gov.sa/en/rega-services/platforms/ejar/"
+    },
+    {
+      "label": "منصة إيجار",
+      "url": "https://www.ejar.sa"
+    }
   ]
 }

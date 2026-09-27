@@ -5,7 +5,7 @@
   "date": "2026-09-26",
   "readTime": "٥ دقائق قراءة",
   "excerpt": "من يتحمّل الصيانة في عقد الإيجار؟ دليل عملي يوضّح الفرق بين الصيانة الأساسية والتشغيلية، وكيف يحدّد العقد المسؤوليات بوضوح لتجنّب النزاعات بين المالك والمستأجر.",
-  "coverImage": "/images/blog.jpg",
+  "coverImage": "/images/blog/covers/maintenance.png",
   "imageAlt": "مسؤولية الصيانة في عقد الإيجار",
   "sections": [
     {
@@ -58,7 +58,13 @@
     }
   ],
   "sources": [
-    { "label": "الهيئة العامة للعقار — منصة إيجار", "url": "https://rega.gov.sa/en/rega-services/platforms/ejar/" },
-    { "label": "منصة إيجار", "url": "https://www.ejar.sa" }
+    {
+      "label": "الهيئة العامة للعقار — منصة إيجار",
+      "url": "https://rega.gov.sa/en/rega-services/platforms/ejar/"
+    },
+    {
+      "label": "منصة إيجار",
+      "url": "https://www.ejar.sa"
+    }
   ]
 }
