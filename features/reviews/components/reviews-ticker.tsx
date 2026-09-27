@@ -25,7 +25,7 @@ export default function ReviewsTicker({
     <Marquee
       pauseOnHover
       reverse={reverse}
-      className="[--duration:60s] [--gap:1.25rem] py-1"
+      className="[--duration:150s] [--gap:1.25rem] py-1"
     >
       {items.map((review) => (
         <ReviewCard
