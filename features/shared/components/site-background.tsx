@@ -55,9 +55,9 @@ export default function SiteBackground() {
       className="site-bg pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       <div className="site-bg-base absolute inset-0" />
-      <div className="site-bg-glow site-bg-glow-1 animate-aurora" />
-      <div className="site-bg-glow site-bg-glow-2 animate-aurora-slow" />
-      <div className="site-bg-glow site-bg-glow-3 animate-aurora" />
+      <div className="site-bg-glow site-bg-glow-1" />
+      <div className="site-bg-glow site-bg-glow-2" />
+      <div className="site-bg-glow site-bg-glow-3" />
       <div className="site-bg-grid absolute inset-0" />
       <div className="site-bg-grain absolute inset-0" />
     </div>
