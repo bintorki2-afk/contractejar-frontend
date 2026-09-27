@@ -8,6 +8,7 @@ import { getContentPageSeo } from "@/features/content-pages/services/get-content
 import { resolveContentPageMetadata } from "@/features/content-pages/utils/resolve-content-page-metadata";
 import FaqSectionBoundary from "@/features/faq/components/faq-section-boundary";
 import HeroSection from "@/features/home/components/hero-section";
+import Reveal from "@/features/shared/motion/reveal";
 import TrustedEntitiesSection from "@/features/home/components/trusted-entities-section";
 import { trustedEntitiesConfig } from "@/features/home/data/trusted-entities";
 import { getHomeContent } from "@/features/home/services/get-home-content";
@@ -126,12 +127,24 @@ export default async function Home() {
   return (
     <main>
       <HeroSection content={content.hero} />
-      <TrustedEntitiesSection content={content.authorities} />
-      <ServicesSection />
-      <AdvantagesSection content={content.features} />
-      <PricingSection content={content.pricing} />
-      <SupportSection content={content.contact} />
-      <FaqSectionBoundary />
+      <Reveal>
+        <TrustedEntitiesSection content={content.authorities} />
+      </Reveal>
+      <Reveal>
+        <ServicesSection />
+      </Reveal>
+      <Reveal>
+        <AdvantagesSection content={content.features} />
+      </Reveal>
+      <Reveal>
+        <PricingSection content={content.pricing} />
+      </Reveal>
+      <Reveal>
+        <SupportSection content={content.contact} />
+      </Reveal>
+      <Reveal>
+        <FaqSectionBoundary />
+      </Reveal>
     </main>
   );
 }

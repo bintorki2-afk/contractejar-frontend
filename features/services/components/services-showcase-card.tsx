@@ -53,15 +53,17 @@ export default function ServicesShowcaseCard({
         </div>
       </div>
 
-      <Image
+      <div className="group overflow-hidden rounded-3xl">
+        <Image
           src={imageSrc}
           alt={imageAlt}
           width={1024}
           height={1024}
-          className="h-auto w-full object-cover"
+          className="h-auto w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           sizes="(max-width: 1023px) 100vw, 50vw"
           quality={75}
         />
+      </div>
     </article>
   );
 }

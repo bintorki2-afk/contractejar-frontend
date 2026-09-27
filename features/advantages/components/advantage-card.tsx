@@ -47,10 +47,10 @@ export default function AdvantageCard({
   const styles = themeStyles[theme];
 
   return (
-    <div className="flex flex-col items-start gap-4 px-4 text-center md:px-6">
+    <div className="group flex flex-col items-start gap-4 px-4 text-center md:px-6">
       <span
         className={cn(
-          "flex size-12 items-center justify-center rounded-2xl",
+          "flex size-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3",
           styles.iconWrap
         )}
       >

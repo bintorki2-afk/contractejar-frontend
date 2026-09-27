@@ -58,7 +58,7 @@ export default function TrustedEntityCard({
   return (
     <article
       className={cn(
-        "flex h-full flex-col gap-5  border-t-4 p-6 shadow-sm",
+        "flex h-full flex-col gap-5  border-t-4 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl",
         styles.card
       )}
     >

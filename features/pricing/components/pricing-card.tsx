@@ -39,7 +39,7 @@ export default function PricingCard({
   cta,
 }: PricingCardProps) {
   return (
-    <article className="rounded-[3rem] border bg-brand-background shadow-md p-8 ">
+    <article className="rounded-[3rem] border bg-brand-background shadow-md p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
       <div className="mb-6 flex flex-col items-strat ">
         <span className="mb-4 inline-flex size-9 items-center justify-start rounded-full text-brand shrink-0">
           <CustomIcon src={icon} size={30} className="text-brand" />

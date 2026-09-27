@@ -13,8 +13,8 @@ export default function HeroVisual({ alt, imageUrl }: HeroVisualProps) {
   const remote = isRemoteImage(imageUrl);
 
   return (
-    <div className="w-full">
-      <div className="overflow-hidden rounded-3xl lg:rounded-[32px]">
+    <div className="w-full animate-float">
+      <div className="relative overflow-hidden rounded-3xl lg:rounded-[32px]">
         <Image
           src={imageUrl}
           alt={alt}
@@ -25,6 +25,11 @@ export default function HeroVisual({ alt, imageUrl }: HeroVisualProps) {
           quality={75}
           priority
           unoptimized={remote}
+        />
+        {/* Periodic light sweep — makes the mockup feel fresh and "live". */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-transparent via-white/25 to-transparent animate-shine"
         />
       </div>
     </div>
