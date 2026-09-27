@@ -623,6 +623,12 @@
           }
         ]
       }
+    },
+    "cta": {
+      "title": "Ready to document your lease? Create a verified rental contract in minutes",
+      "description": "No sign-up and just a few simple steps — a clear contract that protects both landlord and tenant, and we follow up with you on WhatsApp to finalize it.",
+      "residentialCta": "Create a residential lease",
+      "commercialCta": "Commercial lease"
     }
   },
   "auth": {

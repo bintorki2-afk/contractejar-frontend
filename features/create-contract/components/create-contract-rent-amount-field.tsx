@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 
 import { Input } from "@/components/ui/input";
@@ -46,15 +46,19 @@ export default function CreateContractRentAmountField({
   valid = false,
 }: CreateContractRentAmountFieldProps) {
   const t = useTranslations("createContract");
+  const locale = useLocale();
   const inputId = useId();
   const chrome = resolveFieldChromeState({ invalid, valid });
   const numericValue = Number(value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, ""));
+  // Spell the amount in Arabic words only in Arabic; in English show the
+  // formatted numeral so the helper line reads naturally in each language.
+  const amountText =
+    locale === "ar"
+      ? `${numberToArabicWords(numericValue)} ${currency}`
+      : `${numericValue.toLocaleString("en-US")} ${currency}`;
   const amountInWords =
     amountInWordsLabel && numericValue > 0
-      ? amountInWordsLabel.replace(
-          "{amount}",
-          `${numberToArabicWords(numericValue)} ${currency}`,
-        )
+      ? amountInWordsLabel.replace("{amount}", amountText)
       : null;
 
   return (

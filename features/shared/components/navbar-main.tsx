@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowUpLeft } from "lucide-react";
+import { ArrowUpLeft, Info, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import NavbarMobileSheet from "@/features/shared/components/navbar-mobile-sheet";
+import LocaleSwitcher from "@/features/shared/components/locale-switcher";
 import NavbarNavLink from "@/features/shared/components/navbar-nav-link";
 import ThemeToggle from "@/features/shared/theme/theme-toggle";
 import StartWithAqdiDialog from "@/features/start-with-aqdi/components/start-with-aqdi-dialog";
@@ -71,9 +72,19 @@ export default function NavbarMain({
       icon: <CustomIcon src="/icons/home.svg" size={16} />,
     },
     {
+      href: "/about",
+      label: aboutUs,
+      icon: <Info className="size-4" aria-hidden="true" />,
+    },
+    {
       href: "/blog",
       label: blog,
       icon: <CustomIcon src="/icons/news-letter.svg" size={16} />,
+    },
+    {
+      href: "/faq",
+      label: faq,
+      icon: <HelpCircle className="size-4" aria-hidden="true" />,
     },
   ];
 
@@ -115,6 +126,7 @@ export default function NavbarMain({
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <LocaleSwitcher className="h-12" />
           <ThemeToggle className="size-12" />
           <StartWithAqdiDialog labels={dialogLabels}>
             <Button className="group h-12 gap-3 rounded-full bg-brand px-5 pe-2 text-sm font-semibold text-white hover:bg-brand/90">
@@ -130,6 +142,7 @@ export default function NavbarMain({
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          <LocaleSwitcher />
           <ThemeToggle />
           <NavbarMobileSheet
             aboutUs={aboutUs}
