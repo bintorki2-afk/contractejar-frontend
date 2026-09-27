@@ -36,7 +36,7 @@ export default function AboutValuesItem({
         </p>
       </div>
 
-      <div className="overflow-hidden">
+      <div className="overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10">
         <Image
           src={imageSrc}
           alt={imageAlt}

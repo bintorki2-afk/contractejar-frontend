@@ -100,7 +100,8 @@
     "googlePlay": "Google Play",
     "appStore": "Apple Store",
     "whatsapp": "Contact via WhatsApp",
-    "visualAlt": "Rental Contract app showing a successfully issued lease contract"
+    "visualAlt": "Rental Contract app showing a successfully issued lease contract",
+    "compliantWith": "Compliant with"
   },
   "trustedEntities": {
     "badge": "Trusted and certified entities",

@@ -100,7 +100,8 @@
     "googlePlay": "Google Play",
     "appStore": "Apple Store",
     "whatsapp": "تواصل عبر واتساب",
-    "visualAlt": "تطبيق عقد إيجار يعرض عقدًا موثقًا بنجاح"
+    "visualAlt": "تطبيق عقد إيجار يعرض عقدًا موثقًا بنجاح",
+    "compliantWith": "متوافق مع"
   },
   "trustedEntities": {
     "badge": "جهات موثوقة ومعتمدة",
