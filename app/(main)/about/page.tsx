@@ -6,6 +6,7 @@ import AboutCoreValuesSection from "@/features/about/components/about-core-value
 import AboutValuesSection from "@/features/about/components/about-values-section";
 import NumbersSection from "@/features/about/components/numbers-section";
 import WhoWeAre from "@/features/about/components/who-we-are";
+import Reveal from "@/features/shared/motion/reveal";
 import { numbersStatsConfig } from "@/features/about/data/numbers-stats";
 import { getAboutContent } from "@/features/about/services/get-about-content";
 import type {
@@ -110,11 +111,21 @@ export default async function AboutPage() {
   return (
     <div>
       <WhoWeAre content={content.hero} />
-      <NumbersSection content={content.story} />
-      <AboutValuesSection content={content.visionMission} />
-      <AboutBeneficiariesSection content={content.beneficiaries} />
-      <AboutCoreValuesSection content={content.coreValues} />
-      <SupportSection />
+      <Reveal>
+        <NumbersSection content={content.story} />
+      </Reveal>
+      <Reveal>
+        <AboutValuesSection content={content.visionMission} />
+      </Reveal>
+      <Reveal>
+        <AboutBeneficiariesSection content={content.beneficiaries} />
+      </Reveal>
+      <Reveal>
+        <AboutCoreValuesSection content={content.coreValues} />
+      </Reveal>
+      <Reveal>
+        <SupportSection />
+      </Reveal>
     </div>
   );
 }

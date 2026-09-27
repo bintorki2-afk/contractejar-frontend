@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import BlogLatestSection from "@/features/blog/components/blog-latest-section";
 import BlogListingSection from "@/features/blog/components/blog-listing-section";
+import Reveal from "@/features/shared/motion/reveal";
 import { getContentPageSeo } from "@/features/content-pages/services/get-content-pages";
 import { resolveContentPageMetadata } from "@/features/content-pages/utils/resolve-content-page-metadata";
 import FaqSectionBoundary from "@/features/faq/components/faq-section-boundary";
@@ -18,9 +19,15 @@ export default function BlogPage() {
   return (
     <main className="overflow-x-hidden">
       <BlogLatestSection />
-      <BlogListingSection />
-      <SupportSection />
-      <FaqSectionBoundary />
+      <Reveal>
+        <BlogListingSection />
+      </Reveal>
+      <Reveal>
+        <SupportSection />
+      </Reveal>
+      <Reveal>
+        <FaqSectionBoundary />
+      </Reveal>
     </main>
   );
 }

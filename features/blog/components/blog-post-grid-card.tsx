@@ -14,7 +14,7 @@ export default function BlogPostGridCard({
   readMoreLabel,
 }: BlogPostGridCardProps) {
   return (
-    <article className="flex h-full min-w-0 flex-col">
+    <article className="group flex h-full min-w-0 flex-col">
       <Link
         href={`/blog/${post.slug}`}
         className="relative block aspect-4/3 w-full overflow-hidden"
@@ -24,7 +24,7 @@ export default function BlogPostGridCard({
           alt={post.listTitle}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover transition-transform rounded-[35px] "
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105 rounded-[35px] "
         />
       </Link>
 

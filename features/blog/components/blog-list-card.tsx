@@ -10,7 +10,7 @@ type BlogListCardProps = {
 
 export default function BlogListCard({ post }: BlogListCardProps) {
   return (
-    <article className="flex items-center gap-4  pb-4 last:pb-0">
+    <article className="group flex items-center gap-4  pb-4 last:pb-0">
       <Link
         href={`/blog/${post.slug}`}
         className="relative block h-24 w-28 shrink-0 overflow-hidden rounded-2xl md:h-30 md:w-32"
@@ -20,7 +20,7 @@ export default function BlogListCard({ post }: BlogListCardProps) {
           alt={post.listTitle}
           fill
           sizes="128px"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </Link>
 
