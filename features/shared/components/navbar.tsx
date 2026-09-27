@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import NavbarMain from "@/features/shared/components/navbar-main";
-import NavbarTopBar from "@/features/shared/components/navbar-top-bar";
+// import NavbarTopBar from "@/features/shared/components/navbar-top-bar"; // top utility bar hidden by request
 import { useWhatsappHref } from "@/features/settings/hooks/use-whatsapp-href";
 import type { StartWithAqdiDialogLabels } from "@/features/start-with-aqdi/types/start-with-aqdi-dialog-labels";
 import { cn } from "@/lib/utils";
@@ -117,7 +117,8 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
         )}
       >
         <div className="container">
-          <NavbarTopBar
+          {/* Top utility bar hidden by request (about/blog/faq still available in the main navbar). */}
+          {/* <NavbarTopBar
             aboutUs={t("topBar.aboutUs")}
             blog={t("topBar.blog")}
             faq={t("topBar.faq")}
@@ -128,7 +129,7 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
             whatsappService={t("topBar.whatsappService")}
             whatsappHref={whatsappHref}
             scrolled={scrolled}
-          />
+          /> */}
           <NavbarMain
             aboutUs={t("topBar.aboutUs")}
             blog={t("topBar.blog")}
