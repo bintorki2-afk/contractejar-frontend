@@ -112,8 +112,7 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
       <header
         ref={headerRef}
         className={cn(
-          "fixed inset-x-0 top-0 z-50 isolate bg-brand-background-green py-4",
-          scrolled && "shadow-sm",
+          "fixed inset-x-0 top-0 z-50 isolate py-4",
         )}
       >
         <div className="container">
