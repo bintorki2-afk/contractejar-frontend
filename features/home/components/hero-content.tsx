@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import HeroCtaButtons from "@/features/home/components/hero-cta-buttons";
 import CustomIcon from "@/features/shared/components/custom-icon";
-import HeroMarquee from "./hero-marquee";
 
 type HeroContentProps = {
   badge: string;
@@ -80,7 +79,6 @@ export default function HeroContent({
         </p>
       </div>
 
-      <HeroMarquee />
       <HeroCtaButtons
         residentialCta={residentialCta}
         commercialCta={commercialCta}

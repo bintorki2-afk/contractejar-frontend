@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
-import { Marquee } from "@/components/ui/marquee";
-
 const featureLogos = [
   "/images/ejar.png",
   "/images/general-authority.png",
@@ -19,34 +17,28 @@ export default function HeroMarquee() {
   const t = useTranslations("hero");
 
   return (
-    <div className="mt-1 w-full max-w-xl rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-black/5">
-      <p className="mb-2 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
-        {t("compliantWith")}
-      </p>
-
-      <div
-        dir="ltr"
-        className="relative flex w-full flex-col items-center justify-center overflow-hidden"
-      >
-        <Marquee pauseOnHover className="[--duration:40s] [--gap:1.75rem]">
+    <div className="container pb-8">
+      <div className="rounded-2xl bg-white px-5 py-4 shadow-sm ring-1 ring-black/5">
+        <p className="mb-3 text-end text-sm font-bold text-[#0a6b57]">
+          {t("compliantWith")}
+        </p>
+        <div className="flex items-center gap-6 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-4 md:justify-between md:overflow-visible md:pb-0 [&::-webkit-scrollbar]:hidden">
           {featureLogos.map((logo) => (
             <div
               key={logo}
-              className="flex h-11 items-center justify-center px-2"
+              className="flex h-11 shrink-0 items-center justify-center md:flex-1"
             >
               <Image
                 src={logo}
                 alt=""
-                width={120}
+                width={140}
                 height={44}
-                className="max-h-8 w-auto object-contain"
-                sizes="120px"
+                className="max-h-9 w-auto object-contain"
+                sizes="140px"
               />
             </div>
           ))}
-        </Marquee>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-[8%] bg-linear-to-r from-white" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-[8%] bg-linear-to-l from-white" />
+        </div>
       </div>
     </div>
   );
