@@ -6,13 +6,13 @@ import { useTranslations } from "next-intl";
 import { Marquee } from "@/components/ui/marquee";
 
 const featureLogos = [
-  "/images/ejar.png",
-  "/images/general-authority.png",
-  "/images/saudi-center.png",
-  "/images/hesab.png",
-  "/images/daman.png",
-  "/images/tegara.png",
-  "/images/najez.png",
+  "/images/logos-white/ejar.png",
+  "/images/logos-white/general-authority.png",
+  "/images/logos-white/saudi-center.png",
+  "/images/logos-white/hesab.png",
+  "/images/logos-white/daman.png",
+  "/images/logos-white/tegara.png",
+  "/images/logos-white/najez.png",
 ];
 
 export default function HeroMarquee() {
@@ -32,15 +32,15 @@ export default function HeroMarquee() {
           {featureLogos.map((logo) => (
             <div
               key={logo}
-              className="flex h-16 w-24 items-center justify-center rounded-2xl bg-white px-3 shadow-sm"
+              className="flex h-16 items-center justify-center px-5"
             >
               <Image
                 src={logo}
                 alt=""
-                width={64}
-                height={64}
-                className="max-h-10 w-auto object-contain"
-                sizes="64px"
+                width={120}
+                height={48}
+                className="max-h-9 w-auto object-contain opacity-90"
+                sizes="120px"
               />
             </div>
           ))}
