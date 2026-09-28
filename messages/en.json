@@ -359,6 +359,14 @@
         {
           "label": "FAQ",
           "href": "/faq"
+        },
+        {
+          "label": "Guide",
+          "href": "/guide"
+        },
+        {
+          "label": "Support & Help",
+          "href": "/support"
         }
       ]
     },
@@ -2857,5 +2865,98 @@
       "all": "All",
       "allCities": "All cities"
     }
+  },
+  "guidePage": {
+    "metaTitle": "How it works",
+    "metaDescription": "A step-by-step guide to documenting your residential or commercial lease online with Ejar Contract — requirements, steps, and tips.",
+    "breadcrumbHome": "Home",
+    "breadcrumb": "Guide",
+    "title": "Your guide to documenting a lease",
+    "subtitle": "Clear, simple steps to document your residential or commercial contract online — no hassle.",
+    "stepsTitle": "Documentation steps",
+    "steps": [
+      {
+        "title": "Start your contract",
+        "desc": "Click “Create a lease” and choose the type: residential or commercial."
+      },
+      {
+        "title": "Enter property data",
+        "desc": "Add the unit details, national address, and deed or meter information."
+      },
+      {
+        "title": "Add the parties",
+        "desc": "Register the landlord and tenant details (ID and contact) accurately."
+      },
+      {
+        "title": "Set financial terms & clauses",
+        "desc": "Enter the rent amount, payment method, duration, and agreed clauses."
+      },
+      {
+        "title": "Review, document & pay",
+        "desc": "Review the contract, document it officially via the Ejar network, and complete secure payment."
+      }
+    ],
+    "docsTitle": "Required documents",
+    "docs": [
+      "Landlord and tenant ID (or commercial registration for businesses).",
+      "The property’s national address.",
+      "Deed data or proof of eligibility to lease.",
+      "Electricity meter details (when needed)."
+    ],
+    "tipsTitle": "Tips to make it easier",
+    "tips": [
+      "Prepare your documents before you start to finish faster.",
+      "Verify the parties’ details and national address to avoid delays.",
+      "For any question, support is available on WhatsApp during working hours."
+    ],
+    "ctaTitle": "Ready to start?",
+    "ctaDesc": "Document your contract now in simple, secure steps.",
+    "ctaButton": "Create a lease",
+    "faqTitle": "Have a question?",
+    "faqButton": "FAQ",
+    "supportButton": "Support & help"
+  },
+  "supportPage": {
+    "metaTitle": "Support & Help",
+    "metaDescription": "Reach the Ejar Contract support team via WhatsApp or phone, and browse help topics and FAQs.",
+    "breadcrumbHome": "Home",
+    "breadcrumb": "Support & Help",
+    "title": "How can we help?",
+    "subtitle": "Our team is ready to answer and guide you through any step — pick what suits you.",
+    "channelsTitle": "Contact us directly",
+    "whatsappTitle": "WhatsApp",
+    "whatsappDesc": "The fastest way — message us and we’ll reply right away.",
+    "whatsappAction": "Message us on WhatsApp",
+    "phoneTitle": "Phone call",
+    "phoneDesc": "Talk to us directly during working hours.",
+    "hoursTitle": "Working hours",
+    "hoursWeekdays": "Mon – Fri: 9:00 AM – 6:00 PM",
+    "hoursSaturday": "Sat: 9:00 AM – 2:00 PM",
+    "socialTitle": "Follow us",
+    "topicsTitle": "Help topics",
+    "topics": [
+      {
+        "title": "Residential lease",
+        "desc": "Steps and requirements to document a residential contract.",
+        "href": "/service/residential"
+      },
+      {
+        "title": "Commercial lease",
+        "desc": "Steps and requirements to document a commercial contract.",
+        "href": "/service/commercial"
+      },
+      {
+        "title": "Guide",
+        "desc": "A full step-by-step walkthrough of the whole process.",
+        "href": "/guide"
+      },
+      {
+        "title": "FAQ",
+        "desc": "Answers to the most common questions.",
+        "href": "/faq"
+      }
+    ],
+    "ctaTitle": "Ready to document your contract?",
+    "ctaButton": "Create a lease"
   }
 }
