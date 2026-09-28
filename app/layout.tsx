@@ -12,6 +12,7 @@ import { getWebsiteStatus } from "@/features/website-status/services/get-website
 import { getWebsiteClosedView } from "@/features/website-status/utils/get-website-closed-view";
 import PwaRegister from "@/components/pwa-register";
 import GtmScripts from "@/features/analytics/components/gtm-scripts";
+import ClarityScript from "@/features/analytics/components/clarity-script";
 import GtmNoScript from "@/features/analytics/components/gtm-noscript";
 import CookieNotice from "@/features/analytics/components/cookie-notice";
 import {
@@ -139,6 +140,7 @@ export default async function RootLayout({
         />
         <GtmNoScript />
         <GtmScripts />
+        <ClarityScript />
         <PwaRegister />
         <SentryInit />
         <script
