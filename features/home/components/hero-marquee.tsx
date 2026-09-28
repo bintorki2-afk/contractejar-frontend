@@ -30,7 +30,7 @@ export default function HeroMarquee() {
           {featureLogos.map((logo) => (
             <div
               key={logo}
-              className="flex h-16 w-24 items-center justify-center rounded-2xl bg-white px-3 shadow-sm ring-1 ring-black/5"
+              className="flex h-16 w-24 items-center justify-center rounded-2xl bg-white/75 px-3 shadow-sm ring-1 ring-white/40 backdrop-blur-md"
             >
               <Image
                 src={logo}

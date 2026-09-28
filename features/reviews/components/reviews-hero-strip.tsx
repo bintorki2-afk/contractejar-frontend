@@ -17,7 +17,7 @@ export default async function ReviewsHeroStrip() {
       {/* Rating + trust — links to the reviews page */}
       <Link
         href="/reviews"
-        className="group inline-flex items-center gap-2.5 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-sm transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.05]"
+        className="group inline-flex items-center gap-2.5 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-md transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.08] dark:border-white/15"
       >
         <span className="text-lg font-extrabold text-brand">
           {reviewsSummary.average.toFixed(1)}
@@ -33,7 +33,7 @@ export default async function ReviewsHeroStrip() {
       </Link>
 
       {/* Scale stat — total documented contract value */}
-      <div className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-sm dark:bg-white/[0.05]">
+      <div className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-md dark:bg-white/[0.08] dark:border-white/15">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
           <Landmark className="size-4" aria-hidden="true" />
         </span>
