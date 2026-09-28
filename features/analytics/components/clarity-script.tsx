@@ -9,8 +9,12 @@ import Script from "next/script";
  * id) in the environment to activate. Clarity masks text content by default,
  * so it stays privacy-friendly.
  */
+// Clarity project id for عقد إيجار (contractejar.com). Public by design — it
+// appears in the page source like any tracking id. An env var overrides it.
+const DEFAULT_CLARITY_ID = "yp4isdfowh";
+
 export default function ClarityScript() {
-  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
+  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID || DEFAULT_CLARITY_ID;
 
   if (!clarityId) {
     return null;
