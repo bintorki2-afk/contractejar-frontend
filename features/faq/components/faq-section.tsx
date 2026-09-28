@@ -10,7 +10,7 @@ export default function FaqSection() {
   const { data, isLoading, isError } = useCommonQuestions();
 
   return (
-    <section className="bg-brand py-16 md:py-20">
+    <section className="bg-brand dark:bg-transparent py-16 md:py-20">
       <div className="container">
         <div className="grid items-center gap-8 lg:grid-cols-[300px_1fr] lg:gap-12">
           <header className="space-y-3 text-center text-white lg:text-start">
