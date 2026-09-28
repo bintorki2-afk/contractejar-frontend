@@ -7,6 +7,8 @@ import { Marquee } from "@/components/ui/marquee";
 
 const featureLogos = [
   "/images/ejar.png",
+  "/images/general-authority.png",
+  "/images/saudi-center.png",
   "/images/hesab.png",
   "/images/daman.png",
   "/images/tegara.png",
@@ -30,7 +32,7 @@ export default function HeroMarquee() {
           {featureLogos.map((logo) => (
             <div
               key={logo}
-              className="flex h-16 w-24 items-center justify-center rounded-2xl bg-white/75 px-3 shadow-sm ring-1 ring-white/40 backdrop-blur-md"
+              className="flex h-16 w-24 items-center justify-center rounded-2xl bg-white/55 px-3 shadow-sm ring-1 ring-white/50 backdrop-blur-lg"
             >
               <Image
                 src={logo}
