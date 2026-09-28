@@ -377,7 +377,14 @@
     },
     "licenses": {
       "title": "Licenses",
-      "items": []
+      "items": [
+        {
+          "label": "Commercial Reg.: 4650258662"
+        },
+        {
+          "label": "Ejar Membership: EJAR_00237930"
+        }
+      ]
     },
     "support": {
       "title": "Need help?",

@@ -51,11 +51,21 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: title,
       locale: "ar_SA",
       type: "website",
+      url: SITE_URL,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: ["/og-image.png"],
     },
     manifest: "/manifest.webmanifest",
     appleWebApp: {
@@ -110,6 +120,8 @@ export default async function RootLayout({
     name: "عقد إيجار",
     url: SITE_URL,
     logo: `${SITE_URL}/icons/icon-512.png`,
+    image: `${SITE_URL}/og-image.png`,
+    identifier: "CR 4650258662",
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+966597500014",
@@ -117,6 +129,7 @@ export default async function RootLayout({
       areaServed: "SA",
       availableLanguage: ["ar"],
     },
+    sameAs: ["https://x.com/aqdi_sa", "https://www.tiktok.com/@aqdi.sa"],
   };
   const websiteJsonLd = {
     "@context": "https://schema.org",
