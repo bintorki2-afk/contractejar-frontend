@@ -1018,6 +1018,17 @@ html.dark textarea::placeholder {
     linear-gradient(180deg, #0d1413 0%, #101614 45%, #0b110f 100%);
 }
 
+/* Live header height (the navbar script overwrites this with the exact value);
+   responsive default lets the hero sit behind the transparent header before JS. */
+:root {
+  --header-h: 100px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 148px;
+  }
+}
+
 .site-bg-glow {
   position: absolute;
   border-radius: 9999px;

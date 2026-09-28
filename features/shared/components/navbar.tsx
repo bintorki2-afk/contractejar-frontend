@@ -32,7 +32,11 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
     let stopAt = 0;
 
     const syncHeight = () => {
-      setHeaderHeight(header.getBoundingClientRect().height);
+      const h = header.getBoundingClientRect().height;
+      setHeaderHeight(h);
+      // Expose the live header height so the hero can slide up behind the
+      // transparent header without shifting its content.
+      document.documentElement.style.setProperty("--header-h", `${h}px`);
     };
 
     const tick = (now: number) => {

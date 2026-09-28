@@ -9,7 +9,16 @@ type HeroSectionProps = {
 
 export default function HeroSection({ content }: HeroSectionProps) {
   return (
-    <section className="relative min-h-screend rounded-3xl bg-brand-background-green pb-2   lg:rounded-[60px] 2xl:rounded-[80px] rounded-t-none! overflow-hidden">
+    <section
+      // Pull the green hero up behind the transparent fixed header, and pad the
+      // content back down by the same amount — so the header pill floats on the
+      // hero's green at the top with no dead dark band, and content never shifts.
+      style={{
+        marginTop: "calc(-1 * var(--header-h, 148px))",
+        paddingTop: "var(--header-h, 148px)",
+      }}
+      className="relative min-h-screend rounded-3xl bg-brand-background-green pb-2   lg:rounded-[60px] 2xl:rounded-[80px] rounded-t-none! overflow-hidden"
+    >
 
       <div className="relative container pb-10 ">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
