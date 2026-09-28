@@ -34,7 +34,7 @@ export default async function SupportSection({ content }: SupportSectionProps) {
     })());
 
   return (
-    <section className="bg-brand py-16 md:py-24">
+    <section className="bg-brand dark:bg-gradient-to-br dark:from-[#153a30] dark:to-[#0d241f] py-16 md:py-24">
       <div className="container">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="order-2 space-y-5 text-center text-white lg:order-1 lg:text-start">
