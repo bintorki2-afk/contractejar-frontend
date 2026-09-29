@@ -54,7 +54,7 @@ export default function AboutValuesItem({
           alt={imageAlt}
           width={1024}
           height={768}
-          className="h-auto w-full object-contain"
+          className={`h-auto w-full object-contain${bareImage ? " [mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)]" : ""}`}
           unoptimized={remote}
         />
       </div>
