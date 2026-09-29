@@ -124,6 +124,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       excerpt: a.excerpt,
       category: tabsT(ARTICLE_CATEGORY_LABEL_KEY[a.categoryId]),
       readTime: a.readTime,
+      coverImage: a.coverImage,
     }));
 
   // Article structured data (JSON-LD) for richer Google results.

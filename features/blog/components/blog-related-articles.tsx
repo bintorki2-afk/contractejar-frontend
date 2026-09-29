@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpLeft } from "lucide-react";
 
@@ -7,6 +8,7 @@ export type RelatedArticle = {
   excerpt: string;
   category: string;
   readTime: string;
+  coverImage: string;
 };
 
 type BlogRelatedArticlesProps = {
@@ -33,21 +35,32 @@ export default function BlogRelatedArticles({
           <Link
             key={article.slug}
             href={`/blog/${article.slug}`}
-            className="group flex flex-col gap-2 rounded-2xl border border-border/60 p-5 transition-colors hover:border-brand/40"
+            className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 transition-colors hover:border-brand/40"
           >
-            <span className="text-xs font-bold text-brand-secondary">
-              {article.category}
-            </span>
-            <h3 className="text-base font-bold leading-snug text-foreground transition-colors group-hover:text-brand">
-              {article.title}
-            </h3>
-            <p className="line-clamp-2 text-sm leading-6 text-foreground/70">
-              {article.excerpt}
-            </p>
-            <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand">
-              {readMoreLabel}
-              <ArrowUpLeft className="size-3.5" aria-hidden="true" />
-            </span>
+            <div className="relative aspect-video w-full overflow-hidden">
+              <Image
+                src={article.coverImage}
+                alt={article.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
+            </div>
+            <div className="flex flex-col gap-2 p-5">
+              <span className="text-xs font-bold text-brand-secondary">
+                {article.category}
+              </span>
+              <h3 className="text-base font-bold leading-snug text-foreground transition-colors group-hover:text-brand">
+                {article.title}
+              </h3>
+              <p className="line-clamp-2 text-sm leading-6 text-foreground/70">
+                {article.excerpt}
+              </p>
+              <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand">
+                {readMoreLabel}
+                <ArrowUpLeft className="size-3.5" aria-hidden="true" />
+              </span>
+            </div>
           </Link>
         ))}
       </div>
