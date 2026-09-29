@@ -13,7 +13,7 @@ export default async function ReviewsHeroStrip() {
   const t = await getTranslations("reviews");
 
   return (
-    <div className="container -mt-4 flex flex-wrap items-center justify-center gap-3 pb-2">
+    <div className="mt-1 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
       {/* Rating + trust — links to the reviews page */}
       <Link
         href="/reviews"

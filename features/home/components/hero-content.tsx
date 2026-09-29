@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import HeroCtaButtons from "@/features/home/components/hero-cta-buttons";
+import ReviewsHeroStrip from "@/features/reviews/components/reviews-hero-strip";
 import CustomIcon from "@/features/shared/components/custom-icon";
 
 type HeroContentProps = {
@@ -84,6 +85,8 @@ export default function HeroContent({
         commercialCta={commercialCta}
         mostRequested={mostRequested}
       />
+
+      <ReviewsHeroStrip />
     </div>
   );
 }
