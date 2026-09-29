@@ -7,6 +7,11 @@ type AboutValuesItemProps = {
   imageSrc: string;
   imageAlt: string;
   reverse?: boolean;
+  /**
+   * When true, the image is shown on its own (no white card / shadow / ring)
+   * so a transparent PNG blends into the section background.
+   */
+  bareImage?: boolean;
 };
 
 export default function AboutValuesItem({
@@ -16,6 +21,7 @@ export default function AboutValuesItem({
   imageSrc,
   imageAlt,
   reverse = false,
+  bareImage = false,
 }: AboutValuesItemProps) {
   const remote =
     imageSrc.startsWith("http://") || imageSrc.startsWith("https://");
@@ -36,7 +42,13 @@ export default function AboutValuesItem({
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10">
+      <div
+        className={
+          bareImage
+            ? "flex justify-center"
+            : "overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10"
+        }
+      >
         <Image
           src={imageSrc}
           alt={imageAlt}

@@ -26,6 +26,7 @@ export default function AboutValuesSection({
           description={content.vision.description}
           imageSrc={content.vision.imageSrc}
           imageAlt={content.vision.imageAlt}
+          bareImage
         />
 
         <AboutValuesItem
