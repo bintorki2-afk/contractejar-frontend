@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { InstallmentsHelp } from "@/features/create-contract/components/create-contract-field-help";
 import { cn } from "@/lib/utils";
 
 export type FinancePaymentMethodOption = {
@@ -35,7 +36,9 @@ export default function CreateContractFinancePaymentMethodSelect({
 
   return (
     <div>
-      <CreateContractFieldLabel label={label} invalid={invalid} />
+      <CreateContractFieldLabel label={label} invalid={invalid}
+        help={<InstallmentsHelp />}
+      />
 
       <div
         role="radiogroup"

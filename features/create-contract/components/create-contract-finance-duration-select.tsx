@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { DurationRenewalHelp } from "@/features/create-contract/components/create-contract-field-help";
 import { cn } from "@/lib/utils";
 
 export type FinanceDurationOption = {
@@ -40,7 +41,9 @@ export default function CreateContractFinanceDurationSelect({
 
   return (
     <div>
-      <CreateContractFieldLabel label={label} invalid={invalid} />
+      <CreateContractFieldLabel label={label} invalid={invalid}
+        help={<DurationRenewalHelp />}
+      />
 
       <div
         role="radiogroup"

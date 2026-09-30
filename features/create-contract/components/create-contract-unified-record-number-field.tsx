@@ -5,6 +5,7 @@ import { useId } from "react";
 
 import { Input } from "@/components/ui/input";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { UnifiedRecordHelp } from "@/features/create-contract/components/create-contract-field-help";
 import {
   getUnifiedRecordNumberSubscriber,
   toUnifiedRecordNumberInputValue,
@@ -54,7 +55,9 @@ export default function CreateContractUnifiedRecordNumberField({
 
   return (
     <div>
-      <CreateContractFieldLabel label={label} invalid={showInvalid} />
+      <CreateContractFieldLabel label={label} invalid={showInvalid}
+        help={<UnifiedRecordHelp />}
+      />
 
       <div
         dir="ltr"

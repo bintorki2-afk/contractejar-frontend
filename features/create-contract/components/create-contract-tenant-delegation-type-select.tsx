@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { DelegationHelp } from "@/features/create-contract/components/create-contract-field-help";
 import {
   DELEGATION_TYPE_OPTIONS,
   type DelegationTypeOption,
@@ -39,7 +40,9 @@ export default function CreateContractTenantDelegationTypeSelect({
 
   return (
     <div>
-      <CreateContractFieldLabel label={labels.label} invalid={invalid} />
+      <CreateContractFieldLabel label={labels.label} invalid={invalid}
+        help={<DelegationHelp />}
+      />
 
       <div
         role="radiogroup"
