@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import CreateContractDeedImageUpload from "@/features/create-contract/components/create-contract-deed-image-upload";
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { NationalAddressLinkHelp } from "@/features/create-contract/components/create-contract-field-help";
 import {
   isValidNationalAddressLink,
   type NationalAddressMethodId,
@@ -161,7 +162,11 @@ export default function CreateContractDeedNationalAddress({
 
       {method === "link" ? (
         <div className="space-y-2">
-          <CreateContractFieldLabel label={labels.link.label} invalid={linkInvalid} />
+          <CreateContractFieldLabel
+            label={labels.link.label}
+            invalid={linkInvalid}
+            help={<NationalAddressLinkHelp />}
+          />
 
           <div className="relative">
             <Link2
