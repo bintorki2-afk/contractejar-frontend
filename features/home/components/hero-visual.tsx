@@ -44,7 +44,6 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
           <div className={`${styles.ring} ${styles.r2}`} />
           <span className={`${styles.spark} ${styles.s1}`}>✦</span>
           <span className={`${styles.spark} ${styles.s2}`}>✦</span>
-          <span className={`${styles.spark} ${styles.s3}`}>✦</span>
 
           <div className={styles.persp}>
             <div className={styles.phone}>
@@ -107,20 +106,16 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
             </div>
           </div>
 
-          <div className={`${styles.fc} ${styles.chip} ${styles.c1}`}>
-            <img src="/images/ejar.png" alt="" />
-            <span>موثّق عبر إيجار</span>
-          </div>
           <div className={`${styles.fc} ${styles.chip} ${styles.c2}`}>
             <img src="/images/general-authority.png" alt="" />
-            <span>مرخّص</span>
+            <span>مرخّص من الهيئة</span>
           </div>
           <div className={`${styles.pill} ${styles.p1}`}>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M12 7v5l3 2" />
             </svg>
-            <span>خلال دقائق</span>
+            <span>خلال ٣٠ دقيقة</span>
           </div>
         </div>
       </div>

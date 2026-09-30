@@ -1,51 +1,40 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft, Landmark } from "lucide-react";
+import { Landmark } from "lucide-react";
 
 import ReviewStars from "@/features/reviews/components/review-stars";
 import { reviewsSummary } from "@/features/reviews/data/reviews";
 
 /**
- * Slim trust bar shown just below the hero: a rating pill (links to /reviews)
- * and a headline scale stat (total value of documented contracts).
+ * Slim, single-line trust row shown under the hero CTAs: rating (links to
+ * /reviews) and the total documented-contract value — quiet by design so it
+ * supports the primary actions instead of competing with them.
  */
 export default async function ReviewsHeroStrip() {
   const t = await getTranslations("reviews");
 
   return (
-    <div className="mt-1 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-      {/* Rating + trust — links to the reviews page */}
+    <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-muted-foreground lg:justify-start">
       <Link
         href="/reviews"
-        className="group inline-flex items-center gap-2.5 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-md transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.08] dark:border-white/15"
+        className="group inline-flex items-center gap-2 transition hover:text-foreground"
       >
-        <span className="text-lg font-extrabold text-brand">
+        <span className="text-base font-extrabold text-brand">
           {reviewsSummary.average.toFixed(1)}
         </span>
-        <ReviewStars rating={reviewsSummary.average} size={14} />
-        <span className="text-sm font-semibold text-muted-foreground">
-          {t("trustLabel")}
-        </span>
-        <ArrowLeft
-          className="size-4 text-brand transition-transform group-hover:-translate-x-0.5"
-          aria-hidden="true"
-        />
+        <ReviewStars rating={reviewsSummary.average} size={13} />
+        <span className="font-semibold">{t("trustLabel")}</span>
       </Link>
 
-      {/* Scale stat — total documented contract value */}
-      <div className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-md dark:bg-white/[0.08] dark:border-white/15">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
-          <Landmark className="size-4" aria-hidden="true" />
-        </span>
-        <span className="flex flex-col items-start leading-tight">
-          <span className="text-sm font-extrabold text-brand">
-            {t("valueAmount")}
-          </span>
-          <span className="text-xs font-semibold text-muted-foreground">
-            {t("valueLabel")}
-          </span>
-        </span>
-      </div>
+      <span aria-hidden="true" className="text-muted-foreground/40">
+        •
+      </span>
+
+      <span className="inline-flex items-center gap-1.5">
+        <Landmark className="size-3.5 text-brand" aria-hidden="true" />
+        <span className="font-extrabold text-brand">{t("valueAmount")}</span>
+        <span className="font-semibold">{t("valueLabel")}</span>
+      </span>
     </div>
   );
 }
