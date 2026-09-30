@@ -15,10 +15,11 @@ const LOGOS = [
 ];
 
 /**
- * Trusted-authorities strip: logos scroll right -> left on the section's dark
- * green. Each logo is dim/white at the edges and, as it crosses the centre,
- * smoothly scales up and turns full-colour (a moving "spotlight"). Pure rAF,
- * with a static coloured fallback under prefers-reduced-motion.
+ * Trusted-authorities strip. Logos scroll right -> left and blend into the
+ * section background (no card). Each logo is dim + monochrome at the edges —
+ * white in dark theme, grey in light theme — and, as it crosses the centre,
+ * smoothly scales up and turns full, boosted colour (a moving spotlight).
+ * rAF-driven, with a static coloured fallback under prefers-reduced-motion.
  */
 export default function HeroMarquee() {
   const t = useTranslations("hero");
@@ -39,10 +40,11 @@ export default function HeroMarquee() {
 
     if (reduce) {
       slots.forEach((s) => {
+        s.querySelectorAll<HTMLElement>("[data-dim]").forEach(
+          (d) => (d.style.opacity = "0")
+        );
         const c = s.querySelector<HTMLElement>("[data-c]");
-        const w = s.querySelector<HTMLElement>("[data-w]");
         if (c) c.style.opacity = "1";
-        if (w) w.style.opacity = "0";
       });
       return;
     }
@@ -82,10 +84,13 @@ export default function HeroMarquee() {
         const k = Math.max(0, 1 - d / 0.4); // spotlight width
         const e = k * k * (3 - 2 * k); // smoothstep
         s.style.transform = `scale(${(1 + 0.5 * e).toFixed(3)})`;
+
         const c = s.querySelector<HTMLElement>("[data-c]");
-        const w = s.querySelector<HTMLElement>("[data-w]");
         if (c) c.style.opacity = e.toFixed(3);
-        if (w) w.style.opacity = (0.4 * (1 - e)).toFixed(3);
+        s.querySelectorAll<HTMLElement>("[data-dim]").forEach((dm) => {
+          const base = Number(dm.dataset.base || "0.45");
+          dm.style.opacity = (base * (1 - e)).toFixed(3);
+        });
       }
       raf = requestAnimationFrame(frame);
     };
@@ -99,11 +104,8 @@ export default function HeroMarquee() {
 
   return (
     <div className="container pb-8">
-      <div
-        ref={stripRef}
-        className="relative overflow-hidden rounded-2xl px-6 py-5 ring-1 ring-white/10 [background:radial-gradient(120%_150%_at_50%_45%,#1d463b_0%,#12302a_72%)]"
-      >
-        <p className="mb-4 text-start text-sm font-bold text-[#8ff0d3]">
+      <div ref={stripRef} className="relative">
+        <p className="mb-4 text-start text-sm font-bold text-[#0a6b57] dark:text-[#8ff0d3]">
           {t("compliantWith")}
         </p>
 
@@ -120,18 +122,30 @@ export default function HeroMarquee() {
                   className="flex h-16 w-[120px] shrink-0 items-center justify-center will-change-transform"
                 >
                   <span className="relative block h-9 w-[110px]">
+                    {/* dim — white in dark theme */}
                     <img
-                      data-w
+                      data-dim
+                      data-base="0.45"
                       src={`/images/logos-white/${name}.png`}
                       alt=""
-                      className="absolute inset-0 m-auto max-h-9 max-w-full w-auto object-contain"
-                      style={{ opacity: 0.4 }}
+                      className="absolute inset-0 m-auto hidden max-h-9 w-auto max-w-full object-contain dark:block"
+                      style={{ opacity: 0.45 }}
                     />
+                    {/* dim — grey in light theme */}
+                    <img
+                      data-dim
+                      data-base="0.55"
+                      src={`/images/${name}.png`}
+                      alt=""
+                      className="absolute inset-0 m-auto max-h-9 w-auto max-w-full object-contain grayscale dark:hidden"
+                      style={{ opacity: 0.55 }}
+                    />
+                    {/* full, boosted colour */}
                     <img
                       data-c
                       src={`/images/${name}.png`}
                       alt=""
-                      className="absolute inset-0 m-auto max-h-9 max-w-full w-auto object-contain"
+                      className="absolute inset-0 m-auto max-h-9 w-auto max-w-full object-contain [filter:saturate(1.35)_contrast(1.06)]"
                       style={{ opacity: 0 }}
                     />
                   </span>
@@ -140,8 +154,8 @@ export default function HeroMarquee() {
             )}
           </div>
 
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-28 [background:linear-gradient(to_right,#132f29,transparent)]" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-28 [background:linear-gradient(to_left,#132f29,transparent)]" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-28 [background:linear-gradient(to_right,#e9fbf5,transparent)] dark:[background:linear-gradient(to_right,#16352f,transparent)]" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-28 [background:linear-gradient(to_left,#e9fbf5,transparent)] dark:[background:linear-gradient(to_left,#16352f,transparent)]" />
         </div>
       </div>
     </div>
