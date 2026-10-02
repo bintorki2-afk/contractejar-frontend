@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -147,7 +148,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <script
+        <Script
+          id="theme-no-flash"
+          strategy="beforeInteractive"
           // Applies the saved (or system) theme before first paint — no flash.
           dangerouslySetInnerHTML={{ __html: THEME_NO_FLASH_SCRIPT }}
         />

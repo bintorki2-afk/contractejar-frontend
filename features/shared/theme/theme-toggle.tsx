@@ -7,25 +7,25 @@ import { cn } from "@/lib/utils";
 
 type ThemeToggleProps = {
   className?: string;
-  lightLabel?: string;
-  darkLabel?: string;
 };
 
-/** Light/dark theme toggle for the public site header. */
-export default function ThemeToggle({
-  className,
-  lightLabel = "الوضع الفاتح",
-  darkLabel = "الوضع الداكن",
-}: ThemeToggleProps) {
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === "dark";
+/**
+ * Light/dark theme toggle for the public site header.
+ *
+ * The visible icon is driven purely by the `.dark` class on <html> via CSS,
+ * not by JS state, so the server-rendered markup and the first client render
+ * are identical — this avoids the hydration mismatch that happens because the
+ * server always assumes "light" while the client may already be "dark".
+ */
+export default function ThemeToggle({ className }: ThemeToggleProps) {
+  const { toggleTheme } = useTheme();
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={isDark ? lightLabel : darkLabel}
-      title={isDark ? lightLabel : darkLabel}
+      aria-label="تبديل بين الوضع الفاتح والداكن"
+      title="تبديل بين الوضع الفاتح والداكن"
       className={cn(
         "inline-flex size-10 shrink-0 items-center justify-center rounded-full border transition-colors",
         "border-[#e4e4e4] bg-white text-brand hover:bg-brand-background",
@@ -33,11 +33,10 @@ export default function ThemeToggle({
         className,
       )}
     >
-      {isDark ? (
-        <Sun className="size-[18px] shrink-0" aria-hidden />
-      ) : (
-        <Moon className="size-[18px] shrink-0" aria-hidden />
-      )}
+      {/* Shown in light mode, hidden in dark mode (CSS-driven, no JS state) */}
+      <Moon className="size-[18px] shrink-0 dark:hidden" aria-hidden />
+      {/* Hidden in light mode, shown in dark mode */}
+      <Sun className="hidden size-[18px] shrink-0 dark:block" aria-hidden />
     </button>
   );
 }
