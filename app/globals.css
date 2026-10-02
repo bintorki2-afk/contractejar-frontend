@@ -189,41 +189,44 @@
 }
 
 .dark {
-  --background: #0d1413;
-  --foreground: #ffffff;
-  --card: #151c1b;
-  --card-foreground: #ffffff;
-  --popover: #1a2421;
-  --popover-foreground: #ffffff;
+  /* Richer dark theme: deeper, more saturated teal base with a clear surface
+     ladder (background → card → elevated) so cards separate and read as layered
+     rather than one flat dark mass. Body text is off-white, not pure white. */
+  --background: #07140f;
+  --foreground: #e9f1ee;
+  --card: #12231e;
+  --card-foreground: #e9f1ee;
+  --popover: #193a32;
+  --popover-foreground: #e9f1ee;
   --primary: #00a880;
   --primary-foreground: #ffffff;
-  --secondary: #1a2221;
-  --secondary-foreground: #ffffff;
-  --muted: #1a2221;
-  --muted-foreground: #a3adac;
-  --accent: #16352f;
-  --accent-foreground: #ffffff;
+  --secondary: #12231e;
+  --secondary-foreground: #e9f1ee;
+  --muted: #12231e;
+  --muted-foreground: #9fb4ac;
+  --accent: #184a3f;
+  --accent-foreground: #eaf5f1;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #262d2c;
-  --input: #0d1614;
+  --border: #2b443d;
+  --input: #0b1a16;
   --ring: #00a880;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: #151c1b;
-  --sidebar-foreground: #ffffff;
+  --sidebar: #12231e;
+  --sidebar-foreground: #e9f1ee;
   --sidebar-primary: #00a880;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a2221;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #262d2c;
+  --sidebar-accent: #16302a;
+  --sidebar-accent-foreground: #eaf5f1;
+  --sidebar-border: #2b443d;
   --sidebar-ring: #00a880;
   /* Brand surface tokens themed globally in dark (public pages + flows), so
      bg-brand-background / bg-brand-background-green follow the dark theme. */
-  --color-brand-background: #101614;
-  --color-brand-background-green: #16352f;
+  --color-brand-background: #10231d;
+  --color-brand-background-green: #173f36;
 }
 
 @layer base {
@@ -1012,10 +1015,10 @@ html.dark textarea::placeholder {
 }
 .dark .site-bg-base {
   background:
-    radial-gradient(120% 80% at 50% -15%, rgba(23, 116, 98, 0.45), transparent 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(13, 179, 139, 0.12), transparent 60%),
-    radial-gradient(80% 50% at 0% 60%, rgba(13, 179, 139, 0.08), transparent 60%),
-    linear-gradient(180deg, #0d1413 0%, #101614 45%, #0b110f 100%);
+    radial-gradient(120% 80% at 50% -15%, rgba(16, 150, 120, 0.3), transparent 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(13, 179, 139, 0.15), transparent 60%),
+    radial-gradient(80% 50% at 0% 60%, rgba(13, 179, 139, 0.1), transparent 60%),
+    linear-gradient(180deg, #07140f 0%, #0a1a15 45%, #04100c 100%);
 }
 
 /* Live header height (the navbar script overwrites this with the exact value);

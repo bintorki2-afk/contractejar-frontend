@@ -1,3 +1,4 @@
+import AboutValueVisual from "@/features/about/components/about-value-visual";
 import AboutValuesItem from "@/features/about/components/about-values-item";
 import type { AboutVisionMissionResolved } from "@/features/about/types/about-content";
 
@@ -24,18 +25,15 @@ export default function AboutValuesSection({
           eyebrow={content.vision.eyebrow}
           title={content.vision.title}
           description={content.vision.description}
-          imageSrc={content.vision.imageSrc}
-          imageAlt={content.vision.imageAlt}
-          bareImage
+          visual={<AboutValueVisual variant="vision" />}
         />
 
         <AboutValuesItem
           eyebrow={content.mission.eyebrow}
           title={content.mission.title}
           description={content.mission.description}
-          imageSrc={content.mission.imageSrc}
-          imageAlt={content.mission.imageAlt}
           reverse
+          visual={<AboutValueVisual variant="mission" />}
         />
       </div>
     </section>
