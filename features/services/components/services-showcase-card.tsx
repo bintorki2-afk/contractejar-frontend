@@ -2,17 +2,23 @@ import Image from "next/image";
 
 import ServicesVisual from "@/features/services/components/services-visual";
 
+type ServiceStage = {
+  key: string;
+  label: string;
+  title: string;
+  state: "done" | "active" | "todo";
+};
+
 type ServiceVisualContent = {
   heading: string;
-  tabs: string[];
-  rowTitle: string;
-  rowSubtitle: string;
+  stages: ServiceStage[];
   successTitle: string;
   successSubtitle: string;
   priceValue: string;
   priceCurrency: string;
   priceLabel: string;
   priceSub: string;
+  verifiedLabel: string;
 };
 
 type ServicesShowcaseCardProps = {

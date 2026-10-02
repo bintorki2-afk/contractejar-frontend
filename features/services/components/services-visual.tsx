@@ -4,45 +4,43 @@ import { useEffect, useRef, useState } from "react";
 
 import styles from "./services-visual.module.css";
 
+type Stage = { key: string; label: string; title: string; state: "done" | "active" | "todo" };
+
 type ServicesVisualProps = {
   alt: string;
-  /** Phone screen heading, e.g. "إنشاء عقد إيجار سكني" */
   heading: string;
-  /** Short chip tabs shown under the heading */
-  tabs: string[];
-  /** Row title + subtitle inside the screen */
-  rowTitle: string;
-  rowSubtitle: string;
-  /** Success popup texts */
+  /** Contract journey stages shown inside the phone */
+  stages: Stage[];
   successTitle: string;
   successSubtitle: string;
-  /** Floating price pill */
+  /** Floating price chip */
   priceValue: string;
   priceCurrency: string;
   priceLabel: string;
   priceSub: string;
+  /** Floating verification chip */
+  verifiedLabel: string;
 };
 
 /**
- * Live, CSS-built visual for a service showcase — same design language as the
- * hero (floating 3D phone, glow, rings, floating pills) so the sections read as
- * one system. Replaces the old flat PNG whose elements were scattered.
+ * Live, CSS-built service visual — same design language as the hero (floating
+ * 3D phone, glow, rings) but the in-screen content shows the CONTRACT JOURNEY
+ * (stepper + stage cards), and the whole screen ADAPTS to the site theme
+ * (light/dark) because it is built from live elements, not a flat image.
  *
  * Authored at a fixed 760x700 design size and scaled to the container width.
- * All motion is pure CSS and disabled under `prefers-reduced-motion`.
  */
 export default function ServicesVisual({
   alt,
   heading,
-  tabs,
-  rowTitle,
-  rowSubtitle,
+  stages,
   successTitle,
   successSubtitle,
   priceValue,
   priceCurrency,
   priceLabel,
   priceSub,
+  verifiedLabel,
 }: ServicesVisualProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.72);
@@ -56,6 +54,8 @@ export default function ServicesVisual({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  const stepCount = stages.length;
 
   return (
     <div className="w-full">
@@ -80,11 +80,11 @@ export default function ServicesVisual({
                 <div className={styles.sbar}>
                   <span>٩:٤١</span>
                   <span className={styles.ic}>
-                    <svg viewBox="0 0 20 14" width="18" height="12" fill="#111">
-                      <rect x="0" y="9" width="3" height="5" rx="1" />
-                      <rect x="5" y="6" width="3" height="8" rx="1" />
-                      <rect x="10" y="3" width="3" height="11" rx="1" />
-                      <rect x="15" y="0" width="3" height="14" rx="1" />
+                    <svg viewBox="0 0 20 14" width="18" height="12">
+                      <rect x="0" y="9" width="3" height="5" rx="1" fill="#111" />
+                      <rect x="5" y="6" width="3" height="8" rx="1" fill="#111" />
+                      <rect x="10" y="3" width="3" height="11" rx="1" fill="#111" />
+                      <rect x="15" y="0" width="3" height="14" rx="1" fill="#111" />
                     </svg>
                     <svg viewBox="0 0 26 13" width="24" height="12">
                       <rect x="1" y="1" width="20" height="11" rx="3" fill="none" stroke="#111" strokeOpacity=".9" />
@@ -99,26 +99,66 @@ export default function ServicesVisual({
                   <span className={styles.gdot} />
                 </div>
 
-                <div className={styles.tabs}>
-                  {tabs.map((tab) => (
-                    <span key={tab}>{tab}</span>
+                {/* contract-journey stepper */}
+                <div className={styles.steps}>
+                  {stages.map((s, i) => (
+                    <div key={s.key} className={styles.step}>
+                      {i < stepCount - 1 && (
+                        <span
+                          className={styles.sline}
+                          style={{ right: "50%", width: "100%" }}
+                        />
+                      )}
+                      <span
+                        className={`${styles.sdot} ${
+                          s.state === "done"
+                            ? styles.done
+                            : s.state === "active"
+                              ? styles.active
+                              : ""
+                        }`}
+                      >
+                        {s.state === "done" ? (
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        ) : (
+                          i + 1
+                        )}
+                      </span>
+                      <span className={styles.slabel}>{s.label}</span>
+                    </div>
                   ))}
                 </div>
 
-                <p className={styles.lead}>{rowSubtitle}</p>
-
-                <div className={styles.prow}>
-                  <span className={styles.pdot}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0e6a5a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="5" width="20" height="14" rx="2" />
-                      <path d="M2 10h20" />
-                    </svg>
-                  </span>
-                  <span>
-                    <b>{rowTitle}</b>
-                    <span>{rowSubtitle}</span>
-                  </span>
+                {/* stage cards */}
+                <div className={styles.scards}>
+                  {stages.map((s) => (
+                    <div
+                      key={s.key}
+                      className={`${styles.scard} ${s.state === "active" ? styles.active : ""}`}
+                    >
+                      <span className={styles.cdot}>
+                        {s.state === "done" ? (
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1aa589" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0e6a5a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 8v4l2.5 2" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className={styles.ctxt}>
+                        <b>{s.title}</b>
+                        <span>{s.state === "done" ? "مكتملة" : "قيد الإنجاز"}</span>
+                      </span>
+                    </div>
+                  ))}
                 </div>
+
+                <div className={styles.scrFoot} />
 
                 <div className={styles.success}>
                   <div className={styles.cc}>
@@ -140,16 +180,12 @@ export default function ServicesVisual({
                   </div>
                 </div>
 
-                <div className={styles.scrFoot}>
-                  <div className={styles.home} />
-                </div>
-
                 <div className={styles.sheen} />
               </div>
             </div>
           </div>
 
-          {/* floating price pill — replaces the old stray card */}
+          {/* floating price chip — upper-left */}
           <div className={`${styles.price} ${styles.pr1}`}>
             <span className={styles.pv}>
               {priceValue} <small>{priceCurrency}</small>
@@ -160,11 +196,12 @@ export default function ServicesVisual({
             </span>
           </div>
 
-          <div className={`${styles.pill} ${styles.p1}`}>
+          {/* floating verified chip — lower, opposite corner */}
+          <div className={`${styles.vpill} ${styles.vp1}`}>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
               <path d="M20 6 9 17l-5-5" />
             </svg>
-            <span>موثّق رسميًا</span>
+            <span>{verifiedLabel}</span>
           </div>
         </div>
       </div>
