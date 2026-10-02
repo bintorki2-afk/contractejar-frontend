@@ -1,5 +1,6 @@
 
 import HeroCtaButtons from "@/features/home/components/hero-cta-buttons";
+import HeroMarquee from "@/features/home/components/hero-marquee";
 import ReviewsHeroStrip from "@/features/reviews/components/reviews-hero-strip";
 
 type HeroContentProps = {
@@ -63,6 +64,8 @@ export default function HeroContent({
       />
 
       <ReviewsHeroStrip />
+
+      <HeroMarquee />
     </div>
   );
 }

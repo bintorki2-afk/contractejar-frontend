@@ -1,5 +1,4 @@
 import HeroContent from "@/features/home/components/hero-content";
-import HeroMarquee from "@/features/home/components/hero-marquee";
 import HeroVisual from "@/features/home/components/hero-visual";
 import HeroWhatsappButton from "@/features/home/components/hero-whatsapp-button";
 import type { HomeHeroResolved } from "@/features/home/types/home-content";
@@ -48,8 +47,6 @@ export default function HeroSection({ content }: HeroSectionProps) {
           href={content.whatsappHref}
         />
       </div>
-
-      <HeroMarquee />
     </section>
   );
 }

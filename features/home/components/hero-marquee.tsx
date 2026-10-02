@@ -103,7 +103,7 @@ export default function HeroMarquee() {
   }, []);
 
   return (
-    <div className="container pb-8">
+    <div className="w-full">
       <div ref={stripRef} className="relative">
         <p className="mb-4 text-start text-sm font-bold text-[#0a6b57] dark:text-[#8ff0d3]">
           {t("compliantWith")}
