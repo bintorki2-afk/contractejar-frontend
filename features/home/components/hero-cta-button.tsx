@@ -40,7 +40,7 @@ export default function HeroCtaButton({
         {label}
       </span>
 
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white dark:bg-[#06231c] sm:size-6 lg:size-8">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-white/0 sm:size-6 lg:size-8 dark:bg-gradient-to-br dark:from-[#0f4d3e] dark:to-[#06231c] dark:ring-white/10 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
         <ArrowUpLeft
           className="size-4 text-brand dark:text-white transition-transform duration-300 group-hover:-rotate-45 sm:size-3 lg:size-4"
           aria-hidden="true"
