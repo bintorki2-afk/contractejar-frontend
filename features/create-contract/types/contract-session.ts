@@ -8,6 +8,14 @@ type ContractSessionBase = {
   contractId: number;
   uuid: string;
   contractType: PropertyContractType;
+  /**
+   * Customer-facing order reference — a stable 6-digit number generated when a
+   * fresh (account-less) order starts, so the customer always sees an order
+   * number from the first step even before any backend id exists. For a real
+   * backend-backed contract the displayable number is the numeric `uuid`
+   * (matches the dashboard); this reference is the fallback for the fresh flow.
+   */
+  orderReference?: string;
 };
 
 export type FreshContractSession = ContractSessionBase & {

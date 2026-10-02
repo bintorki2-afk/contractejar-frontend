@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -13,8 +13,10 @@ import CreateContractFormSelect from "@/features/create-contract/components/crea
 import CreateContractLeaseRenewalAddressChoice from "@/features/create-contract/components/create-contract-lease-renewal-address-choice";
 import CreateContractLeaseRenewalInstrumentUpload from "@/features/create-contract/components/create-contract-lease-renewal-instrument-upload";
 import CreateContractLeaseRenewalNotice from "@/features/create-contract/components/create-contract-lease-renewal-notice";
+import CreateContractStageAccordion, {
+  type StageAccordionState,
+} from "@/features/create-contract/components/create-contract-stage-accordion";
 import CreateContractStepNavigation from "@/features/create-contract/components/create-contract-step-navigation";
-import CreateContractStepPhaseHeader from "@/features/create-contract/components/create-contract-step-phase-header";
 import { Switch } from "@/components/ui/switch";
 import { useCreateContractDeedStep } from "@/features/create-contract/hooks/use-create-contract-deed-step";
 import { useSubmitContractStep1 } from "@/features/create-contract/hooks/use-submit-contract-step1";
@@ -86,6 +88,8 @@ export default function CreateContractDeedStep({
     nationalAddressManual,
     setNationalAddressManual,
     showNationalAddress,
+    isDeedComplete,
+    isAddressComplete,
     canContinue,
     existingInstrumentImageUrl,
     existingInstrumentFrontImageUrl,
@@ -120,8 +124,32 @@ export default function CreateContractDeedStep({
   const deedTypePopup = useInstrumentTypeDeedPopup("contract");
   const supportsManualEntry = deedTypeSupportsManualEntry(selectedDeedType);
 
+  // Progressive stages: only one open at a time. The deed stage opens first;
+  // once it's complete it folds up (keeping an edit affordance) and the national
+  // address stage opens automatically.
+  const [openStage, setOpenStage] = useState<"deed" | "address">("deed");
+  const deedWasComplete = useRef(isDeedComplete);
+
+  useEffect(() => {
+    if (!deedWasComplete.current && isDeedComplete && showNationalAddress) {
+      setOpenStage("address");
+    }
+    deedWasComplete.current = isDeedComplete;
+  }, [isDeedComplete, showNationalAddress]);
+
   const deedPhase = labels.phases[0];
   const addressPhase = labels.phases[1];
+
+  const selectedDeedTypeLabel =
+    selectedDeedType !== "" ? labels.deedType.types[selectedDeedType] : "";
+  const deedSummary = selectedDeedTypeLabel || deedPhase.title;
+  const addressSummary = addressPhase.subtitle;
+
+  const addressStageState: StageAccordionState = !isDeedComplete
+    ? "locked"
+    : isAddressComplete && openStage !== "address"
+      ? "complete"
+      : "active";
   const leaseRenewalNotice =
     contractType === "commercial"
       ? labels.leaseRenewal?.noticeCommercial
@@ -150,6 +178,8 @@ export default function CreateContractDeedStep({
 
     if (!canContinue) {
       setShowFieldErrors(true);
+      // Open whichever stage still has missing fields so the errors are visible.
+      setOpenStage(!isDeedComplete ? "deed" : "address");
       toast.error(tIncomplete("incompleteContinue"));
       setTimeout(scrollToFirstInvalidField, 0);
       return;
@@ -490,70 +520,81 @@ export default function CreateContractDeedStep({
   return (
     <>
       <div className="p-3 md:p-5">
-        <CreateContractStepPhaseHeader
-          title={deedPhase.title}
-          subtitle={deedPhase.subtitle}
-        />
-
-        <div className="space-y-4">
-          <div className="space-y-3 rounded-[24px] bg-white p-3 md:p-4 dark:bg-transparent">
-            <CreateContractDeedTypeSelect
-              labels={labels.deedType}
-              value={selectedDeedType}
-              onChange={handleDeedTypeChange}
-              locked={isInstrumentTypeLocked}
-              invalid={showFieldErrors && selectedDeedType === ""}
-            />
-
-            {isLeaseRenewal && leaseRenewalNotice ? (
-              <CreateContractLeaseRenewalNotice message={leaseRenewalNotice} />
-            ) : null}
-
-            {isLeaseRenewal && labels.leaseRenewal ? (
-              <CreateContractLeaseRenewalInstrumentUpload
-                labels={labels.leaseRenewal}
-                deedImageLabels={labels.deedImage}
-                value={deedFiles}
-                onChange={setDeedFiles}
-                existingImageUrl={existingInstrumentImageUrl}
-                showFieldErrors={showFieldErrors}
-              />
-            ) : null}
-
-            {renderDeedInstrumentContent()}
-          </div>
-
-          {showNationalAddress ? (
-            <div className="space-y-3 border-t border-dashed border-[#d9d9d9] pt-4">
-              <CreateContractStepPhaseHeader
-                title={addressPhase.title}
-                subtitle={addressPhase.subtitle}
+        <div className="space-y-3">
+          <CreateContractStageAccordion
+            index={1}
+            title={deedPhase.title}
+            subtitle={deedPhase.subtitle}
+            state={openStage === "deed" ? "active" : "complete"}
+            open={openStage === "deed"}
+            onToggle={() => setOpenStage("deed")}
+            summary={deedSummary}
+          >
+            <div className="space-y-3">
+              <CreateContractDeedTypeSelect
+                labels={labels.deedType}
+                value={selectedDeedType}
+                onChange={handleDeedTypeChange}
+                locked={isInstrumentTypeLocked}
+                invalid={showFieldErrors && selectedDeedType === ""}
               />
 
-              {isLeaseRenewal && labels.leaseRenewal ? (
-                <CreateContractLeaseRenewalAddressChoice
-                  labels={labels.leaseRenewal}
-                  value={leaseRenewalAddressMode}
-                  onChange={setLeaseRenewalAddressMode}
-                />
+              {isLeaseRenewal && leaseRenewalNotice ? (
+                <CreateContractLeaseRenewalNotice message={leaseRenewalNotice} />
               ) : null}
 
-              {showStandardAddressMethods || showChangeAddressMethods ? (
-                <CreateContractDeedNationalAddress
-                  labels={labels.nationalAddress}
-                  method={nationalAddressMethod}
-                  onMethodChange={setNationalAddressMethod}
-                  photoFiles={nationalAddressPhotoFiles}
-                  onPhotoFilesChange={setNationalAddressPhotoFiles}
-                  linkUrl={nationalAddressLinkUrl}
-                  onLinkUrlChange={setNationalAddressLinkUrl}
-                  manualAddress={nationalAddressManual}
-                  onManualAddressChange={setNationalAddressManual}
-                  existingPhotoUrl={existingAddressImageUrl}
+              {isLeaseRenewal && labels.leaseRenewal ? (
+                <CreateContractLeaseRenewalInstrumentUpload
+                  labels={labels.leaseRenewal}
+                  deedImageLabels={labels.deedImage}
+                  value={deedFiles}
+                  onChange={setDeedFiles}
+                  existingImageUrl={existingInstrumentImageUrl}
                   showFieldErrors={showFieldErrors}
                 />
               ) : null}
+
+              {renderDeedInstrumentContent()}
             </div>
+          </CreateContractStageAccordion>
+
+          {showNationalAddress ? (
+            <CreateContractStageAccordion
+              index={2}
+              title={addressPhase.title}
+              subtitle={addressPhase.subtitle}
+              state={addressStageState}
+              open={openStage === "address"}
+              onToggle={() => setOpenStage("address")}
+              summary={addressSummary}
+              lockedLabel={deedPhase.title}
+            >
+              <div className="space-y-3">
+                {isLeaseRenewal && labels.leaseRenewal ? (
+                  <CreateContractLeaseRenewalAddressChoice
+                    labels={labels.leaseRenewal}
+                    value={leaseRenewalAddressMode}
+                    onChange={setLeaseRenewalAddressMode}
+                  />
+                ) : null}
+
+                {showStandardAddressMethods || showChangeAddressMethods ? (
+                  <CreateContractDeedNationalAddress
+                    labels={labels.nationalAddress}
+                    method={nationalAddressMethod}
+                    onMethodChange={setNationalAddressMethod}
+                    photoFiles={nationalAddressPhotoFiles}
+                    onPhotoFilesChange={setNationalAddressPhotoFiles}
+                    linkUrl={nationalAddressLinkUrl}
+                    onLinkUrlChange={setNationalAddressLinkUrl}
+                    manualAddress={nationalAddressManual}
+                    onManualAddressChange={setNationalAddressManual}
+                    existingPhotoUrl={existingAddressImageUrl}
+                    showFieldErrors={showFieldErrors}
+                  />
+                ) : null}
+              </div>
+            </CreateContractStageAccordion>
           ) : null}
         </div>
 

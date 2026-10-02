@@ -1,6 +1,6 @@
 "use client";
 
-import { IdCard, User } from "lucide-react";
+import { IdCard } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Switch } from "@/components/ui/switch";
@@ -77,22 +77,11 @@ export default function CreateContractOwnerDataPhase({
     showFieldErrors && !isAdultBirthDateComplete(value.birthDate);
   const hasAgentInvalid = showFieldErrors && value.hasAgent === "";
   const hasAgentChecked = value.hasAgent === "yes";
-  const fullNameInvalid = showFieldErrors && value.fullName.trim() === "";
   const idValid = !idInvalid && isIdNumberComplete(value.idNumber);
   const phoneValid = !phoneInvalid && isPhoneComplete(value.phone);
 
   return (
     <div className="space-y-3">
-      <CreateContractIconInputField
-        label={labels.fullName.label}
-        placeholder={labels.fullName.placeholder}
-        value={value.fullName}
-        onChange={(fullName) => updateField("fullName", fullName)}
-        icon={User}
-        errorMessage={fullNameInvalid ? t("fieldRequired") : undefined}
-        invalid={fullNameInvalid}
-      />
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <CreateContractIconInputField
           label={labels.idNumber.label}
