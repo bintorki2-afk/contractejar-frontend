@@ -103,9 +103,9 @@ export default function HeroMarquee() {
   }, []);
 
   return (
-    <div className="container pb-8">
+    <div className="w-full">
       <div ref={stripRef} className="relative">
-        <p className="mb-4 text-start text-sm font-bold text-[#0a6b57] dark:text-[#8ff0d3]">
+        <p className="mb-4 text-center text-sm font-bold text-[#0a6b57] lg:text-start dark:text-[#8ff0d3]">
           {t("compliantWith")}
         </p>
 
@@ -154,8 +154,8 @@ export default function HeroMarquee() {
             )}
           </div>
 
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-28 [background:linear-gradient(to_right,#e9fbf5,transparent)] dark:[background:linear-gradient(to_right,#16352f,transparent)]" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-28 [background:linear-gradient(to_left,#e9fbf5,transparent)] dark:[background:linear-gradient(to_left,#16352f,transparent)]" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-28 [background:linear-gradient(to_right,var(--color-brand-background-green),transparent)]" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-28 [background:linear-gradient(to_left,var(--color-brand-background-green),transparent)]" />
         </div>
       </div>
     </div>

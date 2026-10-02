@@ -110,6 +110,10 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
             <img src="/images/general-authority.png" alt="" />
             <span>مرخّص من الهيئة</span>
           </div>
+          <div className={`${styles.fc} ${styles.chip} ${styles.c3}`}>
+            <img src="/images/ejar.png" alt="" />
+            <span>موثّق رسميًا</span>
+          </div>
           <div className={`${styles.pill} ${styles.p1}`}>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="9" />

@@ -1,17 +1,20 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 
 type AboutValuesItemProps = {
   eyebrow: string;
   title: string;
   description: string;
-  imageSrc: string;
-  imageAlt: string;
+  imageSrc?: string;
+  imageAlt?: string;
   reverse?: boolean;
   /**
    * When true, the image is shown on its own (no white card / shadow / ring)
    * so a transparent PNG blends into the section background.
    */
   bareImage?: boolean;
+  /** When provided, a live content visual is rendered instead of the image. */
+  visual?: ReactNode;
 };
 
 export default function AboutValuesItem({
@@ -22,9 +25,11 @@ export default function AboutValuesItem({
   imageAlt,
   reverse = false,
   bareImage = false,
+  visual,
 }: AboutValuesItemProps) {
   const remote =
-    imageSrc.startsWith("http://") || imageSrc.startsWith("https://");
+    !!imageSrc &&
+    (imageSrc.startsWith("http://") || imageSrc.startsWith("https://"));
 
   return (
     <article
@@ -42,22 +47,28 @@ export default function AboutValuesItem({
         </p>
       </div>
 
-      <div
-        className={
-          bareImage
-            ? "flex justify-center"
-            : "overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10"
-        }
-      >
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          width={1024}
-          height={768}
-          className={`h-auto w-full object-contain${bareImage ? " [mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)]" : ""}`}
-          unoptimized={remote}
-        />
-      </div>
+      {visual ? (
+        visual
+      ) : (
+        <div
+          className={
+            bareImage
+              ? "flex justify-center"
+              : "overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10"
+          }
+        >
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={imageAlt ?? ""}
+              width={1024}
+              height={768}
+              className={`h-auto w-full object-contain${bareImage ? " [mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_62%,transparent_96%)]" : ""}`}
+              unoptimized={remote}
+            />
+          ) : null}
+        </div>
+      )}
     </article>
   );
 }

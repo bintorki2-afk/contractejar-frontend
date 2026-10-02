@@ -20,23 +20,28 @@ type SubmitOrderResult = {
 };
 
 /**
- * The order number shown to the customer must match the 6-digit number in the
- * dashboard (the backend contract uuid), so support can match them. Use that
- * real number; only fall back to a generated reference if it isn't available.
+ * The order number must match what the customer saw in the header throughout
+ * the wizard. Precedence:
+ *   1. the real backend contract uuid (6-digit) when present, so it matches the
+ *      dashboard for support;
+ *   2. otherwise the 6-digit order reference generated when the fresh order
+ *      started (the number shown in the header from the first step);
+ *   3. a last-resort generated reference, only if neither exists.
  */
 function resolveOrderNumber(): string {
-  const uuid = useCreateContractDraftStore.getState().contractSession?.uuid;
+  const session = useCreateContractDraftStore.getState().contractSession;
+
+  const uuid = session?.uuid;
   if (uuid != null && /^\d{4,7}$/.test(String(uuid).trim())) {
     return String(uuid).trim();
   }
 
-  const now = new Date();
-  const yy = String(now.getFullYear()).slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const random = String(Math.floor(1000 + Math.random() * 9000));
+  const reference = session?.orderReference;
+  if (reference != null && /^\d{4,7}$/.test(String(reference).trim())) {
+    return String(reference).trim();
+  }
 
-  return `AQ-${yy}${mm}${dd}-${random}`;
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 // Deed / document file categories held in the draft store. Each has an

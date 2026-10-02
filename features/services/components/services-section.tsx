@@ -37,6 +37,57 @@ export default async function ServicesSection() {
               description={item.description}
               statsValue={item.statsValue}
               statsText={item.statsText}
+              visual={
+                serviceType === "residential"
+                  ? {
+                      navActive: "عقد سكني",
+                      heading: "طلبات قبل أن نبدأ",
+                      subheading: "لخدمتك بشكل سريع، جهّز التالي:",
+                      hint: "رحلتك الإيجارية أصبحت أسهل.",
+                      steps: ["الصك", "المالك", "المستأجر", "المالية"],
+                      activeStep: 0,
+                      requirements: [
+                        { key: "parties", label: "بيانات المؤجر والمستأجر.", icon: "people" },
+                        { key: "deed", label: "صورة الصك وعنوان العقار.", icon: "deed" },
+                        { key: "unit", label: "بيانات الوحدة المؤجرة.", icon: "home" },
+                        { key: "rent", label: "مبلغ الإيجار.", icon: "money" },
+                        { key: "draft", label: "نرسل لك مسودة العقد عبر واتساب للاطلاع.", icon: "chat" },
+                      ],
+                      priceBoxLabel: "سعر العقد لمدة سنة :",
+                      startLabel: "لنبدأ",
+                      seeAllLabel: "عرض جميع الأسعار",
+                      priceValue: "٢٤٩",
+                      priceCurrency: "ريال",
+                      priceLabel: "إنشاء عقد إيجار سكني",
+                      priceSub: "عمارة، شقة، فيلا، غرفة",
+                      verifiedLabel: "موثّق رسميًا",
+                    }
+                  : serviceType === "commercial"
+                    ? {
+                        navActive: "عقد تجاري",
+                        heading: "طلبات قبل أن نبدأ",
+                        subheading: "لخدمتك بشكل سريع، جهّز التالي:",
+                        hint: "رحلتك الإيجارية أصبحت أسهل.",
+                        steps: ["الصك", "المالك", "المستأجر", "المالية"],
+                        activeStep: 0,
+                        requirements: [
+                          { key: "parties", label: "بيانات المؤجر والمستأجر.", icon: "people" },
+                          { key: "deed", label: "صورة الصك والسجل التجاري.", icon: "deed" },
+                          { key: "unit", label: "بيانات الوحدة التجارية.", icon: "home" },
+                          { key: "rent", label: "مبلغ الإيجار.", icon: "money" },
+                          { key: "draft", label: "نرسل لك مسودة العقد عبر واتساب للاطلاع.", icon: "chat" },
+                        ],
+                        priceBoxLabel: "سعر العقد لمدة سنة :",
+                        startLabel: "لنبدأ",
+                        seeAllLabel: "عرض جميع الأسعار",
+                        priceValue: "٣٤٩",
+                        priceCurrency: "ريال",
+                        priceLabel: "إنشاء عقد إيجار تجاري",
+                        priceSub: "محلات، مكاتب، معارض",
+                        verifiedLabel: "موثّق رسميًا",
+                      }
+                    : undefined
+              }
               reverse={serviceType === "commercial"}
             />
           );

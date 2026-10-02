@@ -1,8 +1,8 @@
-import { ArrowLeft, MessageCircle } from "lucide-react";
-import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import SupportVisual from "@/features/support/components/support-visual";
 import type { HomeContactResolved } from "@/features/home/types/home-content";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 
@@ -65,30 +65,31 @@ export default async function SupportSection({ content }: SupportSectionProps) {
           </div>
 
           <div className="order-1 lg:order-2">
-            <div className="relative overflow-hidden ">
-              <Image
-                src={resolved.imageUrl}
-                alt={resolved.imageAlt}
-                width={920}
-                height={648}
-                className="h-auto w-full rounded-[2.2rem] object-cover"
-                sizes="(max-width: 1023px) 100vw, 50vw"
-                quality={75}
-                unoptimized={
-                  resolved.imageUrl.startsWith("http://") ||
-                  resolved.imageUrl.startsWith("https://")
-                }
-              />
-
-              <span className="absolute inset-s-6 top-8 inline-flex -rotate-12 items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-extrabold text-white shadow-lg">
-                {resolved.satisfaction}
-              </span>
-
-              <span className="absolute bottom-10 inset-e-6 inline-flex rotate-12 items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-extrabold text-white shadow-lg">
-                <MessageCircle className="size-4" aria-hidden="true" />
-                {resolved.responseTime}
-              </span>
-            </div>
+            <SupportVisual
+              alt={resolved.imageAlt}
+              chatName="فريق دعم عقد إيجار"
+              status="متصل الآن"
+              messages={[
+                {
+                  from: "in",
+                  text: "أهلاً بك في عقد إيجار 👋 كيف يمكنني مساعدتك في توثيق عقدك؟",
+                  time: "١:٣٠ ص",
+                },
+                {
+                  from: "out",
+                  text: "أبغى أوثّق عقد إيجار سكني، كم يأخذ وقت؟",
+                  time: "١:٣١ ص",
+                },
+                {
+                  from: "in",
+                  text: "يتم التوثيق خلال ٣٠ دقيقة فقط! أرسل بياناتك وأبدأ فوراً 🚀",
+                  time: "١:٣٢ ص",
+                },
+              ]}
+              inputPlaceholder="اكتب رسالتك…"
+              satisfaction={resolved.satisfaction}
+              responseTime={resolved.responseTime}
+            />
           </div>
         </div>
       </div>

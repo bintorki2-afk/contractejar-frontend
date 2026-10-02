@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpLeft, FileText } from "lucide-react";
+import { ArrowUpLeft, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import CustomIcon from "@/features/shared/components/custom-icon";
@@ -14,28 +14,8 @@ type TrustedEntityCardProps = {
   viewLicense: string;
   licenseUrl: string;
   logoSrc: string;
-  theme: TrustedEntityTheme;
-};
-
-const themeStyles: Record<
-  TrustedEntityTheme,
-  { card: string; link: string; divider: string }
-> = {
-  purple: {
-    card: "border-t-[#7c3aed] bg-[#faf5ff] dark:bg-[#151c1b]",
-    link: "text-[#7c3aed] dark:text-[#a78bfa] hover:text-[#6d28d9]",
-    divider: "border-[#ede9fe] dark:border-[#262d2c]",
-  },
-  blue: {
-    card: "border-t-[#2563eb] bg-[#eff6ff] dark:bg-[#151c1b]",
-    link: "text-[#2563eb] dark:text-[#60a5fa] hover:text-[#1d4ed8]",
-    divider: "border-[#dbeafe] dark:border-[#262d2c]",
-  },
-  teal: {
-    card: "border-t-brand-secondary bg-brand-background-green dark:bg-[#151c1b]",
-    link: "text-brand dark:text-[#48c0b8] hover:text-brand/80",
-    divider: "border-brand/10 dark:border-[#262d2c]",
-  },
+  /** Kept for data compatibility; the section now uses one unified brand identity. */
+  theme?: TrustedEntityTheme;
 };
 
 export default function TrustedEntityCard({
@@ -45,9 +25,7 @@ export default function TrustedEntityCard({
   viewLicense,
   licenseUrl,
   logoSrc,
-  theme,
 }: TrustedEntityCardProps) {
-  const styles = themeStyles[theme];
   // Only show the "view license" action when a real URL is provided — a "#"
   // or empty value is a placeholder, so the dead button is hidden instead.
   const hasLicense =
@@ -58,48 +36,60 @@ export default function TrustedEntityCard({
   return (
     <article
       className={cn(
-        "flex h-full flex-col gap-5  border-t-4 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl",
-        styles.card
+        "group relative flex h-full flex-col items-center gap-4 overflow-hidden rounded-2xl border border-brand/15 bg-white p-7 text-center shadow-sm transition-all duration-300",
+        "hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-[0_22px_44px_-12px_rgba(14,106,90,0.28)]",
+        "dark:border-white/10 dark:bg-[#111a18] dark:hover:border-brand-secondary/40",
       )}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-bold text-foreground">{name}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">{nameEn}</p>
-        </div>
-          <span className="relative inline-block h-[100px] w-25 shrink-0 dark:rounded-xl dark:bg-white dark:p-2">
-            <Image
-              src={logoSrc}
-              alt=""
-              fill
-              className="object-contain dark:p-1"
-              sizes="100px"
-              aria-hidden="true"
-              unoptimized={
-                logoSrc.startsWith("http://") || logoSrc.startsWith("https://")
-              }
-            />
-          </span>
+      {/* unified brand accent + soft glow on hover */}
+      <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-l from-brand-secondary to-brand" />
+      <span className="pointer-events-none absolute -top-16 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-brand-secondary/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+
+      {/* logo tile */}
+      <span className="relative flex h-24 w-36 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+        <Image
+          src={logoSrc}
+          alt=""
+          width={120}
+          height={64}
+          className="max-h-16 w-auto object-contain"
+          sizes="120px"
+          aria-hidden="true"
+          unoptimized={
+            logoSrc.startsWith("http://") || logoSrc.startsWith("https://")
+          }
+        />
+      </span>
+
+      {/* verified badge */}
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-background-green px-3 py-1 text-[11px] font-bold text-brand dark:bg-brand-secondary/15 dark:text-brand-secondary">
+        <ShieldCheck className="size-3.5 shrink-0" aria-hidden="true" />
+        جهة معتمدة
+      </span>
+
+      <div>
+        <h3 className="text-lg font-bold text-foreground">{name}</h3>
+        <p className="mt-1 text-xs text-muted-foreground">{nameEn}</p>
       </div>
 
-      <p className=" font-medium leading-relaxed text-gray-600 dark:text-white/60">
+      <p className="text-sm font-medium leading-relaxed text-gray-600 dark:text-white/60">
         {description}
       </p>
 
       {hasLicense ? (
-        <div className={cn("mt-auto border-t pt-4", styles.divider)}>
+        <div className="mt-auto w-full border-t border-brand/10 pt-4 dark:border-white/10">
           <Link
             href={licenseUrl}
-            className={cn(
-              "inline-flex items-center gap-2 text-sm font-bold transition-colors group",
-              styles.link
-            )}
+            className="group/link inline-flex items-center gap-2 text-sm font-bold text-brand transition-colors hover:text-brand/80 dark:text-brand-secondary"
             target="_blank"
             rel="noopener noreferrer"
           >
             <CustomIcon src="/icons/doc-markdown.svg" size={16} />
             <span>{viewLicense}</span>
-            <ArrowUpLeft className="size-3.5 shrink-0 group-hover:-rotate-45 transition-transform duration-300" aria-hidden="true" />
+            <ArrowUpLeft
+              className="size-3.5 shrink-0 transition-transform duration-300 group-hover/link:-rotate-45"
+              aria-hidden="true"
+            />
           </Link>
         </div>
       ) : null}

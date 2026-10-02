@@ -16,8 +16,8 @@ export default function HeroCtaButtons({
   mostRequested,
 }: HeroCtaButtonsProps) {
   return (
-    <div className="flex items-start gap-3 sm:gap-4">
-      <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+    <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4">
+      <div className="flex w-full flex-col items-center gap-2 sm:min-w-0 sm:flex-1">
         <Link
           href="/create-contract?id=residential"
           className="w-full"
@@ -36,7 +36,7 @@ export default function HeroCtaButtons({
         </p>
       </div>
 
-      <div className="min-w-0 flex-1">
+      <div className="w-full sm:min-w-0 sm:flex-1">
         <Link
           href="/create-contract?id=commercial"
           className="w-full"
