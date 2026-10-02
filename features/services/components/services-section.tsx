@@ -40,15 +40,22 @@ export default async function ServicesSection() {
               visual={
                 serviceType === "residential"
                   ? {
-                      heading: "إنشاء عقد إيجار سكني",
-                      stages: [
-                        { key: "owner", label: "المالك", title: "بيانات المالك", state: "done" },
-                        { key: "tenant", label: "المستأجر", title: "بيانات المستأجر", state: "done" },
-                        { key: "deed", label: "الصك", title: "بيانات الصك والوحدة", state: "done" },
-                        { key: "pay", label: "الدفع", title: "دفع المقابل المالي للعقد", state: "active" },
+                      navActive: "عقد سكني",
+                      heading: "طلبات قبل أن نبدأ",
+                      subheading: "لخدمتك بشكل سريع، جهّز التالي:",
+                      hint: "رحلتك الإيجارية أصبحت أسهل.",
+                      steps: ["الصك", "المالك", "المستأجر", "المالية"],
+                      activeStep: 0,
+                      requirements: [
+                        { key: "parties", label: "بيانات المؤجر والمستأجر.", icon: "people" },
+                        { key: "deed", label: "صورة الصك وعنوان العقار.", icon: "deed" },
+                        { key: "unit", label: "بيانات الوحدة المؤجرة.", icon: "home" },
+                        { key: "rent", label: "مبلغ الإيجار.", icon: "money" },
+                        { key: "draft", label: "نرسل لك مسودة العقد عبر واتساب للاطلاع.", icon: "chat" },
                       ],
-                      successTitle: "تم إنشاء عقد إيجار سكني بنجاح",
-                      successSubtitle: "تهانينا، تم الدفع بنجاح",
+                      priceBoxLabel: "سعر العقد لمدة سنة :",
+                      startLabel: "لنبدأ",
+                      seeAllLabel: "عرض جميع الأسعار",
                       priceValue: "٢٤٩",
                       priceCurrency: "ريال",
                       priceLabel: "إنشاء عقد إيجار سكني",

@@ -1,19 +1,25 @@
 import Image from "next/image";
 
+import AnimatedStat from "@/features/services/components/animated-stat";
 import ServicesVisual from "@/features/services/components/services-visual";
 
-type ServiceStage = {
+type ServiceRequirement = {
   key: string;
   label: string;
-  title: string;
-  state: "done" | "active" | "todo";
+  icon: "people" | "deed" | "home" | "money" | "chat";
 };
 
 type ServiceVisualContent = {
+  navActive: string;
   heading: string;
-  stages: ServiceStage[];
-  successTitle: string;
-  successSubtitle: string;
+  subheading: string;
+  hint: string;
+  steps: string[];
+  activeStep: number;
+  requirements: ServiceRequirement[];
+  priceBoxLabel: string;
+  startLabel: string;
+  seeAllLabel: string;
   priceValue: string;
   priceCurrency: string;
   priceLabel: string;
@@ -61,19 +67,7 @@ export default function ServicesShowcaseCard({
         </h3>
         <p className="leading-7 text-black dark:text-white/90">{description}</p>
 
-        <div className="mt-1">
-          <p className="text-3xl font-bold text-brand">{statsValue}</p>
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-black dark:text-white/90">{statsText}</p>
-            <Image
-              src="/images/ejar.png"
-              alt="stats"
-              width={50}
-              height={50}
-              className="w-10 object-contain"
-            />
-          </div>
-        </div>
+        <AnimatedStat value={statsValue} text={statsText} />
       </div>
 
       {visual ? (
