@@ -1,0 +1,25 @@
+# contractejar-frontend — الموقع 🌐
+
+الموقع العام لـ **«عقد إيجار» (contractejar.com)** — منصة عقود الإيجار العقارية الإلكترونية.
+جزء من مشروع **صقر واحد**.
+
+**التقنية:** Next.js 16 + React 19 (App Router) · عربي RTL · PWA · Sentry
+**الاستضافة:** Vercel (ينشر تلقائياً من فرع `master`)
+
+## التشغيل محلياً
+```bash
+cp .env.example .env.local   # ثم عبّئ القيم
+npm install
+npm run dev                  # http://localhost:3000
+```
+
+## 📚 التوثيق (ابدأ من هنا)
+| الملف | المحتوى |
+|-------|---------|
+| [`AGENTS.md`](AGENTS.md) | دليل أي مساعد ذكي يعمل على المشروع |
+| [`AQDI-CONTEXT.md`](AQDI-CONTEXT.md) | السياق الكامل للمشروع |
+| [`OWNER-GUIDE.md`](OWNER-GUIDE.md) | دليل المالك وخطة الاستمرارية |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | المخطط المعماري |
+| [`CLAUDE.md`](CLAUDE.md) | إرشادات تقنية لهذا الريبو |
+| [`سجل-العمل.md`](سجل-العمل.md) | سجل التغييرات الزمني |
+| [`docs/`](docs/) | أدلة متخصصة (الإعلانات، المدوّنة، قائمة الإطلاق، API الطلبات) |
