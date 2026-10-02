@@ -19,22 +19,20 @@ const iconMap: Record<AdvantageIcon, LucideIcon> = {
   headphones: Headphones,
 };
 
+// Unified brand-green identity for all advantage icons (previously the blue
+// and purple themes clashed with the site's green palette).
+const brandIconStyle = {
+  iconWrap: "bg-brand-background-green dark:bg-brand-secondary/15",
+  icon: "text-brand dark:text-brand-secondary",
+};
+
 const themeStyles: Record<
   AdvantageTheme,
   { iconWrap: string; icon: string }
 > = {
-  teal: {
-    iconWrap: "bg-brand-background-green",
-    icon: "text-brand-secondary",
-  },
-  blue: {
-    iconWrap: "bg-[#eff6ff] dark:bg-[#16233a]",
-    icon: "text-[#2563eb] dark:text-[#60a5fa]",
-  },
-  purple: {
-    iconWrap: "bg-[#faf5ff] dark:bg-[#241a34]",
-    icon: "text-[#7c3aed] dark:text-[#a78bfa]",
-  },
+  teal: brandIconStyle,
+  blue: brandIconStyle,
+  purple: brandIconStyle,
 };
 
 export default function AdvantageCard({
