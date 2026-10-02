@@ -48,6 +48,11 @@
       "sectionTitle": "الملف الشخصي",
       "avatarAlt": "صورة المستخدم"
     },
+    "nav": {
+      "sectionTitle": "حسابي",
+      "requests": "طلباتي",
+      "requestsHref": "/requests"
+    },
     "policies": {
       "sectionTitle": "الأنظمة والسياسات",
       "terms": "الشروط والاحكام",

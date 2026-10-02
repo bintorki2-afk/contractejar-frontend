@@ -5,6 +5,7 @@ import { LogIn } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import UserSheet from "@/features/auth/components/user-sheet";
 import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import { getUserInitials } from "@/features/auth/utils/get-user-initials";
 import { cn } from "@/lib/utils";
@@ -36,17 +37,19 @@ export default function NavbarAccountButton({
     const displayName = user.name || user.full_name || user.fname || "";
 
     return (
-      <Link
-        href="/profile"
-        aria-label={t("account")}
-        title={displayName || t("account")}
-        className={cn(
-          "flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-sm font-bold text-brand transition-colors hover:bg-brand-background-green/80 dark:bg-[#16352f] dark:text-[#48c0b8]",
-          className,
-        )}
-      >
-        {getUserInitials(displayName) || "٠"}
-      </Link>
+      <UserSheet>
+        <button
+          type="button"
+          aria-label={t("account")}
+          title={displayName || t("account")}
+          className={cn(
+            "flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-sm font-bold text-brand transition-colors hover:bg-brand-background-green/80 dark:bg-[#16352f] dark:text-[#48c0b8]",
+            className,
+          )}
+        >
+          {getUserInitials(displayName) || "٠"}
+        </button>
+      </UserSheet>
     );
   }
 
