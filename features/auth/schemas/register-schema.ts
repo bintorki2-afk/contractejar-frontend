@@ -3,8 +3,8 @@ import { z } from "zod";
 type RegisterSchemaMessages = {
   fullNameRequired: string;
   fullNameMin: string;
-  phoneRequired: string;
-  phoneInvalid: string;
+  emailRequired: string;
+  emailInvalid: string;
   passwordRequired: string;
   passwordMin: string;
   termsRequired: string;
@@ -16,13 +16,10 @@ export function createRegisterSchema(messages: RegisterSchemaMessages) {
       .string()
       .min(1, messages.fullNameRequired)
       .min(3, messages.fullNameMin),
-    phone: z
+    email: z
       .string()
-      .min(1, messages.phoneRequired)
-      .refine(
-        (value) => /^\+9665\d{8}$/.test(value.replace(/\s/g, "")),
-        messages.phoneInvalid
-      ),
+      .min(1, messages.emailRequired)
+      .email(messages.emailInvalid),
     password: z
       .string()
       .min(1, messages.passwordRequired)

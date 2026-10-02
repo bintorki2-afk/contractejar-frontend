@@ -1,35 +1,34 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowUpLeft, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowUpLeft, Loader2, MailCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import AuthEmailField from "@/features/auth/components/auth-email-field";
 import ForgotPasswordFooter from "@/features/auth/components/forgot-password-footer";
-import ForgotPasswordPhoneField from "@/features/auth/components/forgot-password-phone-field";
 import {
   createForgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/features/auth/schemas/forgot-password-schema";
 import { requestForgotPassword } from "@/features/auth/services/request-forgot-password";
-import { buildVerifyOtpUrl } from "@/features/auth/utils/build-verify-otp-url";
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("auth.forgotPassword");
-  const router = useRouter();
+  const [sent, setSent] = useState(false);
 
   const schema = createForgotPasswordSchema({
-    phoneRequired: t("validation.phoneRequired"),
-    phoneInvalid: t("validation.phoneInvalid"),
+    emailRequired: t("validation.emailRequired"),
+    emailInvalid: t("validation.emailInvalid"),
   });
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      phone: "",
+      email: "",
     },
   });
 
@@ -44,7 +43,27 @@ export default function ForgotPasswordForm() {
     }
 
     toast.success(response.message || t("submitSuccess"));
-    router.push(buildVerifyOtpUrl(response.phone, "forgot-password"));
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-3 rounded-3xl bg-brand-background-green/60 px-6 py-8 text-center">
+          <span className="flex size-14 items-center justify-center rounded-full bg-brand text-white">
+            <MailCheck className="size-7" aria-hidden="true" />
+          </span>
+          <h2 className="text-lg font-extrabold text-brand">{t("sentTitle")}</h2>
+          <p className="text-sm leading-6 text-[#5b5b5b]">{t("sentHint")}</p>
+        </div>
+
+        <ForgotPasswordFooter
+          orLabel={t("or")}
+          rememberedPassword={t("rememberedPassword")}
+          backToLogin={t("backToLogin")}
+        />
+      </div>
+    );
   }
 
   return (
@@ -53,10 +72,11 @@ export default function ForgotPasswordForm() {
       className="flex flex-col gap-6"
       noValidate
     >
-      <ForgotPasswordPhoneField
+      <AuthEmailField
         control={form.control}
-        label={t("phoneLabel")}
-        placeholder={t("phonePlaceholder")}
+        name="email"
+        label={t("emailLabel")}
+        placeholder={t("emailPlaceholder")}
       />
 
       <Button

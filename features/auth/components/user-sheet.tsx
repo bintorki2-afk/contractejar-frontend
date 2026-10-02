@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { LogOut } from "lucide-react";
+import { ClipboardList, LogOut } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -72,6 +72,14 @@ export default function UserSheet({ children }: UserSheetProps) {
                 onEditProfile={handleOpenProfile}
               />
             ) : null}
+
+            <UserSheetSectionCard title={t("nav.sectionTitle")}>
+              <UserSheetMenuRow
+                label={t("nav.requests")}
+                icon={<ClipboardList className="size-4 text-brand" aria-hidden="true" />}
+                href={t("nav.requestsHref")}
+              />
+            </UserSheetSectionCard>
 
             <UserSheetSectionCard title={t("policies.sectionTitle")}>
               <UserSheetMenuRow

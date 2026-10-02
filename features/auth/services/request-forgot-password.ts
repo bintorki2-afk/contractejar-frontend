@@ -1,10 +1,9 @@
 "use server";
 
 import { apiRequest } from "@/lib/api/api-request";
-import { getSaudiMobileForApi } from "@/features/auth/utils/normalize-saudi-phone";
 
 type ForgotPasswordPayload = {
-  phone: string;
+  email: string;
 };
 
 type ForgotPasswordApiResponse = {
@@ -15,11 +14,11 @@ type ForgotPasswordApiResponse = {
 
 export async function requestForgotPassword(payload: ForgotPasswordPayload) {
   const response = await apiRequest<ForgotPasswordApiResponse>(
-    "/auth/forgot-password",
+    "/auth/web/forgot-password",
     {
       method: "POST",
       body: JSON.stringify({
-        mobile: getSaudiMobileForApi(payload.phone),
+        email: payload.email.trim().toLowerCase(),
       }),
       cache: "no-store",
     },
@@ -34,7 +33,7 @@ export async function requestForgotPassword(payload: ForgotPasswordPayload) {
 
   return {
     ok: true,
-    phone: payload.phone,
+    email: payload.email,
     message: response.data.message,
   } as const;
 }

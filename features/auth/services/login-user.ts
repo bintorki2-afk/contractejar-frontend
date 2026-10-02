@@ -3,22 +3,19 @@
 import { setAuthToken } from "@/actions/auth";
 import { apiRequest } from "@/lib/api/api-request";
 import type { LoginApiResponse } from "@/features/auth/types/auth-user";
-import { getSaudiMobileForApi } from "@/features/auth/utils/normalize-saudi-phone";
 
 type LoginUserPayload = {
-  phone: string;
+  email: string;
   password: string;
   rememberMe: boolean;
-  fcmToken?: string | null;
 };
 
 export async function loginUser(payload: LoginUserPayload) {
-  const response = await apiRequest<LoginApiResponse>("/auth/login", {
+  const response = await apiRequest<LoginApiResponse>("/auth/web/login", {
     method: "POST",
     body: JSON.stringify({
-      mobile: getSaudiMobileForApi(payload.phone),
+      email: payload.email.trim().toLowerCase(),
       password: payload.password,
-      ...(payload.fcmToken ? { fcm_token: payload.fcmToken } : {}),
     }),
     cache: "no-store",
   });

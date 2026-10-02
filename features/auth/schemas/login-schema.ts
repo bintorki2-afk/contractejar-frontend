@@ -1,21 +1,18 @@
 import { z } from "zod";
 
 type LoginSchemaMessages = {
-  phoneRequired: string;
-  phoneInvalid: string;
+  emailRequired: string;
+  emailInvalid: string;
   passwordRequired: string;
   passwordMin: string;
 };
 
 export function createLoginSchema(messages: LoginSchemaMessages) {
   return z.object({
-    phone: z
+    email: z
       .string()
-      .min(1, messages.phoneRequired)
-      .refine(
-        (value) => /^\+9665\d{8}$/.test(value.replace(/\s/g, "")),
-        messages.phoneInvalid
-      ),
+      .min(1, messages.emailRequired)
+      .email(messages.emailInvalid),
     password: z
       .string()
       .min(1, messages.passwordRequired)

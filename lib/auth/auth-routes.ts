@@ -2,7 +2,6 @@ export const GUEST_ONLY_ROUTES = [
   "/login",
   "/register",
   "/forgot-password",
-  "/verify-otp",
   "/reset-password",
 ] as const;
 
@@ -10,6 +9,7 @@ export const PROTECTED_ROUTE_PREFIXES = [
   "/properties",
   "/requests",
   "/notifications",
+  "/profile",
 ] as const;
 
 export function isGuestOnlyRoute(pathname: string): boolean {

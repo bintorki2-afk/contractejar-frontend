@@ -1,64 +1,48 @@
 "use server";
 
+import { setAuthToken } from "@/actions/auth";
 import { apiRequest } from "@/lib/api/api-request";
-import { getSaudiMobileForApi } from "@/features/auth/utils/normalize-saudi-phone";
+import type { LoginApiResponse } from "@/features/auth/types/auth-user";
 
 type RegisterUserPayload = {
   fullName: string;
-  phone: string;
+  email: string;
   password: string;
 };
 
-type RegisterUserApiData = {
-  id: number;
-  fname: string;
-  full_name: string;
-  mobile: string;
-  email: string;
-  photo: string;
-  verified: boolean;
-  name: string;
-  phone: string;
-  status: boolean;
-  created_at: string;
-  date_time: string;
-  properties_count: number;
-  units_count: number;
-  completed_orders_count: number;
-  incomplete_orders_count: number;
-  total_paid_amount: number;
-};
-
-type RegisterUserApiResponse = {
-  message: string;
-  code: number;
-  success: boolean;
-  data?: RegisterUserApiData;
-};
-
 export async function registerUser(payload: RegisterUserPayload) {
-  const firstName = payload.fullName.trim().split(/\s+/)[0] ?? payload.fullName.trim();
+  const name = payload.fullName.trim().replace(/\s+/g, " ");
+  const firstSpace = name.indexOf(" ");
+  const fname = firstSpace === -1 ? name : name.slice(0, firstSpace);
+  const lname = firstSpace === -1 ? undefined : name.slice(firstSpace + 1);
 
-  const response = await apiRequest<RegisterUserApiResponse>("/auth/signup", {
+  const response = await apiRequest<LoginApiResponse>("/auth/web/register", {
     method: "POST",
     body: JSON.stringify({
-      fname: firstName,
-      mobile: getSaudiMobileForApi(payload.phone),
+      fname,
+      ...(lname ? { lname } : {}),
+      email: payload.email.trim().toLowerCase(),
       password: payload.password,
+      password_confirmation: payload.password,
     }),
     cache: "no-store",
   });
 
-  if (!response.ok || !response.data?.success) {
+  if (!response.ok || !response.data?.success || !response.data.data) {
     return {
       ok: false,
       error: response.error || response.data?.message || "Something went wrong",
     } as const;
   }
 
+  // The backend returns a token on register too, so sign the customer in right
+  // away; the UI still nudges them to confirm their email (a link was emailed).
+  const { user, token } = response.data.data;
+  await setAuthToken(token, true);
+
   return {
     ok: true,
-    phone: payload.phone,
-    message: response.data?.message,
+    message: response.data.message,
+    user,
   } as const;
 }
