@@ -22,6 +22,16 @@ export function useStartFreshContract(contractType: ContractTypeId) {
       !contractSession.isReal &&
       contractSession.contractType === apiContractType
     ) {
+      // Reuse the in-progress fresh session, but make sure it carries an order
+      // reference — a session persisted before this field existed wouldn't have
+      // one, which would leave the customer with no order number. Keep the same
+      // contractId so step data is preserved by setFreshContractSession.
+      if (!contractSession.orderReference) {
+        setFreshContractSession({
+          ...contractSession,
+          orderReference: generateOrderReference(),
+        });
+      }
       goNextStep();
       return;
     }
