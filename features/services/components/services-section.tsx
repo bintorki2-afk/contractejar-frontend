@@ -37,6 +37,22 @@ export default async function ServicesSection() {
               description={item.description}
               statsValue={item.statsValue}
               statsText={item.statsText}
+              visual={
+                serviceType === "residential"
+                  ? {
+                      heading: "إنشاء عقد إيجار سكني",
+                      tabs: ["عقد إيجار", "الصك", "المالك", "المستأجر"],
+                      rowTitle: "دفع المقابل المالي للعقد",
+                      rowSubtitle: "تفاصيل المقابل المالي للعقد",
+                      successTitle: "تم إنشاء عقد إيجار سكني بنجاح",
+                      successSubtitle: "تهانينا، تم الدفع بنجاح",
+                      priceValue: "٢٤٩",
+                      priceCurrency: "ريال",
+                      priceLabel: "إنشاء عقد إيجار سكني",
+                      priceSub: "عمارة، شقة، فيلا، غرفة",
+                    }
+                  : undefined
+              }
               reverse={serviceType === "commercial"}
             />
           );
