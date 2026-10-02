@@ -8,26 +8,27 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import AuthEmailField from "@/features/auth/components/auth-email-field";
 import RegisterNameField from "@/features/auth/components/register-name-field";
 import RegisterPasswordField from "@/features/auth/components/register-password-field";
-import RegisterPhoneField from "@/features/auth/components/register-phone-field";
 import RegisterTermsField from "@/features/auth/components/register-terms-field";
 import { registerUser } from "@/features/auth/services/register-user";
 import {
   createRegisterSchema,
   type RegisterFormValues,
 } from "@/features/auth/schemas/register-schema";
-import { buildVerifyOtpUrl } from "@/features/auth/utils/build-verify-otp-url";
+import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 
 export default function RegisterForm() {
   const t = useTranslations("auth.register");
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
 
   const schema = createRegisterSchema({
     fullNameRequired: t("validation.fullNameRequired"),
     fullNameMin: t("validation.fullNameMin"),
-    phoneRequired: t("validation.phoneRequired"),
-    phoneInvalid: t("validation.phoneInvalid"),
+    emailRequired: t("validation.emailRequired"),
+    emailInvalid: t("validation.emailInvalid"),
     passwordRequired: t("validation.passwordRequired"),
     passwordMin: t("validation.passwordMin"),
     termsRequired: t("validation.termsRequired"),
@@ -37,7 +38,7 @@ export default function RegisterForm() {
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: "",
-      phone: "",
+      email: "",
       password: "",
       acceptTerms: false,
     },
@@ -51,8 +52,10 @@ export default function RegisterForm() {
       return;
     }
 
+    // Backend signs the customer in and emails a confirmation link.
+    setUser(response.user);
     toast.success(response.message || t("submitSuccess"));
-    router.push(buildVerifyOtpUrl(response.phone, "register"));
+    router.push("/");
   }
   const {isSubmitting} = form.formState;
 
@@ -68,10 +71,11 @@ export default function RegisterForm() {
         placeholder={t("fullNamePlaceholder")}
       />
 
-      <RegisterPhoneField
+      <AuthEmailField
         control={form.control}
-        label={t("phoneLabel")}
-        placeholder={t("phonePlaceholder")}
+        name="email"
+        label={t("emailLabel")}
+        placeholder={t("emailPlaceholder")}
       />
 
       <RegisterPasswordField

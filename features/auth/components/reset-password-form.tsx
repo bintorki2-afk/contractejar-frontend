@@ -16,11 +16,11 @@ import {
 import { resetPassword } from "@/features/auth/services/reset-password";
 
 type ResetPasswordFormProps = {
-  phone?: string;
-  code?: string;
+  email?: string;
+  token?: string;
 };
 
-export default function ResetPasswordForm({ phone, code }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
   const t = useTranslations("auth.resetPassword");
   const router = useRouter();
 
@@ -42,14 +42,14 @@ export default function ResetPasswordForm({ phone, code }: ResetPasswordFormProp
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: ResetPasswordFormValues) {
-    if (!phone || !code) {
+    if (!email || !token) {
       toast.error(t("sessionMissing"));
       return;
     }
 
     const response = await resetPassword({
-      phone,
-      code,
+      email,
+      token,
       password: values.password,
       passwordConfirmation: values.confirmPassword,
     });

@@ -11,8 +11,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import AuthEmailField from "@/features/auth/components/auth-email-field";
 import LoginPasswordField from "@/features/auth/components/login-password-field";
-import LoginPhoneField from "@/features/auth/components/login-phone-field";
 import {
   createLoginSchema,
   type LoginFormValues,
@@ -28,8 +28,8 @@ export default function LoginForm() {
   const setUser = useAuthStore((state) => state.setUser);
 
   const schema = createLoginSchema({
-    phoneRequired: t("validation.phoneRequired"),
-    phoneInvalid: t("validation.phoneInvalid"),
+    emailRequired: t("validation.emailRequired"),
+    emailInvalid: t("validation.emailInvalid"),
     passwordRequired: t("validation.passwordRequired"),
     passwordMin: t("validation.passwordMin"),
   });
@@ -37,7 +37,7 @@ export default function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      phone: "",
+      email: "",
       password: "",
       rememberMe: false,
     },
@@ -46,18 +46,7 @@ export default function LoginForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: LoginFormValues) {
-    // Never block login on FCM (permission prompt / SW / getToken can hang).
-    // Attach a token only if permission was already granted and it resolves quickly.
-    const fcmToken = await Promise.race([
-      import("@/features/notifications/services/get-fcm-token")
-        .then(({ getFcmToken }) => getFcmToken({ requestPermission: false }))
-        .catch(() => null),
-      new Promise<null>((resolve) => {
-        window.setTimeout(() => resolve(null), 800);
-      }),
-    ]);
-
-    const response = await loginUser({ ...values, fcmToken });
+    const response = await loginUser(values);
 
     if (!response.ok) {
       toast.error(response.error || t("submitError"));
@@ -75,10 +64,11 @@ export default function LoginForm() {
       className="flex flex-col gap-5"
       noValidate
     >
-      <LoginPhoneField
+      <AuthEmailField
         control={form.control}
-        label={t("phoneLabel")}
-        placeholder={t("phonePlaceholder")}
+        name="email"
+        label={t("emailLabel")}
+        placeholder={t("emailPlaceholder")}
       />
 
       <LoginPasswordField

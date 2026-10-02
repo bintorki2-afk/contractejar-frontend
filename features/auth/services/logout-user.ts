@@ -10,7 +10,7 @@ type LogoutApiResponse = {
 };
 
 export async function logoutUser() {
-  const response = await apiRequest<LogoutApiResponse>("/auth/logout", {
+  const response = await apiRequest<LogoutApiResponse>("/auth/web/logout", {
     method: "POST",
     cache: "no-store",
   });

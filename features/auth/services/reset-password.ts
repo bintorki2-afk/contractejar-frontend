@@ -1,11 +1,10 @@
 "use server";
 
 import { apiRequest } from "@/lib/api/api-request";
-import { getSaudiMobileForApi } from "@/features/auth/utils/normalize-saudi-phone";
 
 type ResetPasswordPayload = {
-  phone: string;
-  code: string;
+  token: string;
+  email: string;
   password: string;
   passwordConfirmation: string;
 };
@@ -18,12 +17,12 @@ type ResetPasswordApiResponse = {
 
 export async function resetPassword(payload: ResetPasswordPayload) {
   const response = await apiRequest<ResetPasswordApiResponse>(
-    "/auth/reset-password",
+    "/auth/web/reset-password",
     {
       method: "POST",
       body: JSON.stringify({
-        mobile: getSaudiMobileForApi(payload.phone),
-        code: payload.code,
+        token: payload.token,
+        email: payload.email.trim().toLowerCase(),
         password: payload.password,
         password_confirmation: payload.passwordConfirmation,
       }),

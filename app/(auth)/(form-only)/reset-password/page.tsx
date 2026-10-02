@@ -3,23 +3,21 @@ import { getTranslations } from "next-intl/server";
 import AuthBackButton from "@/features/auth/components/auth-back-button";
 import ResetPasswordForm from "@/features/auth/components/reset-password-form";
 import ResetPasswordHeader from "@/features/auth/components/reset-password-header";
-import { repairPhoneFromQueryParam } from "@/features/auth/utils/normalize-saudi-phone";
 
 type ResetPasswordPageProps = {
   searchParams: Promise<{
-    phone?: string;
-    code?: string;
+    token?: string;
+    email?: string;
   }>;
 };
 
 export default async function ResetPasswordPage({
   searchParams,
 }: ResetPasswordPageProps) {
-  const [t, { phone: rawPhone, code }] = await Promise.all([
+  const [t, { token, email }] = await Promise.all([
     getTranslations("auth.resetPassword"),
     searchParams,
   ]);
-  const phone = repairPhoneFromQueryParam(rawPhone);
 
   return (
     <>
@@ -30,7 +28,7 @@ export default async function ResetPasswordPage({
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl lg:rounded-[48px] lg:p-8">
         <div className="flex flex-col gap-8">
           <ResetPasswordHeader title={t("title")} subtitle={t("subtitle")} />
-          <ResetPasswordForm phone={phone} code={code} />
+          <ResetPasswordForm email={email} token={token} />
         </div>
       </div>
     </>

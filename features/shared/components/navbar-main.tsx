@@ -5,6 +5,7 @@ import { ArrowUpLeft, Info, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CustomIcon from "@/features/shared/components/custom-icon";
+import NavbarAccountButton from "@/features/shared/components/navbar-account-button";
 import NavbarMobileSheet from "@/features/shared/components/navbar-mobile-sheet";
 import LocaleSwitcher from "@/features/shared/components/locale-switcher";
 import NavbarNavLink from "@/features/shared/components/navbar-nav-link";
@@ -128,6 +129,7 @@ export default function NavbarMain({
         <div className="hidden items-center gap-3 lg:flex">
           <LocaleSwitcher className="h-12" />
           <ThemeToggle className="size-12" />
+          <NavbarAccountButton />
           <StartWithAqdiDialog labels={dialogLabels}>
             <Button className="group h-12 gap-3 rounded-full bg-brand px-5 pe-2 text-sm font-semibold text-white hover:bg-brand/90">
               <span>{cta}</span>
