@@ -48,11 +48,19 @@ export default function CreateContractHeader({
   const contractUuid = useCreateContractDraftStore(
     (state) => state.contractSession?.uuid ?? null,
   );
-  // Only show the real backend order number (6-digit uuid), never the temporary
-  // placeholder id a fresh session starts with.
+  const orderReference = useCreateContractDraftStore(
+    (state) => state.contractSession?.orderReference ?? null,
+  );
+  // Prefer the real backend order number (6-digit uuid) so it matches the
+  // dashboard for support. For a fresh (account-less) order there is no backend
+  // id, so fall back to the 6-digit order reference generated at order start —
+  // this makes an order number visible from the very first step. Never show the
+  // temporary hex/timestamp placeholder a fresh session also carries.
   const displayOrderNumber = isDisplayableOrderNumber(contractUuid)
     ? String(contractUuid)
-    : null;
+    : isDisplayableOrderNumber(orderReference)
+      ? String(orderReference)
+      : null;
 
   async function handleCopyRequest() {
     if (!displayOrderNumber) {
