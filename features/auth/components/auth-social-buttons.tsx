@@ -3,7 +3,12 @@
 import { FaApple, FaGoogle } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+import { BASE_URL } from "@/lib/api/constants";
+
+// Use the shared API base (env var, else the Railway fallback) so the social
+// redirect always targets the backend — not a relative same-origin URL, which
+// 404s when NEXT_PUBLIC_BASE_URL isn't exposed to the client build.
+const API_BASE_URL = BASE_URL;
 
 /**
  * Google / Apple sign-in. These are full-page navigations to the backend's
