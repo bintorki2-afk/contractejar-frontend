@@ -37,9 +37,9 @@
 .c1{top:74px;right:150px;animation:floatB 5.4s ease-in-out infinite;}
 .c2{top:322px;left:46px;animation:floatA 6.2s ease-in-out .6s infinite;}
 .c3{top:118px;right:24px;animation:floatA 6s ease-in-out .4s infinite;}
-/* Ejar is a wide wordmark; scale it down so this chip matches the compact
-   REGA chip's overall size rather than overpowering it. */
-.c3 img{height:19px;}
+/* Ejar is a wide wordmark; size it so this chip's height matches the REGA
+   chip (both ~52px tall). */
+.c3 img{height:30px;}
 .pill{position:absolute;z-index:20;display:inline-flex;align-items:center;gap:9px;padding:13px 20px;border-radius:999px;background:linear-gradient(135deg,#0d6a5c,#0d5a50);color:#fff;font-weight:700;font-size:15px;box-shadow:0 18px 40px rgba(0,0,0,.30);}
 .p1{top:150px;left:92px;animation:floatB 5.8s ease-in-out .3s infinite;}
 @keyframes float{0%,100%{transform:rotateY(-19deg) rotateX(5deg) rotateZ(-3deg) translateY(0)}50%{transform:rotateY(-16deg) rotateX(4deg) rotateZ(-3deg) translateY(-18px)}}
