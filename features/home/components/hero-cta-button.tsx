@@ -28,7 +28,7 @@ export default function HeroCtaButton({
           "shadow-[0_0_24px_rgba(13,179,139,0.35)] ring-1 ring-brand-secondary/50 dark:shadow-[0_0_28px_rgba(0,168,128,0.5)]"
       )}
     >
-      <span className="inline-flex size-7 shrink-0 items-center justify-center sm:size-6 lg:size-8">
+      <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full sm:size-6 lg:size-8 dark:bg-white/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:ring-1 dark:ring-inset dark:ring-white/40 dark:backdrop-blur-sm">
         <CustomIcon
           src={iconSrc}
           className="text-white dark:text-[#06231c] [&_svg]:size-4 sm:[&_svg]:size-3 lg:[&_svg]:size-4"
@@ -39,9 +39,9 @@ export default function HeroCtaButton({
         {label}
       </span>
 
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white dark:bg-[#06231c] sm:size-6 lg:size-8">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white sm:size-6 lg:size-8 dark:bg-white/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:ring-1 dark:ring-inset dark:ring-white/40 dark:backdrop-blur-sm">
         <ArrowUpLeft
-          className="size-4 text-brand dark:text-brand-secondary transition-transform duration-300 group-hover:-rotate-45 sm:size-3 lg:size-4"
+          className="size-4 text-brand dark:text-[#06231c] transition-transform duration-300 group-hover:-rotate-45 sm:size-3 lg:size-4"
           aria-hidden="true"
         />
       </span>
