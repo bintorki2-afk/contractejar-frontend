@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent } from "react";
-import { ArrowUpLeft, Menu, X } from "lucide-react";
+import { useEffect, useState, type MouseEvent } from "react";
+import { ArrowUpLeft, LogIn, Menu, User, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
+import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -65,6 +67,16 @@ export default function NavbarMobileSheet({
 }: NavbarMobileSheetProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("navbar");
+  const user = useAuthStore((state) => state.user);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  const isSignedIn = mounted && Boolean(user);
 
   const navItems: NavItem[] = [
     { href: "/", label: home, iconSrc: "/icons/home.svg" },
@@ -189,6 +201,20 @@ export default function NavbarMobileSheet({
         </div>
 
         <div className="mt-auto flex flex-col gap-3 border-t border-border/60 pt-4">
+          <SheetClose asChild>
+            <Link
+              href={isSignedIn ? "/profile" : "/login"}
+              className="group flex h-12 w-full items-center justify-center gap-2 rounded-full border border-brand/25 text-sm font-semibold text-brand transition-colors hover:bg-brand-background-green dark:border-[#2f403b] dark:text-[#48c0b8] dark:hover:bg-[#16352f]"
+            >
+              {isSignedIn ? (
+                <User className="size-4" aria-hidden="true" />
+              ) : (
+                <LogIn className="size-4" aria-hidden="true" />
+              )}
+              <span>{isSignedIn ? tNav("account") : tNav("login")}</span>
+            </Link>
+          </SheetClose>
+
           <StartWithAqdiDialog labels={dialogLabels}>
             <Button className="group h-12 w-full gap-3 rounded-full bg-brand px-5 pe-2 text-sm font-semibold text-white hover:bg-brand/90">
               <span>{cta}</span>
