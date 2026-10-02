@@ -1,0 +1,71 @@
+.wrap{position:relative;width:100%;max-width:760px;margin-inline:auto;aspect-ratio:760/700;}
+.stage{position:absolute;top:0;left:0;width:760px;height:700px;transform-origin:top left;font-family:inherit;color:#111;}
+
+/* depth behind the phone */
+.glow{position:absolute;top:46%;left:50%;width:520px;height:520px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(127,227,194,.28),transparent 62%);filter:blur(14px);animation:pulse 8s ease-in-out infinite;}
+.ring{position:absolute;top:50%;left:50%;width:600px;height:600px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,.12);}
+.r2{width:440px;height:440px;border-color:rgba(255,255,255,.16);}
+.spark{position:absolute;color:#bff3df;opacity:.5;animation:twinkle 4s ease-in-out infinite;}
+.s1{top:70px;right:140px;font-size:24px;animation-delay:.4s;}
+.s2{bottom:120px;left:120px;font-size:18px;animation-delay:1.4s;}
+
+/* phone frame (physical dark device) */
+.persp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);perspective:1700px;}
+.phone{position:relative;width:334px;height:684px;border-radius:56px;padding:11px;background:linear-gradient(135deg,#55555a,#232327 42%,#3d3d41 54%,#1b1b1e);box-shadow:0 50px 90px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.4);transform:rotateY(16deg) rotateX(5deg) rotateZ(3deg);transform-style:preserve-3d;animation:float 7.5s ease-in-out infinite;}
+.rim{position:absolute;inset:4px;border-radius:52px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 26%,transparent 72%,rgba(255,255,255,.10));z-index:30;}
+.sb{position:absolute;background:linear-gradient(#42424a,#202024);border-radius:3px;}
+.pw{left:-3px;top:200px;width:3px;height:78px;}
+.ba{right:-3px;top:150px;width:3px;height:34px;}
+.v1{right:-3px;top:210px;width:3px;height:58px;}
+.v2{right:-3px;top:280px;width:3px;height:58px;}
+.island{position:absolute;top:15px;left:50%;transform:translateX(-50%);width:98px;height:27px;background:#000;border-radius:16px;z-index:12;}
+
+/* ───────── screen: WhatsApp chat, adapts to theme ───────── */
+.screen{position:relative;width:100%;height:100%;border-radius:45px;overflow:hidden;display:flex;flex-direction:column;background:#ece5dd;}
+:global(html.dark) .screen{background:#0b141a;}
+
+/* chat header */
+.head{display:flex;align-items:center;gap:10px;flex-direction:row-reverse;padding:40px 16px 10px;background:#0e6a5a;color:#fff;}
+:global(html.dark) .head{background:#14312b;}
+.avatar{width:34px;height:34px;border-radius:50%;background:#1aa589;display:flex;align-items:center;justify-content:center;flex:none;}
+.hmeta{flex:1;text-align:right;line-height:1.25;}
+.hmeta b{display:block;font-size:13px;font-weight:700;}
+.hmeta span{font-size:10.5px;color:rgba(255,255,255,.8);}
+.hdots{display:flex;flex-direction:column;gap:2px;opacity:.85;}
+.hdots i{width:3px;height:3px;border-radius:50%;background:#fff;display:block;}
+
+/* chat body */
+.body{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:9px;overflow:hidden;background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);background-size:16px 16px;}
+:global(html.dark) .body{background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);}
+.msg{max-width:82%;padding:8px 11px;border-radius:14px;font-size:11.5px;line-height:1.55;position:relative;box-shadow:0 1px 1px rgba(0,0,0,.08);}
+.msg time{display:block;font-size:8.5px;margin-top:3px;opacity:.55;}
+.in{align-self:flex-start;background:#fff;color:#111b21;border-top-left-radius:4px;text-align:right;}
+:global(html.dark) .in{background:#202c33;color:#e9edef;}
+.out{align-self:flex-end;background:#d7f7c5;color:#111b21;border-top-right-radius:4px;text-align:right;}
+:global(html.dark) .out{background:#005c4b;color:#e9edef;}
+.out time{text-align:left;}
+
+/* input bar */
+.inputBar{display:flex;align-items:center;gap:9px;flex-direction:row-reverse;padding:10px 12px 16px;background:transparent;}
+.inputField{flex:1;background:#fff;border-radius:999px;padding:9px 14px;font-size:11px;color:#8a9199;text-align:right;}
+:global(html.dark) .inputField{background:#202c33;color:#8696a0;}
+.sendBtn{width:34px;height:34px;border-radius:50%;background:#1aa589;display:flex;align-items:center;justify-content:center;flex:none;}
+
+.sheen{position:absolute;top:0;bottom:0;width:80px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);filter:blur(2px);animation:sheen 6s ease-in-out infinite;z-index:20;pointer-events:none;}
+:global(html.dark) .sheen{background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);}
+
+/* ───────── floating chips (deduplicated, Arabic-Indic digits) ───────── */
+.chip{position:absolute;z-index:40;display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:#fff;color:#0e6a5a;font-weight:800;font-size:14px;box-shadow:0 18px 40px rgba(0,0,0,.28);white-space:nowrap;}
+:global(html.dark) .chip{background:#16231f;color:#6fe3c2;}
+.chip svg{flex:none;}
+.c1{top:96px;right:4px;animation:floatA 6.2s ease-in-out .3s infinite;}
+.c2{top:470px;left:12px;animation:floatB 5.6s ease-in-out .6s infinite;}
+.star{color:#f6b73c;}
+
+@keyframes float{0%,100%{transform:rotateY(16deg) rotateX(5deg) rotateZ(3deg) translateY(0)}50%{transform:rotateY(13deg) rotateX(4deg) rotateZ(3deg) translateY(-18px)}}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(12px) rotate(-3deg)}}
+@keyframes pulse{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1)}50%{opacity:.75;transform:translate(-50%,-50%) scale(1.1)}}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@keyframes sheen{0%{left:-20%}55%,100%{left:120%}}
+@media (prefers-reduced-motion:reduce){.glow,.phone,.spark,.sheen,.chip{animation:none!important}}
