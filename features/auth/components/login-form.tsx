@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import AuthEmailField from "@/features/auth/components/auth-email-field";
+import AuthOrDivider from "@/features/auth/components/auth-or-divider";
+import AuthSocialButtons from "@/features/auth/components/auth-social-buttons";
 import LoginPasswordField from "@/features/auth/components/login-password-field";
 import {
   createLoginSchema,
@@ -128,6 +130,9 @@ export default function LoginForm() {
           </>
         )}
       </Button>
+
+      <AuthOrDivider label={t("or")} />
+      <AuthSocialButtons />
     </form>
   );
 }

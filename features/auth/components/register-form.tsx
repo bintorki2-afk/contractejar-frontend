@@ -9,6 +9,8 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import AuthEmailField from "@/features/auth/components/auth-email-field";
+import AuthOrDivider from "@/features/auth/components/auth-or-divider";
+import AuthSocialButtons from "@/features/auth/components/auth-social-buttons";
 import RegisterNameField from "@/features/auth/components/register-name-field";
 import RegisterPasswordField from "@/features/auth/components/register-password-field";
 import RegisterTermsField from "@/features/auth/components/register-terms-field";
@@ -112,6 +114,9 @@ export default function RegisterForm() {
         </>
         )}
       </Button>
+
+      <AuthOrDivider label={t("or")} />
+      <AuthSocialButtons />
     </form>
   );
 }
