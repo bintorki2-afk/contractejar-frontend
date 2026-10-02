@@ -239,6 +239,8 @@ export function useCreateContractDeedStep() {
     mapLocation: deed.mapLocation ?? DEFAULT_NATIONAL_ADDRESS_LOCATION,
     setMapLocation,
     showNationalAddress,
+    isDeedComplete,
+    isAddressComplete,
     canContinue,
     existingInstrumentImageUrl,
     existingInstrumentFrontImageUrl,
