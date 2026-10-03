@@ -1,6 +1,12 @@
+import Footer from "@/features/footer/components/footer";
 import FooterBottomBar from "@/features/footer/components/footer-bottom-bar";
 import { ServicesPageProvider } from "@/features/services/components/services-page-provider";
+import {
+  AccountRouteOnly,
+  FlowRouteOnly,
+} from "@/features/services/components/services-route-chrome";
 import ServicesSideBackNav from "@/features/services/components/services-side-back-nav";
+import NavbarShell from "@/features/shared/components/navbar-shell";
 import { getTranslations } from "next-intl/server";
 
 export default async function ServicesLayout({
@@ -16,22 +22,38 @@ export default async function ServicesLayout({
       className="flex min-h-screen flex-col bg-brand-background"
     >
       <ServicesPageProvider>
+        {/* طلباتي / عقاراتي wear the full site navbar; service flows keep the
+            minimal back bar. */}
+        <AccountRouteOnly>
+          <NavbarShell />
+        </AccountRouteOnly>
+
         <div className="relative flex-1">
           <div className="container pt-3 pb-6 lg:pb-8">
-            <ServicesSideBackNav />
+            <FlowRouteOnly>
+              <ServicesSideBackNav />
+            </FlowRouteOnly>
             <main className="mx-auto w-full">{children}</main>
           </div>
         </div>
       </ServicesPageProvider>
 
-      <FooterBottomBar
-        copyright={footer("copyright", { year: String(new Date().getFullYear()) })}
-        terms={footer("terms")}
-        privacy={footer("privacy")}
-        termsHref={footer("termsHref")}
-        privacyHref={footer("privacyHref")}
-        className="container pb-6 pt-8"
-      />
+      {/* Full site footer on account pages; the compact bar on service flows. */}
+      <AccountRouteOnly>
+        <Footer />
+      </AccountRouteOnly>
+      <FlowRouteOnly>
+        <FooterBottomBar
+          copyright={footer("copyright", {
+            year: String(new Date().getFullYear()),
+          })}
+          terms={footer("terms")}
+          privacy={footer("privacy")}
+          termsHref={footer("termsHref")}
+          privacyHref={footer("privacyHref")}
+          className="container pb-6 pt-8"
+        />
+      </FlowRouteOnly>
     </div>
   );
 }
