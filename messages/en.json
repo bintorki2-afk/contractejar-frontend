@@ -25,6 +25,12 @@
       "home": "Home",
       "myProperties": "My Properties",
       "requests": "My requests",
+      "properties": "Properties",
+      "orders": "Orders",
+      "more": "More",
+      "reviews": "Reviews",
+      "guide": "Guide",
+      "support": "Support",
       "downloadApp": "Download the app now"
     },
     "cta": "Start with Rental Contract",
