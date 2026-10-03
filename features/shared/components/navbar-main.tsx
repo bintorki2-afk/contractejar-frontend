@@ -1,12 +1,26 @@
 "use client";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowUpLeft, Info, HelpCircle } from "lucide-react";
+import {
+  ArrowUpLeft,
+  BookOpen,
+  Building2,
+  ClipboardList,
+  HelpCircle,
+  Info,
+  LifeBuoy,
+  Newspaper,
+  Star,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import NavbarAccountButton from "@/features/shared/components/navbar-account-button";
+import NavbarIconPopLink from "@/features/shared/components/navbar-icon-pop-link";
 import NavbarMobileSheet from "@/features/shared/components/navbar-mobile-sheet";
+import NavbarMoreMenu, {
+  type NavbarMoreItem,
+} from "@/features/shared/components/navbar-more-menu";
 import LocaleSwitcher from "@/features/shared/components/locale-switcher";
 import NavbarNavLink from "@/features/shared/components/navbar-nav-link";
 import ThemeToggle from "@/features/shared/theme/theme-toggle";
@@ -37,6 +51,12 @@ type NavbarMainProps = {
   home: string;
   myProperties: string;
   requests: string;
+  properties: string;
+  orders: string;
+  more: string;
+  reviews: string;
+  guide: string;
+  support: string;
   cta: string;
   profile: string;
   menu: string;
@@ -59,6 +79,12 @@ export default function NavbarMain({
   home,
   myProperties,
   requests,
+  properties,
+  orders,
+  more,
+  reviews,
+  guide,
+  support,
   cta,
   profile,
   menu,
@@ -66,11 +92,27 @@ export default function NavbarMain({
   notifications,
   dialogLabels,
 }: NavbarMainProps) {
-  const navItems: NavItem[] = [
+  const homeItem: NavItem = {
+    href: "/",
+    label: home,
+    icon: <CustomIcon src="/icons/home.svg" size={16} />,
+  };
+
+  const moreItems: NavbarMoreItem[] = [
     {
-      href: "/",
-      label: home,
-      icon: <CustomIcon src="/icons/home.svg" size={16} />,
+      href: "/faq",
+      label: faq,
+      icon: <HelpCircle className="size-4" aria-hidden="true" />,
+    },
+    {
+      href: "/blog",
+      label: blog,
+      icon: <Newspaper className="size-4" aria-hidden="true" />,
+    },
+    {
+      href: "/reviews",
+      label: reviews,
+      icon: <Star className="size-4" aria-hidden="true" />,
     },
     {
       href: "/about",
@@ -78,14 +120,14 @@ export default function NavbarMain({
       icon: <Info className="size-4" aria-hidden="true" />,
     },
     {
-      href: "/blog",
-      label: blog,
-      icon: <CustomIcon src="/icons/news-letter.svg" size={16} />,
+      href: "/guide",
+      label: guide,
+      icon: <BookOpen className="size-4" aria-hidden="true" />,
     },
     {
-      href: "/faq",
-      label: faq,
-      icon: <HelpCircle className="size-4" aria-hidden="true" />,
+      href: "/support",
+      label: support,
+      icon: <LifeBuoy className="size-4" aria-hidden="true" />,
     },
   ];
 
@@ -121,9 +163,18 @@ export default function NavbarMain({
           aria-label="Main navigation"
           className="hidden flex-1 items-center justify-center gap-6 lg:flex xl:gap-8"
         >
-          {navItems.map((item) => (
-            <NavbarNavLink key={item.label} {...item} />
-          ))}
+          <NavbarNavLink {...homeItem} />
+          <NavbarIconPopLink
+            href="/properties/my-properties"
+            label={properties}
+            icon={<Building2 className="size-4" aria-hidden="true" />}
+          />
+          <NavbarIconPopLink
+            href="/requests"
+            label={orders}
+            icon={<ClipboardList className="size-4" aria-hidden="true" />}
+          />
+          <NavbarMoreMenu label={more} items={moreItems} />
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -160,6 +211,12 @@ export default function NavbarMain({
           home={home}
           myProperties={myProperties}
           requests={requests}
+          properties={properties}
+          orders={orders}
+          more={more}
+          reviews={reviews}
+          guide={guide}
+          support={support}
           cta={cta}
           profile={profile}
           menu={menu}
