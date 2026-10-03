@@ -9,6 +9,7 @@ import RequestsFiltersDialog, {
   type RequestsFiltersValue,
 } from "@/features/requests/components/requests-filters-dialog";
 import RequestsGrid from "@/features/requests/components/requests-grid";
+import RequestsHowItWorks from "@/features/requests/components/requests-how-it-works";
 import type { RequestCardData } from "@/features/requests/types/request";
 import type { RequestLabels } from "@/features/requests/types/request-labels";
 
@@ -161,6 +162,12 @@ export default function RequestsListContent({
       ) : (
         <RequestsGrid items={filteredItems} labels={labels.card} />
       )}
+
+      <RequestsHowItWorks
+        title={labels.howItWorks.title}
+        subtitle={labels.howItWorks.subtitle}
+        steps={labels.howItWorks.steps}
+      />
     </div>
   );
 }

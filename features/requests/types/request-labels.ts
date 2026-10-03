@@ -48,10 +48,20 @@ export type RequestCardLabels = {
   };
 };
 
+export type RequestsHowItWorksStep = {
+  title: string;
+  description: string;
+};
+
 export type RequestLabels = {
   backLabel: string;
   pageTitle: string;
   pageSubtitle: string;
+  howItWorks: {
+    title: string;
+    subtitle: string;
+    steps: RequestsHowItWorksStep[];
+  };
   searchPlaceholder: string;
   filtersLabel: string;
   emptyState: string;
