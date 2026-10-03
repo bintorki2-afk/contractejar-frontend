@@ -17,6 +17,14 @@ export type MyPropertiesLabels = {
     subtitle: string;
     steps: MyPropertiesHowItWorksStep[];
   };
+  onboarding: {
+    title: string;
+    progressTemplate: string;
+    back: string;
+    next: string;
+    start: string;
+    dontShowAgain: string;
+  };
   contractTypes: {
     housing: string;
     commercial: string;

@@ -1150,6 +1150,14 @@
         }
       ]
     },
+    "onboarding": {
+      "title": "مرحباً بك في «عقاراتي» 👋",
+      "progress": "{current} من {total}",
+      "back": "السابق",
+      "next": "التالي",
+      "start": "أضف عقارك الأول",
+      "dontShowAgain": "لا تظهر مرة أخرى"
+    },
     "contractTypes": {
       "housing": "عقار سكني",
       "commercial": "عقار تجاري"

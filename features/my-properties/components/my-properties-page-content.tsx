@@ -2,6 +2,7 @@ import MyPropertiesAddButton from "@/features/my-properties/components/my-proper
 import MyPropertiesEmptyState from "@/features/my-properties/components/my-properties-empty-state";
 import MyPropertiesGrid from "@/features/my-properties/components/my-properties-grid";
 import MyPropertiesHowItWorks from "@/features/my-properties/components/my-properties-how-it-works";
+import MyPropertiesOnboardingDialog from "@/features/my-properties/components/my-properties-onboarding-dialog";
 import ServicesPageBackConfig from "@/features/services/components/services-page-back-config";
 import type { MyPropertyCardData } from "@/features/my-properties/types/property-card";
 import type { MyPropertiesLabels } from "@/features/my-properties/types/my-properties-labels";
@@ -59,6 +60,13 @@ export default function MyPropertiesPageContent({
         subtitle={labels.howItWorks.subtitle}
         steps={labels.howItWorks.steps}
       />
+
+      {items.length === 0 ? (
+        <MyPropertiesOnboardingDialog
+          steps={labels.howItWorks.steps}
+          labels={labels.onboarding}
+        />
+      ) : null}
     </>
   );
 }

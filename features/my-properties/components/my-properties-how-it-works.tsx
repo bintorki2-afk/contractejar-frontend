@@ -50,11 +50,11 @@ export default function MyPropertiesHowItWorks({
               className="relative flex flex-col gap-3 rounded-[1.5rem] border border-black/5 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#151c1b]"
             >
               <div className="flex items-center justify-between">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-background-green text-brand dark:bg-[#16352f] dark:text-[#48c0b8]">
-                  <Icon className="size-6" />
-                </span>
                 <span className="text-3xl font-extrabold text-brand/15 dark:text-white/10">
                   {index + 1}
+                </span>
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-background-green text-brand dark:bg-[#16352f] dark:text-[#48c0b8]">
+                  <Icon className="size-6" />
                 </span>
               </div>
 
