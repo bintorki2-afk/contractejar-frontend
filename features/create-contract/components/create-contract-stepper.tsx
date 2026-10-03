@@ -115,7 +115,7 @@ export default function CreateContractStepper({
 
   return (
     <div className="sticky top-0 z-20 rounded-t-3xl bg-white px-2.5 py-3 sm:px-4 sm:py-4 md:p-5 dark:bg-[#1a2421]">
-      <div className="flex w-full flex-nowrap items-center justify-between gap-0.5 py-1 sm:justify-evenly sm:gap-2">
+      <div className="flex w-full flex-nowrap items-center justify-between gap-0.5 overflow-x-auto py-1 no-scrollbar sm:justify-evenly sm:gap-2 sm:overflow-x-visible">
         {visibleSteps.map((step, index) => {
           const stepIndex = CREATE_CONTRACT_STEPS.indexOf(step);
           const isSkipped = step === "owner" && ownerSkipped;

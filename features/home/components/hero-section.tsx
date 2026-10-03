@@ -17,7 +17,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
         marginTop: "calc(-1 * var(--header-h, 148px))",
         paddingTop: "var(--header-h, 148px)",
       }}
-      className="relative min-h-screend rounded-3xl bg-brand-background-green pb-2   lg:rounded-[60px] 2xl:rounded-[80px] rounded-t-none! overflow-hidden"
+      className="relative rounded-3xl bg-brand-background-green pb-2 lg:rounded-[60px] 2xl:rounded-[80px] rounded-t-none! overflow-hidden"
     >
 
       <div className="relative container pb-10 ">
