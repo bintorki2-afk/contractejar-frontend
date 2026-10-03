@@ -53,7 +53,7 @@ export default function UserSheetProfileSection({
             dir="ltr"
             className="text-right mt-1 block truncate text-sm font-medium text-gray-500"
           >
-            {displayPhone}
+            {displayPhone || user.email}
           </span>
         </span>
 

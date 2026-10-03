@@ -1,6 +1,12 @@
 import { repairPhoneFromQueryParam } from "@/features/auth/utils/normalize-saudi-phone";
 
-export function formatPhoneDisplay(phone: string) {
+export function formatPhoneDisplay(phone: string | null | undefined) {
+  // Social (Google/Apple) users have no mobile number, so this can be null —
+  // return an empty string instead of crashing on `.replace` of null.
+  if (!phone) {
+    return "";
+  }
+
   const repaired = repairPhoneFromQueryParam(phone) ?? phone;
   const digits = repaired.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
 

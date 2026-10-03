@@ -51,7 +51,9 @@
     "nav": {
       "sectionTitle": "حسابي",
       "requests": "طلباتي",
-      "requestsHref": "/requests"
+      "requestsHref": "/requests",
+      "properties": "عقاراتي",
+      "propertiesHref": "/properties/my-properties"
     },
     "policies": {
       "sectionTitle": "الأنظمة والسياسات",

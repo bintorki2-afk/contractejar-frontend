@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { ClipboardList, LogOut } from "lucide-react";
+import { Building2, ClipboardList, LogOut } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -78,6 +78,11 @@ export default function UserSheet({ children }: UserSheetProps) {
                 label={t("nav.requests")}
                 icon={<ClipboardList className="size-4 text-brand" aria-hidden="true" />}
                 href={t("nav.requestsHref")}
+              />
+              <UserSheetMenuRow
+                label={t("nav.properties")}
+                icon={<Building2 className="size-4 text-brand" aria-hidden="true" />}
+                href={t("nav.propertiesHref")}
               />
             </UserSheetSectionCard>
 
