@@ -1,6 +1,7 @@
 import MyPropertiesAddButton from "@/features/my-properties/components/my-properties-add-button";
 import MyPropertiesEmptyState from "@/features/my-properties/components/my-properties-empty-state";
 import MyPropertiesGrid from "@/features/my-properties/components/my-properties-grid";
+import MyPropertiesHowItWorks from "@/features/my-properties/components/my-properties-how-it-works";
 import ServicesPageBackConfig from "@/features/services/components/services-page-back-config";
 import type { MyPropertyCardData } from "@/features/my-properties/types/property-card";
 import type { MyPropertiesLabels } from "@/features/my-properties/types/my-properties-labels";
@@ -48,6 +49,12 @@ export default function MyPropertiesPageContent({
           addPropertyLabel={labels.addProperty}
         />
       )}
+
+      <MyPropertiesHowItWorks
+        title={labels.howItWorks.title}
+        subtitle={labels.howItWorks.subtitle}
+        steps={labels.howItWorks.steps}
+      />
     </>
   );
 }

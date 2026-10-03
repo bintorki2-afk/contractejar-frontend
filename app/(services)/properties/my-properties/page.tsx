@@ -3,7 +3,10 @@ import { getTranslations } from "next-intl/server";
 import MyPropertiesPageContent from "@/features/my-properties/components/my-properties-page-content";
 import { getMyProperties } from "@/features/my-properties/services/get-my-properties";
 import type { MyPropertyCardData } from "@/features/my-properties/types/property-card";
-import type { MyPropertiesLabels } from "@/features/my-properties/types/my-properties-labels";
+import type {
+  MyPropertiesHowItWorksStep,
+  MyPropertiesLabels,
+} from "@/features/my-properties/types/my-properties-labels";
 import { mapRealEstateToCard } from "@/features/my-properties/utils/map-real-estate-to-card";
 
 export default async function MyPropertiesPage() {
@@ -20,6 +23,11 @@ export default async function MyPropertiesPage() {
     emptyStateTitle: t("emptyStateTitle"),
     emptyStateDescription: t("emptyStateDescription"),
     addProperty: t("addProperty"),
+    howItWorks: {
+      title: t("howItWorks.title"),
+      subtitle: t("howItWorks.subtitle"),
+      steps: t.raw("howItWorks.steps") as MyPropertiesHowItWorksStep[],
+    },
     contractTypes: {
       housing: t("contractTypes.housing"),
       commercial: t("contractTypes.commercial"),
