@@ -44,5 +44,10 @@ export async function getMyProperties(): Promise<RealEstateListItem[]> {
     throw new Error(message || "Failed to fetch properties");
   }
 
-  return response.data.data;
+  // Only show properties the customer actually finished: the name is set on the
+  // final step, so a property with no name was created at the deed step and then
+  // abandoned — hide those incomplete records from the list and the count.
+  return response.data.data.filter(
+    (property) => (property.name_real_estate ?? "").trim() !== "",
+  );
 }
