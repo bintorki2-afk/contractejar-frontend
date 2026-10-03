@@ -13,7 +13,6 @@ import {
   Share2,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -728,13 +727,14 @@ export default function CreateContractReviewOrderDialog({
 
           <div className="flex min-h-64 items-center justify-center overflow-hidden bg-[#fafafa] p-4 dark:bg-[#121a18]">
             {attachmentPreview?.kind === "image" ? (
-              <div className="relative mx-auto aspect-4/3 w-full max-w-md overflow-hidden rounded-xl bg-white dark:bg-[#1a2421]">
-                <Image
+              <div className="mx-auto flex w-full max-w-md items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-[#1a2421]">
+                {/* Plain <img>: attachments are served from signed, extensionless
+                    backend URLs that the next/image loader/allowlist rejects. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={attachmentPreview.url}
                   alt={attachmentPreview.title}
-                  fill
-                  unoptimized
-                  className="object-contain"
+                  className="max-h-[55vh] w-full object-contain"
                 />
               </div>
             ) : attachmentPreview?.kind === "pdf" ? (

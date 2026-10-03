@@ -1,7 +1,6 @@
 "use client";
 
 import { Download, FileText, Printer, X } from "lucide-react";
-import Image from "next/image";
 
 import {
   Dialog,
@@ -105,13 +104,14 @@ export default function AttachmentPreviewDialog({
 
         <div className="flex min-h-64 items-center justify-center overflow-hidden bg-[#fafafa] p-4">
           {url && kind === "image" ? (
-            <div className="relative mx-auto aspect-4/3 w-full max-w-md overflow-hidden rounded-xl bg-white">
-              <Image
+            <div className="mx-auto flex w-full max-w-md items-center justify-center overflow-hidden rounded-xl bg-white">
+              {/* Plain <img>: attachments are served from signed, extensionless
+                  backend URLs that the next/image loader/allowlist rejects. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url}
                 alt={resolvedFileName || labels.title}
-                fill
-                unoptimized
-                className="object-contain"
+                className="max-h-[55vh] w-full object-contain"
               />
             </div>
           ) : url && kind === "pdf" ? (

@@ -480,13 +480,14 @@ export default function CreatePropertyDeedImageUpload({
                   className="h-[65vh] w-full rounded-2xl bg-white dark:bg-[#1a2421]"
                 />
               ) : previewIsImage ? (
-                <div className="relative mx-auto aspect-4/3 w-full max-w-2xl overflow-hidden rounded-2xl bg-white dark:bg-[#1a2421]">
-                  <Image
+                <div className="mx-auto flex w-full max-w-2xl items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-[#1a2421]">
+                  {/* Plain <img>: deed documents are served from signed, extensionless
+                      backend URLs that the next/image loader/allowlist rejects. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={previewObjectUrl}
                     alt={previewName}
-                    fill
-                    unoptimized
-                    className="object-contain"
+                    className="max-h-[65vh] w-full object-contain"
                   />
                 </div>
               ) : (
