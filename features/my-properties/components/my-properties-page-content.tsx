@@ -24,20 +24,24 @@ export default function MyPropertiesPageContent({
 
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
         <header className="min-w-0 space-y-2">
-          <h1 className="text-3xl font-extrabold text-brand md:text-4xl">
+          <h1 className="text-3xl font-extrabold text-brand dark:text-white md:text-4xl">
             {labels.pageTitle}
           </h1>
-          <p className="max-w-2xl text-sm leading-7 text-[#7a7a7a] md:text-base">
+          <p className="max-w-2xl text-sm leading-7 text-[#5b5b5b] dark:text-white/65 md:text-base">
             {labels.pageSubtitle}
           </p>
         </header>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-3">
-          <span className="inline-flex items-center rounded-full bg-brand-background-green px-3.5 py-1.5 text-sm font-bold text-brand">
-            {labels.propertiesCountLabel}
-          </span>
-          <MyPropertiesAddButton label={labels.addProperty} />
-        </div>
+        {/* Count + add control only once there are properties — the empty state
+            carries its own single call to action, so nothing is duplicated. */}
+        {items.length > 0 ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-3">
+            <span className="inline-flex items-center rounded-full bg-brand-background-green px-3.5 py-1.5 text-sm font-bold text-brand dark:bg-[#16352f] dark:text-[#48c0b8]">
+              {labels.propertiesCountLabel}
+            </span>
+            <MyPropertiesAddButton label={labels.addProperty} />
+          </div>
+        ) : null}
       </div>
 
       {items.length > 0 ? (
