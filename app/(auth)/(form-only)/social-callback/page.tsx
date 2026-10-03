@@ -33,16 +33,23 @@ export default function SocialCallbackPage() {
       return;
     }
 
-    void completeSocialLogin(token).then((result) => {
-      if (!result.ok) {
-        toast.error(result.error || t("error"));
-        router.replace("/login?error=social");
-        return;
-      }
+    void completeSocialLogin(token)
+      .then((result) => {
+        if (!result.ok) {
+          toast.error(result.error || t("error"));
+          router.replace("/login?error=social");
+          return;
+        }
 
-      setUser(result.user);
-      router.replace("/");
-    });
+        setUser(result.user);
+        router.replace("/");
+      })
+      .catch(() => {
+        // Any unexpected failure must not surface the full-screen error page —
+        // show a toast and send the user back to login to retry.
+        toast.error(t("error"));
+        router.replace("/login?error=social");
+      });
   }, [router, setUser, t]);
 
   return (
