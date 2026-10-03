@@ -424,13 +424,14 @@ export default function CreateContractDeedImageUpload({
 
           <div className="max-h-[85vh] overflow-auto bg-[#f7f7f7] p-4 no-scrollbar dark:bg-[#121a18]">
             {previewExistingUrl ? (
-              <div className="relative mx-auto aspect-4/3 w-full max-w-2xl overflow-hidden rounded-2xl bg-white dark:bg-[#1a2421]">
-                <Image
+              <div className="mx-auto flex w-full max-w-2xl items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-[#1a2421]">
+                {/* Plain <img>: deed documents are served from signed, extensionless
+                    backend URLs that the next/image loader/allowlist rejects. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={previewExistingUrl}
                   alt={labels.previewTitle}
-                  fill
-                  unoptimized
-                  className="object-contain"
+                  className="max-h-[65vh] w-full object-contain"
                 />
               </div>
             ) : previewFile && previewUrl ? (
