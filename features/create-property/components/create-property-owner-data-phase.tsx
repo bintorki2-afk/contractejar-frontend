@@ -1,6 +1,6 @@
 "use client";
 
-import { IdCard, User } from "lucide-react";
+import { IdCard } from "lucide-react";
 
 import { Switch } from "@/components/ui/switch";
 import CreatePropertyBirthDateFields from "@/features/create-property/components/create-property-birth-date-fields";
@@ -65,21 +65,11 @@ export default function CreatePropertyOwnerDataPhase({
     showFieldErrors && !isAdultBirthDateComplete(value.birthDate);
   const hasAgentInvalid = showFieldErrors && value.hasAgent === "";
   const hasAgentChecked = value.hasAgent === "yes";
-  const fullNameInvalid = showFieldErrors && value.fullName.trim() === "";
   const idValid = !idInvalid && isIdNumberComplete(value.idNumber);
   const phoneValid = !phoneInvalid && isPhoneComplete(value.phone);
 
   return (
     <div className="space-y-3">
-      <CreatePropertyIconInputField
-        label={labels.fullName.label}
-        placeholder={labels.fullName.placeholder}
-        value={value.fullName}
-        onChange={(fullName) => updateField("fullName", fullName)}
-        icon={User}
-        invalid={fullNameInvalid}
-      />
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <CreatePropertyIconInputField
           label={labels.idNumber.label}
