@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -9,6 +10,7 @@ import CreatePropertyStepNavigation from "@/features/create-property/components/
 import CreatePropertyStepPhaseHeader from "@/features/create-property/components/create-property-step-phase-header";
 import { useCreatePropertyReviewStep } from "@/features/create-property/hooks/use-create-property-review-step";
 import { useSubmitPropertyStep2 } from "@/features/create-property/hooks/use-submit-property-step2";
+import { resetCreatePropertyDraft } from "@/features/create-property/utils/reset-create-property-draft";
 import type { CreatePropertyLabels } from "@/features/create-property/types/create-property-labels";
 
 type CreatePropertyReviewStepProps = {
@@ -23,20 +25,24 @@ export default function CreatePropertyReviewStep({
   onComplete,
 }: CreatePropertyReviewStepProps) {
   const tIncomplete = useTranslations("createProperty");
+  const router = useRouter();
   const { reviewData, setReviewData, canContinue } =
     useCreatePropertyReviewStep();
   const { isSubmitting, submitStep2 } = useSubmitPropertyStep2();
   const [showFieldErrors, setShowFieldErrors] = useState(false);
 
-  async function handleContinue() {
+  // Validate (name + earlier stages) then actually persist the property. Returns
+  // the submit result on success, or null when blocked/failed — so both the
+  // "save" and "continue" buttons genuinely save instead of pretending to.
+  async function persistProperty() {
     if (isSubmitting) {
-      return;
+      return null;
     }
 
     if (!canContinue) {
       setShowFieldErrors(true);
       toast.error(tIncomplete("incompleteContinue"));
-      return;
+      return null;
     }
 
     setShowFieldErrors(false);
@@ -45,10 +51,26 @@ export default function CreatePropertyReviewStep({
 
     if (!result.ok) {
       toast.error(result.error || labels.navigation.submitError);
-      return;
+      return null;
     }
 
-    onComplete(result.propertyId);
+    return result;
+  }
+
+  async function handleContinue() {
+    const result = await persistProperty();
+    if (result) {
+      onComplete(result.propertyId);
+    }
+  }
+
+  async function handleSave() {
+    const result = await persistProperty();
+    if (result) {
+      toast.success(labels.navigation.saveSuccess);
+      resetCreatePropertyDraft();
+      router.push("/properties/my-properties");
+    }
   }
 
   return (
@@ -82,9 +104,7 @@ export default function CreatePropertyReviewStep({
           }
           isSubmitting={isSubmitting}
           onPrevious={onBack}
-          onSave={() => {
-            toast.success(labels.navigation.saveSuccess);
-          }}
+          onSave={handleSave}
           onContinue={handleContinue}
         />
       </div>

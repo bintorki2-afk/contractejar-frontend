@@ -65,7 +65,9 @@ export const PROPERTY_OWNER_STEP_MAX_PHASE_COUNT = 2;
 export type PropertyOwnerValidationIssue = OwnerValidationIssue;
 
 export function isPropertyOwnerDataComplete(ownerData: PropertyOwnerDataState) {
-  return ownerData.fullName.trim().length > 0 && isOwnerDataComplete(ownerData);
+  // The triple owner name field was removed from the form; it stays in the model
+  // with a default empty value and no longer gates step completion.
+  return isOwnerDataComplete(ownerData);
 }
 
 export function isPropertyAgentDataComplete(

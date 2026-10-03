@@ -1109,6 +1109,14 @@
         }
       ]
     },
+    "onboarding": {
+      "title": "Welcome to \"My Properties\" 👋",
+      "progress": "{current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "start": "Add your first property",
+      "dontShowAgain": "Don't show again"
+    },
     "contractTypes": {
       "housing": "Residential property",
       "commercial": "Commercial property"

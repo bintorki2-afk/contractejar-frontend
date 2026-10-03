@@ -28,6 +28,14 @@ export default async function MyPropertiesPage() {
       subtitle: t("howItWorks.subtitle"),
       steps: t.raw("howItWorks.steps") as MyPropertiesHowItWorksStep[],
     },
+    onboarding: {
+      title: t("onboarding.title"),
+      progressTemplate: t.raw("onboarding.progress") as string,
+      back: t("onboarding.back"),
+      next: t("onboarding.next"),
+      start: t("onboarding.start"),
+      dontShowAgain: t("onboarding.dontShowAgain"),
+    },
     contractTypes: {
       housing: t("contractTypes.housing"),
       commercial: t("contractTypes.commercial"),
