@@ -3,7 +3,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const MAX_UPLOAD_BODY_SIZE = 50 * 1024 * 1024; // 50 MB
 
-const CSP_REPORT_ONLY = [
+// Enforced Content-Security-Policy. The directives cover every origin the app
+// actually loads, so enforcing does not break functionality:
+//   - frame-src: Moyasar payment page, the GTM <noscript> iframe, and the
+//     same-origin / blob: / data: iframes used for PDF & image previews.
+//   - worker-src: the PWA + Firebase-messaging service workers (same-origin + blob:).
+//   - object-src 'none': no plugins/embeds.
+// 'unsafe-inline'/'unsafe-eval' remain for now because GTM and the Next.js runtime
+// rely on inline scripts; removing them requires per-request nonces (follow-up).
+const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "frame-ancestors 'self'",
@@ -13,6 +21,9 @@ const CSP_REPORT_ONLY = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com",
   "connect-src 'self' https: wss:",
+  "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
 ].join("; ");
 
 const SECURITY_HEADERS = [
@@ -27,9 +38,8 @@ const SECURITY_HEADERS = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Report-only: never blocks anything, so it is safe to ship. Flip to
-  // "Content-Security-Policy" to enforce once reports confirm nothing breaks.
-  { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+  // Enforced (was report-only). The policy is scoped to the origins the app uses.
+  { key: "Content-Security-Policy", value: CSP },
 ];
 
 const nextConfig: NextConfig = {
