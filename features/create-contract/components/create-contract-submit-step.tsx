@@ -1,10 +1,18 @@
 "use client";
 
-import { AlertCircle, Pencil } from "lucide-react";
+import {
+  AlertCircle,
+  Check,
+  ClipboardList,
+  Copy,
+  Home,
+  Pencil,
+} from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { getSaudiNationalMobile } from "@/features/auth/utils/normalize-saudi-phone";
@@ -125,6 +133,18 @@ export default function CreateContractSubmitStep({
     contractType,
   });
   const [showWhatsappError, setShowWhatsappError] = useState(false);
+  const [orderNumberCopied, setOrderNumberCopied] = useState(false);
+
+  async function handleCopyOrderNumber(orderNumber: string) {
+    try {
+      await navigator.clipboard.writeText(orderNumber);
+      setOrderNumberCopied(true);
+      toast.success(t("orderNumberCopied"));
+      window.setTimeout(() => setOrderNumberCopied(false), 2000);
+    } catch {
+      // Clipboard may be unavailable (insecure context) — fail quietly.
+    }
+  }
 
   const isWhatsappValid = getSaudiNationalMobile(contactWhatsapp) !== null;
   const hasFailed = result != null && !result.ok;
@@ -168,6 +188,12 @@ export default function CreateContractSubmitStep({
   }
 
   if (result?.ok) {
+    const orderNumber = String(result.orderNumber);
+    const whatsappMessage = t("whatsappMessage", { orderNumber });
+    const whatsappShareHref = `${whatsappHref}${
+      whatsappHref.includes("?") ? "&" : "?"
+    }text=${encodeURIComponent(whatsappMessage)}`;
+
     return (
       <div className="p-3 md:p-5">
         <div className="flex flex-col items-center gap-3 text-center">
@@ -188,20 +214,64 @@ export default function CreateContractSubmitStep({
           <p className="text-xs font-medium text-[#5c6b68] dark:text-[#9eb5af]">
             {t("orderNumberLabel")}
           </p>
-          <p className="mt-2 inline-flex max-w-full truncate rounded-lg bg-brand px-3 py-1.5 text-lg font-extrabold tracking-wide text-white md:text-xl dark:bg-[#0f6b5c]">
-            {result.orderNumber}
-          </p>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="inline-flex max-w-full truncate rounded-lg bg-brand px-3 py-1.5 text-lg font-extrabold tracking-wide text-white md:text-xl dark:bg-[#0f6b5c]">
+              {orderNumber}
+            </span>
+            <button
+              type="button"
+              onClick={() => void handleCopyOrderNumber(orderNumber)}
+              aria-label={t("copyOrderNumber")}
+              title={t("copyOrderNumber")}
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-brand/20 bg-white text-brand transition-colors hover:bg-brand-background-green dark:border-[#2f403b] dark:bg-[#1a2421] dark:text-[#48c0b8] dark:hover:bg-[#24302c]"
+            >
+              {orderNumberCopied ? (
+                <Check className="size-4" aria-hidden="true" />
+              ) : (
+                <Copy className="size-4" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
 
-        <Button
-          asChild
-          className="mt-6 h-12 w-full rounded-full bg-[#25d366] text-base font-bold text-white hover:bg-[#1ebe5a]"
-        >
-          <Link href={whatsappHref} target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp className="size-5" aria-hidden="true" />
-            {t("contactWhatsappCta")}
-          </Link>
-        </Button>
+        <div className="mt-6 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              asChild
+              variant="outline"
+              className="h-12 rounded-full border-brand/25 text-sm font-bold text-brand hover:bg-brand-background-green dark:border-[#2f403b] dark:text-[#48c0b8] dark:hover:bg-[#24302c]"
+            >
+              <Link href="/">
+                <Home className="size-4" aria-hidden="true" />
+                {t("homeCta")}
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="h-12 rounded-full border-brand/25 text-sm font-bold text-brand hover:bg-brand-background-green dark:border-[#2f403b] dark:text-[#48c0b8] dark:hover:bg-[#24302c]"
+            >
+              <Link href="/requests">
+                <ClipboardList className="size-4" aria-hidden="true" />
+                {t("viewOrdersCta")}
+              </Link>
+            </Button>
+          </div>
+
+          <Button
+            asChild
+            className="h-12 w-full rounded-full bg-[#25d366] text-base font-bold text-white hover:bg-[#1ebe5a]"
+          >
+            <Link
+              href={whatsappShareHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaWhatsapp className="size-5" aria-hidden="true" />
+              {t("contactWhatsappCta")}
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }

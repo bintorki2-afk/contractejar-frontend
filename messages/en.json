@@ -834,6 +834,24 @@
     "backLabel": "Back",
     "pageTitle": "My requests",
     "pageSubtitle": "Track the status of your requests and rental contracts step by step until documentation on the Ejar platform.",
+    "howItWorks": {
+      "title": "How does \"My Requests\" work?",
+      "subtitle": "Track all your requests and rental contracts, step by step, from one place.",
+      "steps": [
+        {
+          "title": "Track your request status",
+          "description": "Know each request's status in real time: under review, in progress, or completed and documented."
+        },
+        {
+          "title": "All your requests in one place",
+          "description": "All your requests and rental contracts are saved and organized for easy access anytime."
+        },
+        {
+          "title": "Quick follow-up",
+          "description": "Each request number is ready to copy, and you can reach us on WhatsApp to complete the process."
+        }
+      ]
+    },
     "searchPlaceholder": "Search by request number or ID",
     "filtersLabel": "Filters",
     "filtersDialog": {
@@ -1677,6 +1695,11 @@
       "successBody": "We'll contact you on WhatsApp to complete the contract procedures. Keep your order number for reference.",
       "orderNumberLabel": "Order number",
       "contactWhatsappCta": "Contact us on WhatsApp",
+      "homeCta": "Home",
+      "viewOrdersCta": "View orders",
+      "copyOrderNumber": "Copy order number",
+      "orderNumberCopied": "Order number copied",
+      "whatsappMessage": "Hello, my order number is {orderNumber} and I'd like to complete the contract.",
       "errorTitle": "Couldn't submit your order",
       "errorBody": "Something went wrong while submitting your order. You can try again or contact us directly on WhatsApp.",
       "retry": "Try again",

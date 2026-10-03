@@ -3,7 +3,10 @@ import { getTranslations } from "next-intl/server";
 import RequestsPageContent from "@/features/requests/components/requests-page-content";
 import { getContracts } from "@/features/requests/services/get-contracts";
 import type { RequestCardData } from "@/features/requests/types/request";
-import type { RequestLabels } from "@/features/requests/types/request-labels";
+import type {
+  RequestLabels,
+  RequestsHowItWorksStep,
+} from "@/features/requests/types/request-labels";
 import { mapContractToRequestCard } from "@/features/requests/utils/map-contract-to-request-card";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 
@@ -19,6 +22,11 @@ export default async function RequestsPage() {
     backLabel: t("backLabel"),
     pageTitle: t("pageTitle"),
     pageSubtitle: t("pageSubtitle"),
+    howItWorks: {
+      title: t("howItWorks.title"),
+      subtitle: t("howItWorks.subtitle"),
+      steps: t.raw("howItWorks.steps") as RequestsHowItWorksStep[],
+    },
     searchPlaceholder: t("searchPlaceholder"),
     filtersLabel: t("filtersLabel"),
     emptyState: t("emptyState"),
