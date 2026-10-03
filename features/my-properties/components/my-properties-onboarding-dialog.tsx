@@ -95,11 +95,11 @@ export default function MyPropertiesOnboardingDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md gap-0 overflow-hidden rounded-[1.75rem] p-0 sm:max-w-md dark:bg-[#151c1b]">
-        <DialogHeader className="flex flex-row items-center justify-between border-b border-black/5 px-6 py-4 dark:border-white/10">
-          <DialogTitle className="text-base font-extrabold text-brand dark:text-white">
+        <DialogHeader className="flex flex-row items-center justify-between gap-3 border-b border-black/5 py-4 pl-6 pr-12 dark:border-white/10">
+          <DialogTitle className="min-w-0 truncate text-base font-extrabold text-brand dark:text-white">
             {labels.title}
           </DialogTitle>
-          <span className="me-6 text-xs font-bold text-[#9a9a9a] dark:text-white/40">
+          <span className="shrink-0 text-xs font-bold text-[#9a9a9a] dark:text-white/40">
             {progress}
           </span>
         </DialogHeader>
