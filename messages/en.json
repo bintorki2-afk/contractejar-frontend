@@ -1091,6 +1091,24 @@
     "addProperty": "Add new property",
     "emptyStateTitle": "No saved properties yet",
     "emptyStateDescription": "Add your first property to create contracts on it easily without re-entering data.",
+    "howItWorks": {
+      "title": "How does \"My Properties\" work?",
+      "subtitle": "Save a property once and create contracts on it whenever you need — without re-entering the data.",
+      "steps": [
+        {
+          "title": "Save your property once",
+          "description": "Enter the property details (deed, national address, specifics) once and keep them safely saved."
+        },
+        {
+          "title": "Create contracts fast",
+          "description": "Use a saved property to create any rental contract instantly, without re-entering the same data."
+        },
+        {
+          "title": "All your properties and units in one place",
+          "description": "Track each property's units and linked contracts easily from one organized place."
+        }
+      ]
+    },
     "contractTypes": {
       "housing": "Residential property",
       "commercial": "Commercial property"
