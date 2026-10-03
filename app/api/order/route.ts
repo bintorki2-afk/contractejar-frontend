@@ -13,6 +13,79 @@ import type { NextRequest } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// --- Abuse hardening (public endpoint) ---------------------------------------
+// This route has no auth/OTP, so it is rate-limited and size-capped to blunt
+// floods (Telegram/email bombing) and oversized payloads. The limiter is
+// in-memory and therefore best-effort on serverless (per-instance); a shared
+// store (e.g. Upstash/Redis) is the production-grade follow-up for a hard limit.
+const MAX_BODY_BYTES = 100 * 1024; // 100 KB — an order is small text/JSON.
+const RATE_LIMIT_MAX = 5; // requests…
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // …per IP per minute.
+const MAX_SECTIONS = 40;
+const MAX_FIELDS_PER_SECTION = 60;
+const MAX_STRING_LEN = 2000;
+
+const rateBuckets = new Map<string, number[]>();
+
+function clientIp(request: NextRequest): string {
+  const fwd = request.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0]!.trim();
+  return request.headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+// Returns true when the caller is over the limit.
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const hits = (rateBuckets.get(ip) ?? []).filter(
+    (ts) => now - ts < RATE_LIMIT_WINDOW_MS,
+  );
+  hits.push(now);
+  rateBuckets.set(ip, hits);
+
+  // Opportunistic cleanup so the map does not grow unbounded.
+  if (rateBuckets.size > 5000) {
+    for (const [key, ts] of rateBuckets) {
+      if (ts.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) rateBuckets.delete(key);
+    }
+  }
+
+  return hits.length > RATE_LIMIT_MAX;
+}
+
+function clip(value: unknown): string {
+  return String(value ?? "").slice(0, MAX_STRING_LEN);
+}
+
+// Coerce arbitrary parsed JSON into a bounded, well-typed OrderPayload. Anything
+// unexpected is dropped rather than trusted, so a hostile body cannot blow up the
+// outbound messages or the map.
+function sanitizeOrder(raw: unknown): OrderPayload {
+  const input = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+
+  const rawSections = Array.isArray(input.sections) ? input.sections : [];
+  const sections: OrderSection[] = rawSections
+    .slice(0, MAX_SECTIONS)
+    .map((section) => {
+      const s = (section && typeof section === "object" ? section : {}) as Record<string, unknown>;
+      const rawFields = Array.isArray(s.fields) ? s.fields : [];
+      const fields: OrderField[] = rawFields
+        .slice(0, MAX_FIELDS_PER_SECTION)
+        .map((field) => {
+          const f = (field && typeof field === "object" ? field : {}) as Record<string, unknown>;
+          return { label: clip(f.label), value: clip(f.value) };
+        });
+      return { title: clip(s.title), fields };
+    });
+
+  return {
+    orderNumber: input.orderNumber != null ? clip(input.orderNumber) : undefined,
+    contractType: input.contractType != null ? clip(input.contractType) : undefined,
+    whatsappNumber: input.whatsappNumber != null ? clip(input.whatsappNumber) : undefined,
+    notes: input.notes != null ? clip(input.notes) : undefined,
+    sections,
+  };
+}
+
 type OrderField = { label: string; value: string };
 type OrderSection = { title: string; fields: OrderField[] };
 type OrderPayload = {
@@ -144,9 +217,34 @@ async function emailBackup(order: OrderPayload, text: string): Promise<boolean> 
 }
 
 export async function POST(request: NextRequest) {
+  // 1) Rate limit (best-effort, per instance).
+  if (isRateLimited(clientIp(request))) {
+    return NextResponse.json(
+      { ok: false, error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
+  // 2) Reject oversized bodies early (declared length, then actual bytes).
+  const declaredLength = Number(request.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  }
+
+  let rawBody: string;
+  try {
+    rawBody = await request.text();
+  } catch {
+    return NextResponse.json({ ok: false, error: "invalid_body" }, { status: 400 });
+  }
+  if (rawBody.length > MAX_BODY_BYTES) {
+    return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  }
+
+  // 3) Parse + sanitize into a bounded shape.
   let order: OrderPayload;
   try {
-    order = (await request.json()) as OrderPayload;
+    order = sanitizeOrder(JSON.parse(rawBody));
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_body" }, { status: 400 });
   }
