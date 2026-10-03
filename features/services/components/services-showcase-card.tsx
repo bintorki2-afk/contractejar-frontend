@@ -61,7 +61,7 @@ export default function ServicesShowcaseCard({
     >
       <div className="mx-auto flex max-w-md flex-col items-start gap-4 text-start">
         <p className="text-xs font-semibold text-brand-secondary">{eyebrow}</p>
-        <h3 className="text-5xl font-bold leading-tight text-brand">
+        <h3 className="text-3xl font-bold leading-tight text-brand sm:text-4xl lg:text-5xl">
           <span className="block">{titleLine1}</span>
           <span className="block">{titleLine2}</span>
         </h3>

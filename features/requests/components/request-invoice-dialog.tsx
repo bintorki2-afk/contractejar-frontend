@@ -194,7 +194,7 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-4 text-sm">
+        <div className="mt-6 grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
           {invoice.customer_name ? (
             <div className="min-w-0 space-y-1 rounded-xl border-s-4 border-brand bg-[#f7f7f7] px-4 py-3 text-start">
               <p className="text-xs text-[#6f6f6f]">{labels.customerLabel}</p>
@@ -224,7 +224,8 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
         </div>
 
         {invoice.items.length > 0 ? (
-          <table className="mt-8 w-full border-collapse overflow-hidden rounded-2xl text-sm">
+          <div className="mt-8 overflow-x-auto">
+          <table className="w-full border-collapse overflow-hidden rounded-2xl text-sm">
             <thead>
               <tr className="bg-brand text-xs font-bold tracking-wide text-white uppercase">
                 <th className="rounded-s-xl py-3 ps-4 pe-3 text-start">
@@ -259,6 +260,7 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {invoice.total_due_label || invoice.total_amount_label ? (
