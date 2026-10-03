@@ -62,6 +62,14 @@ export type RequestLabels = {
     subtitle: string;
     steps: RequestsHowItWorksStep[];
   };
+  onboarding: {
+    title: string;
+    progressTemplate: string;
+    back: string;
+    next: string;
+    start: string;
+    dontShowAgain: string;
+  };
   searchPlaceholder: string;
   filtersLabel: string;
   emptyState: string;

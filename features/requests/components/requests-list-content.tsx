@@ -10,6 +10,7 @@ import RequestsFiltersDialog, {
 } from "@/features/requests/components/requests-filters-dialog";
 import RequestsGrid from "@/features/requests/components/requests-grid";
 import RequestsHowItWorks from "@/features/requests/components/requests-how-it-works";
+import RequestsOnboardingDialog from "@/features/requests/components/requests-onboarding-dialog";
 import type { RequestCardData } from "@/features/requests/types/request";
 import type { RequestLabels } from "@/features/requests/types/request-labels";
 
@@ -168,6 +169,13 @@ export default function RequestsListContent({
         subtitle={labels.howItWorks.subtitle}
         steps={labels.howItWorks.steps}
       />
+
+      {items.length === 0 ? (
+        <RequestsOnboardingDialog
+          steps={labels.howItWorks.steps}
+          labels={labels.onboarding}
+        />
+      ) : null}
     </div>
   );
 }

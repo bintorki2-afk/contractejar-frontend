@@ -852,6 +852,14 @@
         }
       ]
     },
+    "onboarding": {
+      "title": "Welcome to \"My Requests\" 👋",
+      "progress": "{current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "start": "Start a contract",
+      "dontShowAgain": "Don't show again"
+    },
     "searchPlaceholder": "Search by request number or ID",
     "filtersLabel": "Filters",
     "filtersDialog": {
