@@ -67,7 +67,7 @@
     "accountSettings": {
       "sectionTitle": "Account Settings",
       "language": "Language",
-      "notifications": "Turn off notifications",
+      "notifications": "Notifications",
       "logout": "Log out",
       "logoutSuccess": "Signed out successfully",
       "logoutError": "Unable to sign out, please try again"
