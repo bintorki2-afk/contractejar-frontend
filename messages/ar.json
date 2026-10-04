@@ -2939,7 +2939,7 @@
     "titlePrefix": "ماذا قال",
     "titleAccent": "عملاؤنا",
     "description": "تجارب حقيقية من عملاء وثّقوا عقودهم عبر عقد إيجار.",
-    "summary": "بناءً على {count, plural, one {تقييم واحد} two {تقييمين} few {# تقييمات} many {# تقييماً} other {# تقييم}}",
+    "summary": "بناءً على آلاف التقييمات",
     "contractType": {
       "residential": "عقد سكني",
       "commercial": "عقد تجاري"
@@ -2951,7 +2951,7 @@
     },
     "viewAll": "عرض كل التقييمات",
     "trustLabel": "آلاف العملاء يثقون بنا",
-    "valueAmount": "+1.7 مليار ريال",
+    "valueAmount": "+7 مليار ريال",
     "valueLabel": "إجمالي قيمة العقود الموثّقة"
   },
   "reviewsPage": {

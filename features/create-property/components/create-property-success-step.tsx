@@ -106,7 +106,7 @@ export default function CreatePropertySuccessStep({
             type="button"
             asChild
             variant="ghost"
-            className="h-11 w-full justify-center gap-3 rounded-2xl bg-brand-background-green px-4 text-sm font-semibold text-brand hover:bg-brand-background-green/80"
+            className="h-11 w-full justify-center gap-3 rounded-2xl bg-brand-background-green px-4 text-sm font-semibold text-brand hover:bg-brand-background-green/80 dark:bg-white/[0.07] dark:text-white dark:hover:bg-white/[0.12]"
           >
             <Link href={action.href}>
               <span>{action.label}</span>

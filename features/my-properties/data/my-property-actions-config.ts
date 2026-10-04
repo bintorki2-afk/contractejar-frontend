@@ -15,13 +15,13 @@ export const MY_PROPERTY_ACTIONS_CONFIG: MyPropertyActionConfig[] = [
     id: "view-edit",
     labelKey: "view-edit",
     iconType: "svg",
-    iconSrc: "/icons/user-edit.svg",
+    iconSrc: "/icons/pencil.svg",
   },
   {
     id: "view-units",
     labelKey: "view-units",
     iconType: "svg",
-    iconSrc: "/icons/pentagon.svg",
+    iconSrc: "/icons/grid.svg",
   },
   {
     id: "add-unit",

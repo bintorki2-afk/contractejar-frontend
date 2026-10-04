@@ -37,14 +37,16 @@ export default function PropertyUnitCardFooter({
         <span className="flex-1 text-center leading-6">
           {isStarting ? t("startContractLoading") : contractLabel}
         </span>
-        <span className="relative h-7 w-16 shrink-0">
-          <Image
-            src={MY_PROPERTY_EJAR_LOGO}
-            alt={t("ejarLogoAlt")}
-            fill
-            sizes="64px"
-            className="object-contain object-center"
-          />
+        <span className="flex h-9 shrink-0 items-center rounded-xl bg-white px-2.5 shadow-sm">
+          <span className="relative h-5 w-12">
+            <Image
+              src={MY_PROPERTY_EJAR_LOGO}
+              alt={t("ejarLogoAlt")}
+              fill
+              sizes="48px"
+              className="object-contain object-center"
+            />
+          </span>
         </span>
       </button>
     </div>
