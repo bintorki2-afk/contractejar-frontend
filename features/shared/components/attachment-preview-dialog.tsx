@@ -122,7 +122,7 @@ export default function AttachmentPreviewDialog({
             />
           ) : url ? (
             <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <FileText className="size-12 text-[#b8b0d9]" aria-hidden="true" />
+              <FileText className="size-12 text-brand/70" aria-hidden="true" />
               <p className="text-sm font-bold text-[#2b2b2b]">
                 {resolvedFileName || labels.title}
               </p>
