@@ -76,7 +76,7 @@
     "accountSettings": {
       "sectionTitle": "إعدادات الحساب",
       "language": "اللغة",
-      "notifications": "إيقاف الإشعارات",
+      "notifications": "الإشعارات",
       "logout": "تسجيل الخروج",
       "logoutSuccess": "تم تسجيل الخروج بنجاح",
       "logoutError": "تعذر تسجيل الخروج، يرجى المحاولة مرة أخرى"

@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 
 import UserSheetSectionCard from "@/features/auth/components/user-sheet-section-card";
 import type { AuthUser } from "@/features/auth/types/auth-user";
 import { formatPhoneDisplay } from "@/features/auth/utils/format-phone-display";
-import CustomIcon from "@/features/shared/components/custom-icon";
+import { getUserInitials } from "@/features/auth/utils/get-user-initials";
 
 type UserSheetProfileSectionProps = {
   user: AuthUser;
@@ -22,6 +23,12 @@ export default function UserSheetProfileSection({
 }: UserSheetProfileSectionProps) {
   const displayName = user.full_name || user.name;
   const displayPhone = formatPhoneDisplay(user.mobile || user.phone);
+  const initials = getUserInitials(displayName);
+
+  // A stored photo URL can be missing or fail to load; fall back to initials
+  // instead of showing the broken-image alt text.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const showPhoto = Boolean(user.photo) && !photoFailed;
 
   return (
     <UserSheetSectionCard title={sectionTitle}>
@@ -30,17 +37,18 @@ export default function UserSheetProfileSection({
         onClick={onEditProfile}
         className="flex w-full items-center gap-3 text-start transition-colors hover:text-brand"
       >
-        <span className="relative inline-flex size-14 shrink-0 overflow-hidden rounded-full bg-white">
-          {user.photo ? (
+        <span className="relative inline-flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-background-green text-brand">
+          {showPhoto ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.photo}
               alt={avatarAlt}
+              onError={() => setPhotoFailed(true)}
               className="size-full object-cover"
             />
           ) : (
-            <span className="flex size-full items-center justify-center bg-brand-background-green text-brand">
-              <CustomIcon src="/icons/user.svg" size={16} />
+            <span className="text-base font-bold" aria-label={avatarAlt}>
+              {initials}
             </span>
           )}
         </span>

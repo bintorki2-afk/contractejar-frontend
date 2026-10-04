@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Building2, ClipboardList, LogOut } from "lucide-react";
+import { Building2, ClipboardList, FileText, LogOut, ShieldCheck } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -89,18 +89,12 @@ export default function UserSheet({ children }: UserSheetProps) {
             <UserSheetSectionCard title={t("policies.sectionTitle")}>
               <UserSheetMenuRow
                 label={t("policies.terms")}
-                icon={<CustomIcon src="/icons/arrow-circle.svg" size={16} />}
+                icon={<FileText className="size-4 text-brand" aria-hidden="true" />}
                 href={t("policies.termsHref")}
               />
               <UserSheetMenuRow
                 label={t("policies.privacy")}
-                icon={
-                  <CustomIcon
-                    src="/icons/arrow-circle.svg"
-                    size={16}
-                    className="rotate-90"
-                  />
-                }
+                icon={<ShieldCheck className="size-4 text-brand" aria-hidden="true" />}
                 href={t("policies.privacyHref")}
               />
             </UserSheetSectionCard>
