@@ -38,6 +38,7 @@ export async function generateMetadata({
   return {
     title: t(`${key}.title`),
     description: t(`${key}.description`),
+    alternates: { canonical: `/service/${key}` },
   };
 }
 

@@ -27,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return resolveContentPageMetadata(pageSeo, {
     title: t("aboutTitle"),
     description: t("aboutDescription"),
+    canonical: "/about",
   });
 }
 

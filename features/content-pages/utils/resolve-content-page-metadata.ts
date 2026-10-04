@@ -7,6 +7,8 @@ type ContentPageMetadataDefaults = {
   title?: Metadata["title"];
   /** Hardcoded fallback description (i18n). Used when API `meta_description` is empty. */
   description?: string;
+  /** Self-referencing canonical path (e.g. "/blog"). Resolved absolute via metadataBase. */
+  canonical?: string;
 };
 
 function normalizeMetaField(value: string | null | undefined): string {
@@ -30,6 +32,10 @@ export function resolveContentPageMetadata(
   const apiDescription = normalizeMetaField(page?.meta_description);
 
   const metadata: Metadata = {};
+
+  if (defaults.canonical) {
+    metadata.alternates = { canonical: defaults.canonical };
+  }
 
   if (defaults.title !== undefined) {
     metadata.title = defaults.title;

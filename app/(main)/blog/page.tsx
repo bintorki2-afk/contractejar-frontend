@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const pageSeo = await getContentPageSeo("blogs");
 
   // Empty API fields inherit root layout defaults. Blog [slug] does not use this.
-  return resolveContentPageMetadata(pageSeo);
+  return resolveContentPageMetadata(pageSeo, { canonical: "/blog" });
 }
 
 export default function BlogPage() {
