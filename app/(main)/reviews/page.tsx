@@ -77,23 +77,6 @@ export default async function ReviewsPage({
     commercial: tr("contractType.commercial"),
   };
 
-  const filters: { key: string; label: string; patch: Partial<SearchParams> }[] =
-    [
-      { key: "all", label: t("filters.all"), patch: { type: undefined, page: "1" } },
-      {
-        key: "residential",
-        label: tr("contractType.residential"),
-        patch: { type: "residential", page: "1" },
-      },
-      {
-        key: "commercial",
-        label: tr("contractType.commercial"),
-        patch: { type: "commercial", page: "1" },
-      },
-    ];
-
-  const ratingChips = [5, 4, 3];
-
   return (
     <main className="py-14 md:py-20">
       <div className="container flex flex-col gap-10">
@@ -129,89 +112,6 @@ export default async function ReviewsPage({
               </span>
             </span>
           </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {filters.map((f) => {
-              const active =
-                (f.key === "all" && !typeFilter) || f.key === typeFilter;
-              return (
-                <Link
-                  key={f.key}
-                  href={buildHref(sp, f.patch)}
-                  className={
-                    active
-                      ? "rounded-full bg-brand px-4 py-2 text-sm font-bold text-white shadow-sm"
-                      : "rounded-full border border-border/60 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-brand hover:text-brand"
-                  }
-                >
-                  {f.label}
-                </Link>
-              );
-            })}
-
-            <span className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
-
-            {ratingChips.map((r) => {
-              const active = ratingFilter === r;
-              return (
-                <Link
-                  key={r}
-                  href={buildHref(sp, {
-                    rating: active ? undefined : String(r),
-                    page: "1",
-                  })}
-                  className={
-                    active
-                      ? "inline-flex items-center gap-1 rounded-full bg-amber-400 px-3 py-2 text-sm font-bold text-white shadow-sm"
-                      : "inline-flex items-center gap-1 rounded-full border border-border/60 px-3 py-2 text-sm font-semibold text-foreground transition hover:border-amber-400"
-                  }
-                >
-                  {r}
-                  <Star className="size-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* City chips */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            <Link
-              href={buildHref(sp, { city: undefined, page: "1" })}
-              className={
-                !cityFilter
-                  ? "rounded-full bg-brand-background px-3 py-1.5 text-xs font-bold text-brand"
-                  : "rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:text-brand"
-              }
-            >
-              {t("filters.allCities")}
-            </Link>
-            {reviewCities.map((c) => {
-              const active = cityFilter === c;
-              return (
-                <Link
-                  key={c}
-                  href={buildHref(sp, {
-                    city: active ? undefined : c,
-                    page: "1",
-                  })}
-                  className={
-                    active
-                      ? "rounded-full bg-brand-background px-3 py-1.5 text-xs font-bold text-brand"
-                      : "rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:text-brand"
-                  }
-                >
-                  {c}
-                </Link>
-              );
-            })}
-          </div>
-
-          <p className="text-center text-sm text-muted-foreground">
-            {t("results", { count: filtered.length })}
-          </p>
         </div>
 
         {/* Grid */}

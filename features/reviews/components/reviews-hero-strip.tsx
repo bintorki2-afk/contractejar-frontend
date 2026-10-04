@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Landmark } from "lucide-react";
 
 import ReviewStars from "@/features/reviews/components/review-stars";
+import ReviewsValueAmount from "@/features/reviews/components/reviews-value-amount";
 import { reviewsSummary } from "@/features/reviews/data/reviews";
 
 /**
@@ -32,7 +33,10 @@ export default async function ReviewsHeroStrip() {
 
       <span className="inline-flex items-center gap-1.5">
         <Landmark className="size-3.5 text-brand" aria-hidden="true" />
-        <span className="font-extrabold text-brand">{t("valueAmount")}</span>
+        <ReviewsValueAmount
+          text={t("valueAmount")}
+          className="font-extrabold text-brand"
+        />
         <span className="font-semibold">{t("valueLabel")}</span>
       </span>
     </div>

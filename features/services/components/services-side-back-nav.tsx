@@ -93,7 +93,7 @@ export default function ServicesSideBackNav() {
           <span
             className={cn(
               pillBaseClassName,
-              "max-w-[min(100%,14rem)] truncate bg-[#fff1e6] text-[#e67e22] sm:max-w-xs dark:border dark:border-[#6b4e2e] dark:bg-[#2a2118] dark:text-[#c4a574]",
+              "max-w-[min(100%,14rem)] truncate bg-brand-background-green text-brand sm:max-w-xs dark:border dark:border-[#1c4138] dark:bg-[#0e312a] dark:text-[#00a880]",
             )}
             title={pageMeta.pageTitle}
           >

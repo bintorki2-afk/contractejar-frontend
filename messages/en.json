@@ -2898,7 +2898,7 @@
     "titlePrefix": "What our",
     "titleAccent": "customers say",
     "description": "Real experiences from customers who documented their contracts with Ejar Contract.",
-    "summary": "Based on {count, plural, one {# review} other {# reviews}}",
+    "summary": "Based on thousands of reviews",
     "contractType": {
       "residential": "Residential",
       "commercial": "Commercial"
@@ -2910,7 +2910,7 @@
     },
     "viewAll": "View all reviews",
     "trustLabel": "Thousands of customers trust us",
-    "valueAmount": "SAR 1.7B+",
+    "valueAmount": "SAR 7B+",
     "valueLabel": "in documented contract value"
   },
   "reviewsPage": {
