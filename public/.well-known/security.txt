@@ -1,0 +1,9 @@
+# Security contact for contractejar.com (عقد إيجار)
+# https://www.rfc-editor.org/rfc/rfc9116
+# ⚠️ تأكد أن بريد التواصل أدناه يصل فعلاً (فعّل security@contractejar.com أو
+#    بدّله ببريدك) — بريد غير موجود أسوأ من عدم وجود الملف.
+
+Contact: mailto:security@contractejar.com
+Expires: 2027-10-04T00:00:00.000Z
+Preferred-Languages: ar, en
+Canonical: https://contractejar.com/.well-known/security.txt
