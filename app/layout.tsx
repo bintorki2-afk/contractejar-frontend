@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { DirectionProvider } from "@/components/ui/direction";
@@ -25,13 +25,19 @@ import InstallPrompt from "@/features/shared/components/install-prompt";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
-const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+// Self-hosted (next/font/local) instead of next/font/google: the Google Fonts
+// fetch at build time made CI non-deterministic (build aborts if fonts.googleapis.com
+// is unreachable). Same font, same Arabic subset, weights 400/500/600/700 only
+// (medium/semibold/bold/extrabold→700). Files live in app/fonts/*.woff2.
+const ibmPlexSansArabic = localFont({
   variable: "--font-ibm-plex-sans-arabic",
-  // Only weights used in UI (medium/semibold/bold/extrabold→700).
-  // Loading 100–300 roughly doubles Arabic font payload and hurts mobile TBT/LCP.
-  weight: ["400", "500", "600", "700"],
-  subsets: ["arabic"],
   display: "swap",
+  src: [
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2", weight: "700", style: "normal" },
+  ],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
