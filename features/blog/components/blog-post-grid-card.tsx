@@ -17,7 +17,7 @@ export default function BlogPostGridCard({
     <article className="group flex h-full min-w-0 flex-col">
       <Link
         href={`/blog/${post.slug}`}
-        className="relative block aspect-4/3 w-full overflow-hidden"
+        className="relative block aspect-video w-full overflow-hidden rounded-[35px]"
       >
         <Image
           src={post.imageSrc}
