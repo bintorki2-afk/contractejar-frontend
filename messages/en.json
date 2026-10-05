@@ -3039,6 +3039,7 @@
     "description": "Sorry for the trouble — our team has been notified automatically. You can try again or go back to the homepage.",
     "reference": "Reference number",
     "retry": "Try again",
-    "homeCta": "Back to home"
+    "homeCta": "Back to home",
+    "badge": "Error"
   }
 }
