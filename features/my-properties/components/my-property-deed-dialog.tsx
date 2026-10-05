@@ -3,10 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import AttachmentPreviewDialog from "@/features/shared/components/attachment-preview-dialog";
-import {
-  fileNameFromUrl,
-  resolveAttachmentKind,
-} from "@/features/shared/utils/attachment-preview-actions";
+import { fileNameFromUrl } from "@/features/shared/utils/attachment-preview-actions";
 
 type MyPropertyDeedDialogProps = {
   open: boolean;
@@ -34,7 +31,10 @@ export default function MyPropertyDeedDialog({
       }}
       fileName={fileNameFromUrl(deedImageUrl)}
       url={deedImageUrl}
-      kind={resolveAttachmentKind(undefined, deedImageUrl)}
+      // A deed is always an image, but its signed backend URL is extensionless
+      // so kind-detection would fall back to "other" (a link). Force image so it
+      // previews inline instead of sending the user to a raw URL.
+      kind="image"
     />
   );
 }
