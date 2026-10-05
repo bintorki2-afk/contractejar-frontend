@@ -3073,14 +3073,18 @@
     "linkBlog": "المدونة",
     "linkFaq": "الأسئلة الشائعة",
     "linkSupport": "الدعم",
-    "linkAbout": "عن المنصة"
+    "linkAbout": "عن المنصة",
+    "createTitle": "اختر نوع العقد",
+    "residentialLabel": "عقد سكني",
+    "residentialDesc": "للعمائر والفلل والشقق والغرف",
+    "commercialLabel": "عقد تجاري",
+    "commercialDesc": "للمحلات والمكاتب والمعارض"
   },
   "errorPage": {
     "title": "حدث خطأ غير متوقع",
     "description": "نعتذر عن الإزعاج، وقد تم إبلاغ فريقنا تلقائياً. يمكنك المحاولة مرة أخرى أو العودة للرئيسية.",
     "reference": "الرقم المرجعي",
     "retry": "حاول مرة أخرى",
-    "homeCta": "العودة للرئيسية",
-    "badge": "خطأ"
+    "homeCta": "العودة للرئيسية"
   }
 }
