@@ -1,17 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-import { Button } from "@/components/ui/button";
-import NavbarLogo from "@/features/shared/components/navbar-logo";
-
 /**
  * Custom 404 page. Rendered by Next.js for unmatched routes and explicit
- * notFound() calls, with a proper 404 status. Branded, RTL, light/dark aware,
- * and bilingual via next-intl. Lives at the app root so it also catches
- * top-level unknown URLs.
+ * notFound() calls (with a proper 404 status). Branded with the real shield
+ * mark, RTL, light/dark aware, bilingual via next-intl.
  */
 export default async function NotFound() {
-  const t = await getTranslations("notFound");
+  const [t, tNav] = await Promise.all([
+    getTranslations("notFound"),
+    getTranslations("navbar"),
+  ]);
 
   const quickLinks = [
     { href: "/blog", label: t("linkBlog") },
@@ -21,70 +21,76 @@ export default async function NotFound() {
   ];
 
   return (
-    <main className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 py-16">
-      {/* Soft brand glow behind the content */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 start-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-brand/10 blur-3xl dark:bg-brand/25"
-      />
+    <main className="relative flex min-h-[100svh] items-center justify-center px-5 py-16">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute start-1/2 top-1/3 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-3xl dark:bg-brand/15" />
+      </div>
 
-      <div className="relative flex w-full max-w-xl flex-col items-center text-center">
+      <section className="relative w-full max-w-lg rounded-3xl border border-border bg-card/85 px-6 py-10 text-center shadow-sm backdrop-blur-sm sm:px-12 sm:py-14">
+        {/* Brand crest with a faint 404 watermark behind it */}
         <Link
           href="/"
-          className="mb-8 inline-flex items-center gap-2"
-          aria-label="عقد إيجار"
+          aria-label={tNav("brand.name")}
+          className="group relative mx-auto mb-6 flex h-28 w-full flex-col items-center justify-center gap-3"
         >
-          <NavbarLogo />
-          <span className="text-lg font-bold text-brand">عقد إيجار</span>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -top-2 text-[7.5rem] leading-none font-black text-brand/[0.06] select-none dark:text-white/[0.06]"
+          >
+            ٤٠٤
+          </span>
+          <span className="relative flex size-20 items-center justify-center rounded-2xl bg-brand-background-green ring-1 ring-brand/10 transition-transform group-hover:-translate-y-0.5">
+            <Image
+              src="/images/logo.png"
+              alt=""
+              width={120}
+              height={184}
+              className="h-11 w-auto object-contain"
+              aria-hidden
+            />
+          </span>
+          <span className="relative text-base font-bold text-brand">
+            {tNav("brand.name")}
+          </span>
         </Link>
 
-        <span className="mb-4 inline-flex items-center rounded-full bg-brand-background-green px-3 py-1 text-xs font-semibold text-brand">
-          {t("eyebrow")}
-        </span>
-
-        <p
-          aria-hidden
-          className="bg-gradient-to-b from-brand to-brand-secondary bg-clip-text text-[6rem] leading-none font-black text-transparent select-none sm:text-[8rem]"
-        >
-          ٤٠٤
-        </p>
-
-        <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">
+        <h1 className="text-2xl font-bold text-foreground sm:text-[1.75rem]">
           {t("title")}
         </h1>
-        <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-muted-foreground sm:text-[0.95rem]">
           {t("description")}
         </p>
 
-        <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-lg bg-brand px-6 text-sm font-medium text-white transition-colors hover:bg-brand/90 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-brand px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             {t("homeCta")}
           </Link>
-          <Button asChild size="lg" variant="outline" className="h-11 px-6">
-            <Link href="/service/residential">{t("createCta")}</Link>
-          </Button>
+          <Link
+            href="/service/residential"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+          >
+            {t("createCta")}
+          </Link>
         </div>
 
-        <div className="mt-10 w-full border-t border-border pt-6">
-          <p className="mb-3 text-xs font-medium text-muted-foreground">
-            {t("linksTitle")}
-          </p>
-          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+        <div className="mt-9 border-t border-border/70 pt-6">
+          <p className="mb-3 text-xs text-muted-foreground">{t("linksTitle")}</p>
+          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
             {quickLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-brand transition-colors hover:text-brand-secondary hover:underline"
+                className="font-medium text-brand transition-colors hover:text-brand-secondary hover:underline"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
