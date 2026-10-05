@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import CreateContractChoiceDialog from "@/features/shared/components/create-contract-choice-dialog";
+
 /**
  * Custom 404 page. Rendered by Next.js for unmatched routes and explicit
  * notFound() calls (with a proper 404 status). Branded with the real shield
@@ -27,19 +29,13 @@ export default async function NotFound() {
       </div>
 
       <section className="relative w-full max-w-lg rounded-3xl border border-border bg-card/85 px-6 py-10 text-center shadow-sm backdrop-blur-sm sm:px-12 sm:py-14">
-        {/* Brand crest with a faint 404 watermark behind it */}
+        {/* Brand crest */}
         <Link
           href="/"
           aria-label={tNav("brand.name")}
-          className="group relative mx-auto mb-6 flex h-28 w-full flex-col items-center justify-center gap-3"
+          className="group mx-auto mb-6 flex w-full flex-col items-center justify-center gap-3"
         >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -top-2 text-[7.5rem] leading-none font-black text-brand/[0.06] select-none dark:text-white/[0.06]"
-          >
-            ٤٠٤
-          </span>
-          <span className="relative flex size-20 items-center justify-center rounded-2xl bg-brand-background-green ring-1 ring-brand/10 transition-transform group-hover:-translate-y-0.5">
+          <span className="flex size-20 items-center justify-center rounded-2xl bg-brand-background-green ring-1 ring-brand/10 transition-transform group-hover:-translate-y-0.5">
             <Image
               src="/images/logo.png"
               alt=""
@@ -49,7 +45,7 @@ export default async function NotFound() {
               aria-hidden
             />
           </span>
-          <span className="relative text-base font-bold text-brand">
+          <span className="text-base font-bold text-brand">
             {tNav("brand.name")}
           </span>
         </Link>
@@ -68,12 +64,24 @@ export default async function NotFound() {
           >
             {t("homeCta")}
           </Link>
-          <Link
-            href="/service/residential"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-background px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
-            {t("createCta")}
-          </Link>
+          <CreateContractChoiceDialog
+            triggerLabel={t("createCta")}
+            title={t("createTitle")}
+            options={[
+              {
+                label: t("residentialLabel"),
+                description: t("residentialDesc"),
+                href: "/service/residential",
+                icon: "residential",
+              },
+              {
+                label: t("commercialLabel"),
+                description: t("commercialDesc"),
+                href: "/service/commercial",
+                icon: "commercial",
+              },
+            ]}
+          />
         </div>
 
         <div className="mt-9 border-t border-border/70 pt-6">
