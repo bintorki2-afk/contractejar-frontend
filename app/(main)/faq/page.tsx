@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const pageSeo = await getContentPageSeo("faq");
 
   // Empty API fields inherit root layout defaults (previous FAQ behavior).
-  return resolveContentPageMetadata(pageSeo);
+  return resolveContentPageMetadata(pageSeo, { canonical: "/faq" });
 }
 
 export default async function FaqPage() {
