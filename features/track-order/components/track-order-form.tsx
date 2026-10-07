@@ -29,9 +29,19 @@ function toAsciiDigits(value: string) {
   return value.replace(/[٠-٩۰-۹]/g, (d) => String("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10));
 }
 
-export default function TrackOrderForm() {
+type TrackOrderFormProps = {
+  /** Prefilled from a smart link (`/r/{order}`). */
+  initialOrder?: string;
+  /** Focus the mobile field right away (the order number is already known). */
+  autoSubmitWhenReady?: boolean;
+};
+
+export default function TrackOrderForm({
+  initialOrder = "",
+  autoSubmitWhenReady = false,
+}: TrackOrderFormProps) {
   const t = useTranslations("trackPage");
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState(initialOrder);
   const [mobile, setMobile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +104,7 @@ export default function TrackOrderForm() {
             inputMode="tel"
             autoComplete="tel"
             placeholder="05XXXXXXXX"
+            autoFocus={autoSubmitWhenReady && initialOrder !== ""}
             value={mobile}
             onChange={(event) => setMobile(event.target.value)}
             dir="ltr"
