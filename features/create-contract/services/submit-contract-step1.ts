@@ -17,6 +17,8 @@ export type SubmitContractStep1Payload = {
   contractId: number;
   instrumentType: ContractInstrumentType;
   imageInstrument?: File;
+  /** Extra pages of a multi-page (paper) deed, in order — after the first page. */
+  imageInstrumentPages?: File[];
   imageInstrumentFront?: File;
   imageInstrumentBack?: File;
   imageInheritanceCertificate?: File;
@@ -35,6 +37,10 @@ export async function submitContractStep1(payload: SubmitContractStep1Payload) {
 
   if (payload.imageInstrument) {
     formData.append("image_instrument", payload.imageInstrument);
+  }
+
+  for (const page of payload.imageInstrumentPages ?? []) {
+    formData.append("image_instrument_pages[]", page);
   }
 
   if (payload.imageInstrumentFront) {

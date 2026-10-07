@@ -61,6 +61,10 @@ export async function POST(request: Request) {
   const files = formData
     .getAll("files")
     .filter((entry): entry is File => entry instanceof File);
+  // Optional, parallel to `files`: what each document is (for the caption).
+  const labels = formData
+    .getAll("labels")
+    .map((entry) => (typeof entry === "string" ? entry.slice(0, 120) : ""));
 
   if (files.length === 0) {
     return NextResponse.json({ ok: true, sent: 0 }, { status: 200 });
@@ -82,9 +86,8 @@ export async function POST(request: Request) {
       break;
     }
 
-    const caption = orderNumber
-      ? `مرفق ${index + 1} — الطلب ${orderNumber}`
-      : `مرفق ${index + 1}`;
+    const label = labels[index] || `مرفق ${index + 1}`;
+    const caption = orderNumber ? `${label} — الطلب ${orderNumber}` : label;
 
     if (await sendDocument(token, chatId, file, caption)) {
       sent += 1;

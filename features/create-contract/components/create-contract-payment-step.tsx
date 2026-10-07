@@ -19,7 +19,7 @@ import CreateContractPaymentNavigation from "@/features/create-contract/componen
 import CreateContractPaymentSummary from "@/features/create-contract/components/create-contract-payment-summary";
 import CreateContractReviewOrderDialog from "@/features/create-contract/components/create-contract-review-order-dialog";
 import CreateContractSaveLaterDialog from "@/features/create-contract/components/create-contract-save-later-dialog";
-import { SAVE_DRAFT_ENABLED } from "@/features/create-contract/config";
+import { SAVE_LATER_ON_PAYMENT_ENABLED } from "@/features/create-contract/config";
 import CreateContractSavePropertyDialog from "@/features/create-contract/components/create-contract-save-property-dialog";
 import { useApplyContractCoupon } from "@/features/create-contract/hooks/use-apply-contract-coupon";
 import { useContractFinanceSummary } from "@/features/create-contract/hooks/use-contract-finance-summary";
@@ -58,6 +58,8 @@ type CreateContractPaymentStepProps = {
     deceasedDeedLabel?: string;
   };
   contractType: ContractTypeId;
+  /** Guest flow: the WhatsApp number typed on the submit step (lead phone). */
+  fallbackPhone?: string;
   onBack: () => void;
   onEditStep: (step: CreateContractStep) => void;
 };
@@ -78,6 +80,7 @@ export default function CreateContractPaymentStep({
   deedTypeLabels,
   deedAttachmentLabels,
   contractType,
+  fallbackPhone = "",
   onBack,
   onEditStep,
 }: CreateContractPaymentStepProps) {
@@ -150,7 +153,7 @@ export default function CreateContractPaymentStep({
     leadFiredForUuid.current = contractUuid;
 
     const leadPhone = formatSaudiMobileForForm(
-      authUser?.phone || authUser?.mobile || "",
+      authUser?.phone || authUser?.mobile || fallbackPhone || "",
     );
 
     void postContractLead({
@@ -170,6 +173,7 @@ export default function CreateContractPaymentStep({
     contractSession?.contractType,
     contractType,
     contractUuid,
+    fallbackPhone,
     financeSummaryIsPending,
     financeSummaryTotal,
   ]);
@@ -363,7 +367,9 @@ export default function CreateContractPaymentStep({
             onPrevious={onBack}
             onPay={() => void paymentFlow.handlePrimaryAction()}
             onSave={
-              SAVE_DRAFT_ENABLED ? () => setSaveLaterDialogOpen(true) : undefined
+              SAVE_LATER_ON_PAYMENT_ENABLED
+                ? () => setSaveLaterDialogOpen(true)
+                : undefined
             }
           />
         </div>

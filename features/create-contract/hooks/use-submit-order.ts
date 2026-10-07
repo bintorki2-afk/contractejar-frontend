@@ -7,7 +7,11 @@ import type { ContractTypeId } from "@/features/create-contract/types/contract-t
 import type { CreateContractReviewOrderSummary } from "@/features/create-contract/types/create-contract-review-order";
 import { trackLead } from "@/features/analytics/utils/track";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
-import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
+import {
+  buildOrderExtraSections,
+  collectLabelledAttachments,
+} from "@/features/create-contract/utils/build-order-extra-sections";
+import { useTenantRoles } from "@/features/create-contract/hooks/use-tenant-roles";
 
 type UseSubmitOrderArgs = {
   summary: CreateContractReviewOrderSummary;
@@ -44,64 +48,23 @@ function resolveOrderNumber(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-// Deed / document file categories held in the draft store. Each has an
-// in-memory File[] (full quality, present during a normal wizard session) and a
-// persisted fallback (small copies restored after a page reload).
-const DEED_FILE_FIELDS: ReadonlyArray<readonly [string, string]> = [
-  ["deedFiles", "deedPersistedFiles"],
-  ["deedFrontFiles", "deedFrontPersistedFiles"],
-  ["deedBackFiles", "deedBackPersistedFiles"],
-  ["deedInheritanceFiles", "deedInheritancePersistedFiles"],
-  ["deedHeirsPoaFiles", "deedHeirsPoaPersistedFiles"],
-  ["deedEndowmentCertFiles", "deedEndowmentCertPersistedFiles"],
-  ["deedTrusteeshipFiles", "deedTrusteeshipPersistedFiles"],
-  ["deedGuardiansPoaFiles", "deedGuardiansPoaPersistedFiles"],
-  ["nationalAddressPhotoFiles", "nationalAddressPhotoPersistedFiles"],
-];
-
-function collectDeedFiles(): File[] {
-  const deed = useCreateContractDraftStore.getState().deed as unknown as Record<
-    string,
-    unknown
-  >;
-
-  const collected: File[] = [];
-
-  for (const [filesKey, persistedKey] of DEED_FILE_FIELDS) {
-    const inMemory = deed?.[filesKey];
-    if (
-      Array.isArray(inMemory) &&
-      inMemory.length > 0 &&
-      inMemory[0] instanceof File
-    ) {
-      collected.push(...(inMemory as File[]));
-      continue;
-    }
-
-    const persisted = deed?.[persistedKey];
-    if (Array.isArray(persisted) && persisted.length > 0) {
-      collected.push(...persistedToFiles(persisted as PersistedFile[]));
-    }
-  }
-
-  return collected;
-}
-
-// Fire-and-forget: forward attached document images to the business channel.
+// Fire-and-forget: forward every attached document to the business channel,
+// each captioned with what it is (deed page, PoA, national address…).
 // Deliberately NOT awaited by the order flow — a failure (size, no Telegram
 // config, a dropped request) degrades to the WhatsApp follow-up and never
 // affects whether the order itself succeeded.
-async function forwardDeedAttachments(orderNumber: string): Promise<void> {
+async function forwardOrderAttachments(orderNumber: string): Promise<void> {
   try {
-    const files = collectDeedFiles();
-    if (files.length === 0) {
+    const attachments = collectLabelledAttachments();
+    if (attachments.length === 0) {
       return;
     }
 
     const form = new FormData();
     form.append("orderNumber", orderNumber);
-    for (const file of files) {
+    for (const { file, label } of attachments) {
       form.append("files", file, file.name);
+      form.append("labels", label);
     }
 
     await fetch("/api/order-attachments", { method: "POST", body: form });
@@ -114,6 +77,7 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
   const t = useTranslations("createContract.payment.reviewDialog");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<SubmitOrderResult | null>(null);
+  const tenantRolesQuery = useTenantRoles();
 
   async function submitOrder({
     contactWhatsapp,
@@ -154,6 +118,9 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
             value: field.value,
           })),
         })),
+        // Agent/representative, deed details, tenant obligations, conditions,
+        // unit extras — previously collected but never forwarded.
+        ...buildOrderExtraSections(tenantRolesQuery.data ?? []),
       ],
     };
 
@@ -187,7 +154,7 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
 
         // Best-effort: forward attached deed/document images. Isolated from the
         // order result above — the order already succeeded regardless of this.
-        void forwardDeedAttachments(orderNumber);
+        void forwardOrderAttachments(orderNumber);
       }
 
       return outcome;

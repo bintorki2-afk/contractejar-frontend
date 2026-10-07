@@ -146,6 +146,8 @@ export default function CreateContractWizard({
               {currentStep === "payment" ? (
                 <CreateContractSubmitStep
                   reviewLabels={labels.payment.reviewDialog}
+                  paymentLabels={labels.payment}
+                  saveLaterDialogLabels={labels.tenant.saveLaterDialog}
                   contractType={contractType}
                   deedTypeLabels={labels.deed.deedType.types}
                   deedAttachmentLabels={{

@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { AUTH_TOKEN_COOKIE } from "@/lib/api/constants";
+import { AUTH_TOKEN_COOKIE, GUEST_SESSION_COOKIE } from "@/lib/api/constants";
 import { isGuestOnlyRoute, isProtectedRoute } from "@/lib/auth/auth-routes";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = Boolean(request.cookies.get(AUTH_TOKEN_COOKIE)?.value);
+  // A guest session (wizard without an account) may read its own orders, but
+  // it is not a signed-in customer: login/register stay reachable.
+  const isGuest = request.cookies.get(GUEST_SESSION_COOKIE)?.value === "1";
 
   // Account pages require a signed-in customer — send guests to login and
   // remember where they were headed.
@@ -18,7 +21,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Auth pages are for guests — a signed-in customer is sent home instead.
-  if (isGuestOnlyRoute(pathname) && hasSession) {
+  if (isGuestOnlyRoute(pathname) && hasSession && !isGuest) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = "/";
     homeUrl.search = "";

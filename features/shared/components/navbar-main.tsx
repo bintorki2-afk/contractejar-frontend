@@ -9,6 +9,7 @@ import {
   HelpCircle,
   Info,
   LifeBuoy,
+  Search,
   Newspaper,
   Star,
 } from "lucide-react";
@@ -57,6 +58,7 @@ type NavbarMainProps = {
   reviews: string;
   guide: string;
   support: string;
+  track: string;
   cta: string;
   profile: string;
   menu: string;
@@ -85,6 +87,7 @@ export default function NavbarMain({
   reviews,
   guide,
   support,
+  track,
   cta,
   profile,
   menu,
@@ -128,6 +131,11 @@ export default function NavbarMain({
       href: "/support",
       label: support,
       icon: <LifeBuoy className="size-4" aria-hidden="true" />,
+    },
+    {
+      href: "/track",
+      label: track,
+      icon: <Search className="size-4" aria-hidden="true" />,
     },
   ];
 
@@ -217,6 +225,7 @@ export default function NavbarMain({
           reviews={reviews}
           guide={guide}
           support={support}
+          track={track}
           cta={cta}
           profile={profile}
           menu={menu}

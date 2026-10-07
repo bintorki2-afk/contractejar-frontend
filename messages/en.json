@@ -31,7 +31,8 @@
       "reviews": "Reviews",
       "guide": "Guide",
       "support": "Support",
-      "downloadApp": "Download the app now"
+      "downloadApp": "Download the app now",
+      "track": "Track order"
     },
     "cta": "Start with Rental Contract",
     "profile": "Profile",
@@ -1711,7 +1712,21 @@
       "errorTitle": "Couldn't submit your order",
       "errorBody": "Something went wrong while submitting your order. You can try again or contact us directly on WhatsApp.",
       "retry": "Try again",
-      "back": "Back"
+      "back": "Back",
+      "successBodyPayLater": "Your order is saved. Pay now to start documentation right away, or later from your orders page or the link we send on WhatsApp.",
+      "payNowCta": "Pay now",
+      "trackOrderCta": "Track order",
+      "syncing": {
+        "session": "Preparing your order...",
+        "start": "Creating the order...",
+        "deed": "Uploading the deed...",
+        "address": "Saving the address...",
+        "owner": "Saving owner details...",
+        "tenant": "Saving tenant details...",
+        "units": "Saving the unit...",
+        "finance": "Saving financial details...",
+        "contact": "Finishing..."
+      }
     },
     "incompleteContinue": "Please complete all required fields before continuing",
     "fieldRequired": "This field is required",
@@ -3045,5 +3060,30 @@
     "reference": "Reference number",
     "retry": "Try again",
     "homeCta": "Back to home"
+  },
+  "trackPage": {
+    "metaTitle": "Track your order | Contract Ejar",
+    "metaDescription": "Check your rental contract order status with the order number and mobile — no sign-in needed.",
+    "breadcrumbHome": "Home",
+    "breadcrumb": "Track order",
+    "title": "Track your order",
+    "subtitle": "Enter the order number and the mobile you used when ordering to see its status — no account needed.",
+    "orderLabel": "Order number",
+    "orderPlaceholder": "e.g. 512345",
+    "mobileLabel": "Mobile number",
+    "mobileHint": "The number you entered when submitting (WhatsApp), or the owner/tenant mobile on the contract.",
+    "validation": "Enter a valid order number and a Saudi mobile starting with 05.",
+    "notFound": "No order matches this number and mobile. Check both or contact us on WhatsApp.",
+    "failed": "Lookup is unavailable right now. Please try again shortly.",
+    "searching": "Searching...",
+    "submit": "Show status",
+    "orderNumber": "Order number",
+    "typeHousing": "Residential contract",
+    "typeCommercial": "Commercial contract",
+    "awaitingPaymentTitle": "Awaiting payment",
+    "awaitingPaymentBody": "Your order is complete; documentation starts as soon as payment is made.",
+    "payNow": "Pay now",
+    "nextStep": "Next step: {step}",
+    "lastUpdate": "Last update: {date}"
   }
 }

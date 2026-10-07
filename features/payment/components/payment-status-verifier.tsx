@@ -4,6 +4,8 @@ import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
+import { resetCreateContractDraft } from "@/features/create-contract/utils/reset-create-contract-draft";
 import PaymentStatusContent from "@/features/payment/components/payment-status-content";
 import {
   resolvePaymentStatusUi,
@@ -120,6 +122,16 @@ export default function PaymentStatusVerifier({
         });
 
         if (outcome.isPaid) {
+          // The paid order now lives on the server: clear the local draft so
+          // the next "create contract" starts clean (only when this draft is
+          // the one that was just paid).
+          const draft = useCreateContractDraftStore.getState();
+          if (
+            draft.contractSession?.uuid != null &&
+            String(draft.contractSession.uuid) === String(contractUuid)
+          ) {
+            resetCreateContractDraft();
+          }
           router.refresh();
         }
       } catch {
