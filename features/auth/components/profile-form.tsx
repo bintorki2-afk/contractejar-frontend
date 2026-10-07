@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ProfileNameField from "@/features/auth/components/profile-name-field";
 import ProfilePasswordField from "@/features/auth/components/profile-password-field";
+
+const PASSWORD_FIELD_ENABLED = false;
 import ProfilePhoneField from "@/features/auth/components/profile-phone-field";
 import {
   createProfileSchema,
@@ -106,12 +108,16 @@ export default function ProfileForm({ user, onSuccess }: ProfileFormProps) {
 
       <ProfilePhoneField label={t("phoneLabel")} value={phoneValue} />
 
-      <ProfilePasswordField
-        control={form.control}
-        label={t("passwordLabel")}
-        placeholder={t("passwordPlaceholder")}
-        toggleVisibilityLabel={t("togglePasswordVisibility")}
-      />
+      {/* Sign-in is mobile + OTP now; the password field is kept in code but
+          not shown (PASSWORD_FIELD_ENABLED). */}
+      {PASSWORD_FIELD_ENABLED ? (
+        <ProfilePasswordField
+          control={form.control}
+          label={t("passwordLabel")}
+          placeholder={t("passwordPlaceholder")}
+          toggleVisibilityLabel={t("togglePasswordVisibility")}
+        />
+      ) : null}
 
       <Button
         type="submit"

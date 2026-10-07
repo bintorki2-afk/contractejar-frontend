@@ -799,6 +799,34 @@
         "passwordRequired": "Password is required",
         "passwordMin": "Password must be at least 8 characters"
       }
+    },
+    "phoneLogin": {
+      "back": "Back to home",
+      "greeting": "Welcome",
+      "subtitle": "Sign in with your mobile — no password.",
+      "phoneLabel": "Mobile number",
+      "phonePlaceholder": "5XXXXXXXX",
+      "hint": "We'll text you a verification code.",
+      "sendCode": "Send code",
+      "sendSuccess": "Code sent",
+      "sendError": "Couldn't send the code, try again",
+      "tooManyRequests": "Too many attempts, wait a moment and try again",
+      "codeSentTo": "We sent a code to",
+      "changeNumber": "Change number",
+      "otpLabel": "Verification code",
+      "verify": "Verify & sign in",
+      "verifySuccess": "Signed in",
+      "verifyError": "Wrong or expired code",
+      "resend": "Resend code",
+      "resending": "Sending...",
+      "resendIn": "Resend in",
+      "firstTimeNote": "First time? No sign-up needed — your account is created after verification, with any earlier orders placed with this number.",
+      "validation": {
+        "phoneRequired": "Mobile is required",
+        "phoneInvalid": "Enter a valid Saudi mobile starting with 05",
+        "otpRequired": "Code is required",
+        "otpInvalid": "The code is 4 digits"
+      }
     }
   },
   "properties": {
