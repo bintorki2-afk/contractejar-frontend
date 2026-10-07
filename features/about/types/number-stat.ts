@@ -1,6 +1,6 @@
 export type NumberStatId =
   | "satisfaction"
-  | "experience"
+  | "contractsValue"
   | "commercial"
   | "residential";
 

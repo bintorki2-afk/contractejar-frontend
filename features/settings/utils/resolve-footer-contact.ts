@@ -3,17 +3,13 @@ import {
   buildWhatsappHref,
   resolveSettingsWhatsappNumber,
 } from "@/features/settings/utils/build-whatsapp-href";
+import { digitsOnly } from "@/lib/utils/digits";
 
 export type FooterSocialLink = {
   id: string;
   href: string;
   label: string;
 };
-
-// Fallback social profiles for عقد إيجار — used when the backend settings do
-// not carry them, so the links always render.
-const DEFAULT_TWITTER_URL = "https://x.com/aqdi_sa";
-const DEFAULT_TIKTOK_URL = "https://www.tiktok.com/@aqdi.sa";
 
 function asAbsoluteUrl(value: string | null | undefined) {
   const raw = typeof value === "string" ? value.trim() : "";
@@ -48,7 +44,7 @@ export function formatSaudiPhoneDisplay(contactNumber: string | null | undefined
     return null;
   }
 
-  const digits = raw.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+  const digits = digitsOnly(raw);
   if (!digits) {
     return null;
   }
@@ -82,7 +78,7 @@ export function resolveFooterPhoneHref(
     return null;
   }
 
-  const digits = number.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+  const digits = digitsOnly(number);
   if (!digits) {
     return null;
   }
@@ -105,8 +101,7 @@ export function resolveFooterWhatsappHref(
 export function resolveFooterSocialLinks(
   settings: AppSettings | null | undefined,
 ): FooterSocialLink[] {
-  // Fall back to an empty settings object so the default profiles still render
-  // even when the backend returns nothing.
+  // No default profiles: an icon renders only for a value set in the dashboard.
   const s = settings ?? ({} as AppSettings);
 
   const links: Array<FooterSocialLink | null> = [
@@ -122,12 +117,12 @@ export function resolveFooterSocialLinks(
     },
     {
       id: "tiktok",
-      href: asAbsoluteUrl(s.tiktok) ?? DEFAULT_TIKTOK_URL,
+      href: asAbsoluteUrl(s.tiktok) ?? "",
       label: "TikTok",
     },
     {
       id: "twitter",
-      href: asAbsoluteUrl(s.twitter) ?? DEFAULT_TWITTER_URL,
+      href: asAbsoluteUrl(s.twitter) ?? "",
       label: "X",
     },
     {

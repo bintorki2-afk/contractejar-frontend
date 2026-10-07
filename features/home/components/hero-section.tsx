@@ -21,7 +21,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
     >
 
       <div className="relative container pb-10 ">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-8">
+          {/* Phones see the phone mockup first, then the title + CTAs; on
+              desktop the visual sits beside the copy. */}
+          <div className="order-first w-full shrink-0 lg:order-last lg:w-[50%]">
+            <HeroVisual alt={content.visualAlt} imageUrl={content.imageUrl} />
+          </div>
+
           <div className="min-w-0 flex-1">
             <HeroContent
               badge={content.badge}
@@ -34,11 +40,9 @@ export default function HeroSection({ content }: HeroSectionProps) {
               residentialCta={content.residentialCta}
               commercialCta={content.commercialCta}
               mostRequested={content.mostRequested}
+              lessorChangeCta={content.lessorChangeCta}
+              lessorChangeHint={content.lessorChangeHint}
             />
-          </div>
-
-          <div className="w-full shrink-0 lg:w-[50%] max-lg:hidden">
-            <HeroVisual alt={content.visualAlt} imageUrl={content.imageUrl} />
           </div>
         </div>
 

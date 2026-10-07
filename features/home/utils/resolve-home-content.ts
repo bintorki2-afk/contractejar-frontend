@@ -34,6 +34,8 @@ export type HomeStaticContent = {
     residentialCta: string;
     commercialCta: string;
     mostRequested: string;
+    lessorChangeCta: string;
+    lessorChangeHint: string;
     whatsapp: string;
     visualAlt: string;
     imageUrl: string;
@@ -174,6 +176,8 @@ function resolveHero(
     residentialCta: staticContent.residentialCta,
     commercialCta: staticContent.commercialCta,
     mostRequested: staticContent.mostRequested,
+    lessorChangeCta: staticContent.lessorChangeCta,
+    lessorChangeHint: staticContent.lessorChangeHint,
     whatsappLabel: staticContent.whatsapp,
     whatsappHref: "https://wa.me/",
     visualAlt: staticContent.visualAlt,
