@@ -1726,7 +1726,8 @@
         "units": "Saving the unit...",
         "finance": "Saving financial details...",
         "contact": "Finishing..."
-      }
+      },
+      "smartLinkHint": "Your direct order link (opens the app when installed):"
     },
     "incompleteContinue": "Please complete all required fields before continuing",
     "fieldRequired": "This field is required",
@@ -3084,6 +3085,9 @@
     "awaitingPaymentBody": "Your order is complete; documentation starts as soon as payment is made.",
     "payNow": "Pay now",
     "nextStep": "Next step: {step}",
-    "lastUpdate": "Last update: {date}"
+    "lastUpdate": "Last update: {date}",
+    "smartLinkTitle": "Order {order} | Contract Ejar",
+    "smartLinkHeading": "Your order is ready to follow",
+    "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status."
   }
 }

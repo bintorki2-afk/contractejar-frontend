@@ -264,6 +264,19 @@ export default function CreateContractSubmitStep({
         </div>
 
         {serverOrder ? (
+          <p className="mt-3 text-center text-xs leading-relaxed text-[#5c6b68] dark:text-[#9eb5af]">
+            {t("smartLinkHint")}{" "}
+            <a
+              href={`/r/${orderNumber}`}
+              dir="ltr"
+              className="font-bold text-brand underline underline-offset-2 dark:text-[#48c0b8]"
+            >
+              contractejar.com/r/{orderNumber}
+            </a>
+          </p>
+        ) : null}
+
+        {serverOrder ? (
           <Button
             type="button"
             onClick={() => setView("payment")}
