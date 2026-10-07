@@ -1,5 +1,14 @@
 export const AUTH_TOKEN_COOKIE = "access_token";
 
+/**
+ * Set (alongside the auth cookie) when the session is a website *guest* —
+ * a server-issued token with no account, created so the contract wizard and
+ * payment can run server-backed without signing in. Not httpOnly on purpose:
+ * it carries no secret, and the middleware/UI only need to know "this session
+ * is a guest, not a signed-in customer".
+ */
+export const GUEST_SESSION_COOKIE = "aqdi_guest";
+
 export const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30;
 
 // NOTE (test deployment): fall back to the Railway TEST backend when

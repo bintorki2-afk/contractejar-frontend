@@ -43,6 +43,14 @@ export function useFcm() {
       const deviceToken = await getFcmToken({ requestPermission: true });
       setRequestedPermission(Notification.permission);
       setToken(deviceToken);
+
+      // Hand the token to the backend so status pushes can reach this browser.
+      if (deviceToken) {
+        const { registerFcmToken } = await import(
+          "@/features/notifications/services/register-fcm-token"
+        );
+        void registerFcmToken(deviceToken);
+      }
     } catch (error) {
       console.error("Failed to request notification permission:", error);
     } finally {

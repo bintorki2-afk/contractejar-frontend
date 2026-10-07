@@ -12,6 +12,7 @@ import {
   Home,
   Info,
   LifeBuoy,
+  Search,
   LogIn,
   Menu,
   Newspaper,
@@ -62,6 +63,7 @@ type NavbarMobileSheetProps = {
   reviews: string;
   guide: string;
   support: string;
+  track: string;
   cta: string;
   profile: string;
   menu: string;
@@ -83,6 +85,7 @@ export default function NavbarMobileSheet({
   reviews,
   guide,
   support,
+  track,
   cta,
   menu,
   dialogLabels,
@@ -120,6 +123,7 @@ export default function NavbarMobileSheet({
     { href: "/about", label: aboutUs, icon: <Info className="size-4" aria-hidden="true" /> },
     { href: "/guide", label: guide, icon: <BookOpen className="size-4" aria-hidden="true" /> },
     { href: "/support", label: support, icon: <LifeBuoy className="size-4" aria-hidden="true" /> },
+    { href: "/track", label: track, icon: <Search className="size-4" aria-hidden="true" /> },
   ];
 
   function renderRow({ href, label, icon }: MobileRow) {

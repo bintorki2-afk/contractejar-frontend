@@ -153,6 +153,7 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
             reviews={t("nav.reviews")}
             guide={t("nav.guide")}
             support={t("nav.support")}
+            track={t("nav.track")}
               cta={t("cta")}
             profile={t("profile")}
             menu={t("menu")}

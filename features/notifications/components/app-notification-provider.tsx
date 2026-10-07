@@ -65,6 +65,29 @@ export function AppNotificationProvider() {
         return;
       }
 
+      // Permission already granted (customer or guest who enabled pushes
+      // earlier): refresh the token and re-register it so the backend always
+      // holds a live token for this browser. Never prompts.
+      if (
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
+      ) {
+        void (async () => {
+          try {
+            const [{ getFcmToken }, { registerFcmToken }] = await Promise.all([
+              import("@/features/notifications/services/get-fcm-token"),
+              import("@/features/notifications/services/register-fcm-token"),
+            ]);
+            const token = await getFcmToken({ requestPermission: false });
+            if (token && !cancelled) {
+              void registerFcmToken(token);
+            }
+          } catch {
+            // Best-effort.
+          }
+        })();
+      }
+
       unsubscribe = onForegroundMessage((payload) => {
         const message = parseForegroundMessage(payload);
         addNotification(message);

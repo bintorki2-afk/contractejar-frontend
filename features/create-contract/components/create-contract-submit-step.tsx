@@ -5,6 +5,7 @@ import {
   Check,
   ClipboardList,
   Copy,
+  CreditCard,
   Home,
   Pencil,
 } from "lucide-react";
@@ -18,6 +19,11 @@ import { Button } from "@/components/ui/button";
 import { getSaudiNationalMobile } from "@/features/auth/utils/normalize-saudi-phone";
 import { useContractReviewOrderSummary } from "@/features/create-contract/hooks/use-contract-review-order-summary";
 import { useSubmitOrder } from "@/features/create-contract/hooks/use-submit-order";
+import {
+  useSyncContractToServer,
+  type SyncContractStage,
+} from "@/features/create-contract/hooks/use-sync-contract-to-server";
+import CreateContractPaymentStep from "@/features/create-contract/components/create-contract-payment-step";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
@@ -31,6 +37,8 @@ import { cn } from "@/lib/utils";
 
 type CreateContractSubmitStepProps = {
   reviewLabels: CreateContractLabels["payment"]["reviewDialog"];
+  paymentLabels: CreateContractLabels["payment"];
+  saveLaterDialogLabels: CreateContractLabels["tenant"]["saveLaterDialog"];
   contractType: ContractTypeId;
   deedTypeLabels: Record<DeedTypeId, string>;
   deedAttachmentLabels: {
@@ -99,6 +107,8 @@ function OverviewEditIcon({
 
 export default function CreateContractSubmitStep({
   reviewLabels,
+  paymentLabels,
+  saveLaterDialogLabels,
   contractType,
   deedTypeLabels,
   deedAttachmentLabels,
@@ -128,12 +138,19 @@ export default function CreateContractSubmitStep({
     (state) => state.setTenantPhaseIndex,
   );
   const whatsappHref = useWhatsappHref();
-  const { submitOrder, isSubmitting, result } = useSubmitOrder({
+  const { submitOrder, isSubmitting: isNotifying, result } = useSubmitOrder({
     summary,
     contractType,
   });
+  const { syncContract, isSyncing, stage } = useSyncContractToServer(contractType);
+  const isSubmitting = isSyncing || isNotifying;
   const [showWhatsappError, setShowWhatsappError] = useState(false);
   const [orderNumberCopied, setOrderNumberCopied] = useState(false);
+  // "payment": the order exists on the server → show the pay screen.
+  // "done": the customer chose to pay later (or the server sync failed and
+  // the order went through the business channel only).
+  const [serverOrder, setServerOrder] = useState<{ uuid: string } | null>(null);
+  const [view, setView] = useState<"form" | "payment" | "done">("form");
 
   async function handleCopyOrderNumber(orderNumber: string) {
     try {
@@ -147,7 +164,7 @@ export default function CreateContractSubmitStep({
   }
 
   const isWhatsappValid = getSaudiNationalMobile(contactWhatsapp) !== null;
-  const hasFailed = result != null && !result.ok;
+  const hasFailed = result != null && !result.ok && serverOrder == null;
 
   function handleEdit(target: CreateContractReviewEditTarget) {
     switch (target) {
@@ -184,11 +201,47 @@ export default function CreateContractSubmitStep({
     }
 
     setShowWhatsappError(false);
-    await submitOrder({ contactWhatsapp });
+
+    // 1) Replay the draft onto the backend (real order → payment & tracking).
+    //    Draft-first stays: a backend failure still lets the order through the
+    //    business channel below, and the customer gets a payment link later.
+    const synced = await syncContract({ contactWhatsapp });
+    if (synced.ok) {
+      setServerOrder({ uuid: synced.uuid });
+    } else if (process.env.NODE_ENV !== "production") {
+      console.warn("contract sync failed", synced.stage, synced.error);
+    }
+
+    // 2) Business notification (Telegram / intake / email) with the real order
+    //    number when the sync succeeded.
+    const outcome = await submitOrder({ contactWhatsapp });
+
+    if (synced.ok) {
+      setView("payment");
+    } else if (outcome.ok) {
+      setView("done");
+    }
   }
 
-  if (result?.ok) {
-    const orderNumber = String(result.orderNumber);
+  const orderSucceeded = serverOrder != null || result?.ok === true;
+
+  if (view === "payment" && serverOrder) {
+    return (
+      <CreateContractPaymentStep
+        labels={paymentLabels}
+        saveLaterDialogLabels={saveLaterDialogLabels}
+        deedTypeLabels={deedTypeLabels}
+        deedAttachmentLabels={deedAttachmentLabels}
+        contractType={contractType}
+        fallbackPhone={contactWhatsapp}
+        onBack={() => setView("done")}
+        onEditStep={onEditStep}
+      />
+    );
+  }
+
+  if (view === "done" && orderSucceeded) {
+    const orderNumber = String(serverOrder?.uuid ?? result?.orderNumber ?? "");
     const whatsappMessage = t("whatsappMessage", { orderNumber });
     const whatsappShareHref = `${whatsappHref}${
       whatsappHref.includes("?") ? "&" : "?"
@@ -206,9 +259,20 @@ export default function CreateContractSubmitStep({
             {t("successTitle")}
           </p>
           <p className="max-w-md text-sm leading-relaxed text-[#5c6b68] dark:text-[#9eb5af]">
-            {t("successBody")}
+            {serverOrder ? t("successBodyPayLater") : t("successBody")}
           </p>
         </div>
+
+        {serverOrder ? (
+          <Button
+            type="button"
+            onClick={() => setView("payment")}
+            className="mt-5 h-12 w-full rounded-full bg-brand text-base font-bold text-white hover:bg-brand/90 dark:bg-[#0f6b5c]"
+          >
+            <CreditCard className="size-5" aria-hidden="true" />
+            {t("payNowCta")}
+          </Button>
+        ) : null}
 
         <div className="mt-5 rounded-2xl bg-brand-background-green px-4 py-4 text-center dark:bg-[#121a18]">
           <p className="text-xs font-medium text-[#5c6b68] dark:text-[#9eb5af]">
@@ -251,9 +315,9 @@ export default function CreateContractSubmitStep({
               variant="outline"
               className="h-12 rounded-full border-brand/25 text-sm font-bold text-brand hover:bg-brand-background-green dark:border-[#2f403b] dark:text-[#48c0b8] dark:hover:bg-[#24302c]"
             >
-              <Link href="/requests">
+              <Link href={serverOrder ? "/requests" : "/track"}>
                 <ClipboardList className="size-4" aria-hidden="true" />
-                {t("viewOrdersCta")}
+                {serverOrder ? t("viewOrdersCta") : t("trackOrderCta")}
               </Link>
             </Button>
           </div>
@@ -542,7 +606,9 @@ export default function CreateContractSubmitStep({
             className="h-12 flex-[2] rounded-2xl bg-brand text-sm font-extrabold text-white transition-opacity hover:opacity-90 disabled:opacity-60 dark:bg-[#0f6b5c]"
           >
             {isSubmitting
-              ? t("submitting")
+              ? stage
+                ? t(`syncing.${stage as SyncContractStage}`)
+                : t("submitting")
               : hasFailed
                 ? t("retry")
                 : t("submitButton")}

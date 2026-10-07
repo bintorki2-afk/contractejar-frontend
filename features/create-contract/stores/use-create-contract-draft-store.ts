@@ -195,6 +195,7 @@ type CreateContractDraftStore = {
   setPaymentData: (data: PaymentDataState) => void;
   setContactWhatsapp: (value: string) => void;
   setFreshContractSession: (session: FreshContractSession) => void;
+  setServerContractIdentity: (identity: { contractId: number; uuid: string }) => void;
   setContractStep1Data: (data: ContractStep1ApiData | null) => void;
   setContractStep2Data: (data: ContractStep2ApiData | null) => void;
   setContractStep3Data: (data: ContractStep3ApiData | null) => void;
@@ -920,6 +921,22 @@ export const useCreateContractDraftStore = create<CreateContractDraftStore>()(
       },
       setPaymentData: (data) => set({ paymentData: data }),
       setContactWhatsapp: (value) => set({ contactWhatsapp: value }),
+      setServerContractIdentity: ({ contractId, uuid }) =>
+        set((state) => ({
+          // The server contract replaces the local placeholder ids so every
+          // consumer (payment, coupon, finance summary, header number) now
+          // points at the real order.
+          contractSession: state.contractSession
+            ? {
+                ...state.contractSession,
+                contractId,
+                uuid,
+                orderReference: uuid,
+                serverContractId: contractId,
+                serverUuid: uuid,
+              }
+            : state.contractSession,
+        })),
       setFreshContractSession: (session) =>
         set((state) => ({
           contractSession: session,

@@ -16,6 +16,13 @@ type ContractSessionBase = {
    * (matches the dashboard); this reference is the fallback for the fresh flow.
    */
   orderReference?: string;
+  /**
+   * Set once the draft has been replayed onto the backend (submit step): the
+   * real contract id/uuid used for payment, tracking and the dashboard. The
+   * customer-facing order number becomes `serverUuid` from then on.
+   */
+  serverContractId?: number;
+  serverUuid?: string;
 };
 
 export type FreshContractSession = ContractSessionBase & {
