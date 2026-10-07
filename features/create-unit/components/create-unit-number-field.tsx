@@ -10,6 +10,7 @@ import {
   resolveFieldChromeState,
 } from "@/lib/ui/field-chrome";
 import { cn } from "@/lib/utils";
+import { toAsciiDigits } from "@/lib/utils/digits";
 
 type CreateUnitNumberFieldProps = {
   label: string;
@@ -49,7 +50,7 @@ export default function CreateUnitNumberField({
           type="text"
           inputMode="text"
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => onChange(toAsciiDigits(event.target.value))}
           placeholder={placeholder}
           aria-invalid={showInvalid}
           className={cn(

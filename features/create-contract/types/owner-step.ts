@@ -57,7 +57,7 @@ export const EMPTY_OWNER_DATA: OwnerDataState = {
 
 export const EMPTY_AGENT_DATA: AgentDataState = {
   idNumber: "",
-  birthDate: { ...EMPTY_BIRTH_DATE, calendarType: "gregorian" },
+  birthDate: { ...EMPTY_BIRTH_DATE },
   phone: "",
   poaNumber: "",
   poaDate: "",

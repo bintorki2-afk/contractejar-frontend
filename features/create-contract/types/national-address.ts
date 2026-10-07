@@ -11,6 +11,15 @@ export const NATIONAL_ADDRESS_METHODS = [
 
 export type NationalAddressMethodId = (typeof NATIONAL_ADDRESS_METHODS)[number];
 
+/** Display order of the method select — Google Maps link first (the default). */
+export const NATIONAL_ADDRESS_METHOD_ORDER: readonly NationalAddressMethodId[] = [
+  "link",
+  "manual",
+  "photo",
+];
+
+export const DEFAULT_NATIONAL_ADDRESS_METHOD: NationalAddressMethodId = "link";
+
 export type NationalAddressMapLocation = {
   lat: number;
   lng: number;

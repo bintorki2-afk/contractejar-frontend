@@ -38,13 +38,3 @@ export const contractFinanceSummaryKeys = {
   detail: (contractUuid: string) =>
     [...contractFinanceSummaryKeys.all, contractUuid] as const,
 };
-
-export const contractDocFeeKeys = {
-  all: ["contract-doc-fee"] as const,
-  preview: (params: {
-    contractId: number | null;
-    contractType: string;
-    years: number;
-    months: number;
-  }) => [...contractDocFeeKeys.all, "preview", params] as const,
-};

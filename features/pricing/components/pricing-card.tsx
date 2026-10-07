@@ -7,13 +7,27 @@ import { resetCreateContractDraft } from "@/features/create-contract/utils/reset
 import Image from "next/image";
 import Link from "next/link";
 
-const featureLogos = [
-  "/images/ejar.png",
-  "/images/hesab.png",
-  "/images/daman.png",
-  "/images/tegara.png",
-  "/images/najez.png",
+/**
+ * Government / platform mark shown beside a feature, matched on the feature
+ * text so the copy (static or from the dashboard) can be reordered freely.
+ * Features with no matching entity (e.g. «بلدي», no asset yet) show no logo.
+ */
+const FEATURE_LOGO_RULES: { match: RegExp; src: string; alt: string }[] = [
+  { match: /حساب المواطن|citizen/i, src: "/images/hesab.png", alt: "حساب المواطن" },
+  { match: /ضمان|daman|developer guarantee/i, src: "/images/daman.png", alt: "الضمان المطوّر" },
+  { match: /سند تنفيذي|ناجز|najiz|enforceable/i, src: "/images/najez.png", alt: "ناجز" },
+  { match: /وزارة التجارة|التجارة|commerce/i, src: "/images/tegara.png", alt: "وزارة التجارة" },
+  {
+    match: /المركز السعودي|saudi business center|business center/i,
+    src: "/images/saudi-center.png",
+    alt: "المركز السعودي للأعمال",
+  },
+  { match: /إيجار|ايجار|عقدك|ejar|contract/i, src: "/images/ejar.png", alt: "منصة إيجار" },
 ];
+
+function resolveFeatureLogo(feature: string) {
+  return FEATURE_LOGO_RULES.find((rule) => rule.match.test(feature)) ?? null;
+}
 
 type PricingCardProps = {
   id: string;
@@ -66,22 +80,35 @@ export default function PricingCard({
 
       <div className="mb-5 rounded-[1.55rem] bg-white dark:bg-[#151c1b] p-6">
         <p className="mb-3  text-base font-bold text-black dark:text-white/90">{benefitsTitle}</p>
-        <ul className="space-y-3.5">
-          {features.map((feature, index) => (
-            <li key={feature} className="flex items-center  gap-1.5">
-              <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-secondary text-white">
-                <Check className="size-3" aria-hidden="true" />
-              </span>
-              <span className=" text-black dark:text-white/90 font-medium">{feature}</span>
-              <Image
-                src={featureLogos[index]}
-                alt={feature}
-                width={20}
-                height={20}
-                className="w-8 object-contain shrink-0"
-              />
-            </li>
-          ))}
+        <ul className="space-y-3">
+          {features.map((feature, index) => {
+            const logo = resolveFeatureLogo(feature);
+
+            return (
+              <li
+                key={`${feature}-${index}`}
+                className="flex min-h-9 items-center gap-2"
+              >
+                <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand-secondary text-white">
+                  <Check className="size-3" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1 text-sm font-medium text-black sm:text-base dark:text-white/90">
+                  {feature}
+                </span>
+                {logo ? (
+                  <Image
+                    src={logo.src}
+                    alt={logo.alt}
+                    title={logo.alt}
+                    width={160}
+                    height={56}
+                    sizes="120px"
+                    className="h-8 w-auto max-w-28 shrink-0 object-contain object-left sm:h-9"
+                  />
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </div>
       <Link

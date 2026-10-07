@@ -1,6 +1,15 @@
 "use client";
 
-import { Droplets, Hash, Zap } from "lucide-react";
+import {
+  AirVent,
+  Bath,
+  BedDouble,
+  CookingPot,
+  Droplets,
+  Fan,
+  Hash,
+  Zap,
+} from "lucide-react";
 
 import CreateUnitAreaField from "@/features/create-unit/components/create-unit-area-field";
 import CreateUnitContractTypeCards from "@/features/create-unit/components/create-unit-contract-type-cards";
@@ -49,6 +58,8 @@ type UnitDataFormFieldsProps = {
   hideHousingOnlyFieldsForCommercial?: boolean;
   electricityMeterFee?: number;
   waterMeterFee?: number;
+  /** Contract length in months when already chosen — for the shared-meter helper. */
+  contractMonths?: number | null;
   showFieldErrors?: boolean;
   requireMeterRegistration?: boolean;
 };
@@ -116,19 +127,33 @@ export default function UnitDataFormFields({
   hideHousingOnlyFieldsForCommercial = false,
   electricityMeterFee = 0,
   waterMeterFee = 0,
+  contractMonths = null,
   showFieldErrors = false,
   requireMeterRegistration = false,
 }: UnitDataFormFieldsProps) {
+  const requireMeters = showFieldErrors && requireMeterRegistration;
+  const electricityMeterNumberInvalid =
+    requireMeters &&
+    value.addElectricityMeter &&
+    value.electricityMeterNumber.trim() === "";
   const electricityMeterRegistrationInvalid =
-    showFieldErrors &&
-    requireMeterRegistration &&
+    requireMeters &&
     value.addElectricityMeter &&
     value.electricityMeterRegistration === "";
+  const electricitySharedFeeInvalid =
+    requireMeters &&
+    value.addElectricityMeter &&
+    value.electricityMeterRegistration === "shared" &&
+    !isPositiveNumber(value.electricitySharedMonthlyFee);
+  const waterMeterNumberInvalid =
+    requireMeters && value.addWaterMeter && value.waterMeterNumber.trim() === "";
   const waterMeterRegistrationInvalid =
-    showFieldErrors &&
-    requireMeterRegistration &&
+    requireMeters && value.addWaterMeter && value.waterMeterRegistration === "";
+  const waterSharedFeeInvalid =
+    requireMeters &&
     value.addWaterMeter &&
-    value.waterMeterRegistration === "";
+    value.waterMeterRegistration === "shared" &&
+    !isPositiveNumber(value.waterSharedMonthlyFee);
   const floorOptions = [
     { value: "ground", label: labels.floorOptions.ground },
     ...Array.from({ length: 50 }, (_, index) => {
@@ -231,12 +256,14 @@ export default function UnitDataFormFields({
           <div className="grid grid-cols-3 gap-3">
             <UnitCountStepper
               label={labels.roomsCount.label}
+              icon={<BedDouble className="size-4 text-brand-secondary" aria-hidden />}
               value={value.roomsCount}
               onChange={(roomsCount) => updateField("roomsCount", roomsCount)}
               required
             />
             <UnitCountStepper
               label={labels.bathroomsCount.label}
+              icon={<Bath className="size-4 text-[#3b82f6]" aria-hidden />}
               value={value.bathroomsCount}
               onChange={(bathroomsCount) =>
                 updateField("bathroomsCount", bathroomsCount)
@@ -244,6 +271,7 @@ export default function UnitDataFormFields({
             />
             <UnitCountStepper
               label={labels.kitchensCount.label}
+              icon={<CookingPot className="size-4 text-[#e39b2d]" aria-hidden />}
               value={value.kitchensCount}
               onChange={(kitchensCount) =>
                 onChange({
@@ -344,6 +372,7 @@ export default function UnitDataFormFields({
         <div className="grid grid-cols-2 gap-3">
           <UnitCountStepper
             label={labels.splitAcCount.label}
+            icon={<AirVent className="size-4 text-brand" aria-hidden />}
             value={value.splitAcCount}
             onChange={(splitAcCount) =>
               updateField("splitAcCount", splitAcCount)
@@ -351,6 +380,7 @@ export default function UnitDataFormFields({
           />
           <UnitCountStepper
             label={labels.windowAcCount.label}
+            icon={<Fan className="size-4 text-[#7c6cf0]" aria-hidden />}
             value={value.windowAcCount}
             onChange={(windowAcCount) =>
               updateField("windowAcCount", windowAcCount)
@@ -412,6 +442,9 @@ export default function UnitDataFormFields({
               electricityMeterRegistration: addElectricityMeter
                 ? value.electricityMeterRegistration
                 : "",
+              electricitySharedMonthlyFee: addElectricityMeter
+                ? value.electricitySharedMonthlyFee
+                : "",
             })
           }
         >
@@ -428,8 +461,14 @@ export default function UnitDataFormFields({
               }
               icon={Hash}
               dir="ltr"
-              required={false}
-              hideLabel
+              inputMode="numeric"
+              required={requireMeterRegistration}
+              hideLabel={!requireMeterRegistration}
+              errorMessage={
+                electricityMeterNumberInvalid
+                  ? labels.meterNumberRequired ?? labels.fieldRequired
+                  : undefined
+              }
             />
 
             {labels.meterRegistration ? (
@@ -438,15 +477,30 @@ export default function UnitDataFormFields({
                 fee={electricityMeterFee}
                 value={value.electricityMeterRegistration}
                 onChange={(electricityMeterRegistration) =>
-                  updateField(
-                    "electricityMeterRegistration",
+                  onChange({
+                    ...value,
                     electricityMeterRegistration,
+                    electricitySharedMonthlyFee:
+                      electricityMeterRegistration === "shared"
+                        ? value.electricitySharedMonthlyFee
+                        : "",
+                  })
+                }
+                sharedMonthlyFee={value.electricitySharedMonthlyFee}
+                onSharedMonthlyFeeChange={(electricitySharedMonthlyFee) =>
+                  updateField(
+                    "electricitySharedMonthlyFee",
+                    electricitySharedMonthlyFee,
                   )
                 }
+                contractMonths={contractMonths}
                 errorMessage={
                   electricityMeterRegistrationInvalid
                     ? labels.fieldRequired
                     : undefined
+                }
+                sharedFeeErrorMessage={
+                  electricitySharedFeeInvalid ? labels.fieldRequired : undefined
                 }
               />
             ) : null}
@@ -465,6 +519,9 @@ export default function UnitDataFormFields({
               waterMeterRegistration: addWaterMeter
                 ? value.waterMeterRegistration
                 : "",
+              waterSharedMonthlyFee: addWaterMeter
+                ? value.waterSharedMonthlyFee
+                : "",
             })
           }
         >
@@ -481,8 +538,14 @@ export default function UnitDataFormFields({
               }
               icon={Hash}
               dir="ltr"
-              required={false}
-              hideLabel
+              inputMode="numeric"
+              required={requireMeterRegistration}
+              hideLabel={!requireMeterRegistration}
+              errorMessage={
+                waterMeterNumberInvalid
+                  ? labels.meterNumberRequired ?? labels.fieldRequired
+                  : undefined
+              }
             />
 
             {labels.meterRegistration ? (
@@ -491,10 +554,25 @@ export default function UnitDataFormFields({
                 fee={waterMeterFee}
                 value={value.waterMeterRegistration}
                 onChange={(waterMeterRegistration) =>
-                  updateField("waterMeterRegistration", waterMeterRegistration)
+                  onChange({
+                    ...value,
+                    waterMeterRegistration,
+                    waterSharedMonthlyFee:
+                      waterMeterRegistration === "shared"
+                        ? value.waterSharedMonthlyFee
+                        : "",
+                  })
                 }
+                sharedMonthlyFee={value.waterSharedMonthlyFee}
+                onSharedMonthlyFeeChange={(waterSharedMonthlyFee) =>
+                  updateField("waterSharedMonthlyFee", waterSharedMonthlyFee)
+                }
+                contractMonths={contractMonths}
                 errorMessage={
                   waterMeterRegistrationInvalid ? labels.fieldRequired : undefined
+                }
+                sharedFeeErrorMessage={
+                  waterSharedFeeInvalid ? labels.fieldRequired : undefined
                 }
               />
             ) : null}

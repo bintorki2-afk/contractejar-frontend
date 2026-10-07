@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import type { ContractFinancialData } from "@/features/create-contract/types/contract-financial";
+import { resolveDocumentSurcharge } from "@/features/create-contract/types/contract-financial";
 import type { AppliedContractCoupon } from "@/features/create-contract/types/contract-coupon";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
@@ -121,6 +122,55 @@ function BreakdownShell({
   );
 }
 
+/**
+ * «عداد مشترك» amounts are a contract term (tenant → owner), shown for
+ * transparency under the fees but never added to our total.
+ */
+function SharedMeterTerms({
+  data,
+  labels,
+}: {
+  data: ContractFinancialData;
+  labels: FinancialSummaryLabels;
+}) {
+  const shared = data.shared_meters;
+  const lines = [
+    shared?.electricity
+      ? { label: labels.sharedElectricityMeter, term: shared.electricity }
+      : null,
+    shared?.water ? { label: labels.sharedWaterMeter, term: shared.water } : null,
+  ].filter((line): line is NonNullable<typeof line> => line !== null);
+
+  if (lines.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2 rounded-xl bg-brand-background px-3 py-2.5 dark:bg-[#16352f]">
+      <p className="text-xs font-bold text-brand dark:text-[#48c0b8]">
+        {labels.sharedMetersTitle}
+      </p>
+      <ul className="mt-1 space-y-1">
+        {lines.map((line) => (
+          <li
+            key={line.label}
+            className="flex items-center justify-between gap-3 text-xs text-[#555555] dark:text-[#9eb5af]"
+          >
+            <span>{line.label}</span>
+            <span dir="ltr" className="font-semibold tabular-nums text-[#333333] dark:text-white">
+              {formatPaymentAmount(line.term.monthly)} × {line.term.months} ={" "}
+              {formatPaymentAmount(line.term.total)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1 text-[11px] leading-4 text-[#8a8a8a] dark:text-[#9eb5af]">
+        {labels.sharedMetersNote}
+      </p>
+    </div>
+  );
+}
+
 function SummarySkeletonRow() {
   return (
     <div className="flex items-center justify-between gap-4 py-2">
@@ -187,8 +237,24 @@ export default function CreateContractFinancialBreakdown({
     const baseTotal = appliedCoupon
       ? appliedCoupon.totalPriceBeforeCoupon
       : data.total_price;
-    // Fees line = total minus tax so the breakdown adds up; free tax leaves fees unchanged.
-    const documentationFeeAmount = Math.max(0, baseTotal - tax);
+    const documentSurcharge = resolveDocumentSurcharge(data);
+    const electricityMeterFee = Math.max(
+      0,
+      Number(data.price_details.electricity_meter_fee ?? 0) || 0,
+    );
+    const waterMeterFee = Math.max(
+      0,
+      Number(data.price_details.water_meter_fee ?? 0) || 0,
+    );
+    // Documentation fee alone: the server's `fee` when present, otherwise the
+    // total minus the itemised lines so the breakdown always adds up.
+    const documentationFeeAmount =
+      typeof data.fee === "number" && Number.isFinite(data.fee) && data.fee > 0
+        ? data.fee
+        : Math.max(
+            0,
+            baseTotal - tax - documentSurcharge - electricityMeterFee - waterMeterFee,
+          );
     const payableTotal = appliedCoupon
       ? appliedCoupon.totalPriceAfterCoupon
       : data.total_price;
@@ -201,6 +267,22 @@ export default function CreateContractFinancialBreakdown({
           subtitle={feeSubtitle}
           primary
         />
+
+        {documentSurcharge > 0 ? (
+          <SummaryRow
+            label={labels.documentSurcharge}
+            amount={documentSurcharge}
+            subtitle={labels.documentSurchargeHint}
+          />
+        ) : null}
+
+        {electricityMeterFee > 0 ? (
+          <SummaryRow label={labels.electricityMeterFee} amount={electricityMeterFee} />
+        ) : null}
+
+        {waterMeterFee > 0 ? (
+          <SummaryRow label={labels.waterMeterFee} amount={waterMeterFee} />
+        ) : null}
 
         <div className="border-t border-dashed border-[#d4d4d4] dark:border-[#2f403b]" />
 
@@ -231,6 +313,8 @@ export default function CreateContractFinancialBreakdown({
           label={appliedCoupon ? labels.priceAfterCoupon : labels.total}
           amount={payableTotal}
         />
+
+        <SharedMeterTerms data={data} labels={labels} />
       </BreakdownShell>
     );
   }

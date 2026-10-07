@@ -8,17 +8,14 @@ import type { CreateContractLabels } from "@/features/create-contract/types/crea
 import type { AppliedContractCoupon } from "@/features/create-contract/types/contract-coupon";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
-import { parseContractPeriodLabel } from "@/features/create-contract/utils/parse-contract-period-label";
+import { formatContractDurationLabel } from "@/features/create-contract/utils/format-contract-duration-label";
+import { useTranslations } from "next-intl";
 
 type CreateContractPaymentSummaryProps = {
   labels: CreateContractLabels["payment"]["summary"];
   contractType: ContractTypeId;
   appliedCoupon?: AppliedContractCoupon | null;
 };
-
-function withTemplate(template: string, count: number) {
-  return template.replaceAll("{count}", String(count));
-}
 
 export default function CreateContractPaymentSummary({
   labels,
@@ -36,28 +33,23 @@ export default function CreateContractPaymentSummary({
   const contractPeriodsQuery = useContractPeriods(
     toPropertyContractType(contractType),
   );
+  const tReview = useTranslations("createContract.review");
 
   const contractTypeLabel =
     contractType === "commercial"
       ? labels.contractTypeCommercial
       : labels.contractTypeResidential;
 
-  const durationLabel = financeData.isCustomDuration
-    ? [
-        financeData.customDurationYears !== "" && financeData.customDurationYears > 0
-          ? withTemplate(labels.yearsCount, financeData.customDurationYears)
-          : null,
-        financeData.customDurationMonths !== "" && financeData.customDurationMonths > 0
-          ? withTemplate(labels.monthsCount, financeData.customDurationMonths)
-          : null,
-      ]
-        .filter((part): part is string => Boolean(part))
-        .join(" ")
-    : parseContractPeriodLabel(
-        (contractPeriodsQuery.data ?? []).find(
-          (period) => period.id === financeData.contractPeriodId,
-        )?.period ?? "",
-      ).title;
+  const durationLabel = formatContractDurationLabel(
+    financeData,
+    contractPeriodsQuery.data ?? [],
+    {
+      yearsCount: labels.yearsCount,
+      monthsCount: labels.monthsCount,
+      oneYear: tReview("durationOneYear"),
+      twoYears: tReview("durationTwoYears"),
+    },
+  );
 
   const feeSubtitle = [contractTypeLabel, durationLabel || null]
     .filter((part): part is string => Boolean(part))

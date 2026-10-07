@@ -5,19 +5,18 @@ import CreateContractPageContent from "@/features/create-contract/components/cre
 import {
   contractPaperworkKeys,
   contractPaymentTypeKeys,
-  contractServicesPricingKeys,
 } from "@/features/create-contract/query-keys";
 import { getPaperwork } from "@/features/create-contract/services/get-paperwork";
 import { getPaymentTypes } from "@/features/create-contract/services/get-payment-types";
-import { getServicesPricing } from "@/features/create-contract/services/get-services-pricing";
+import { contractPricingKeys } from "@/features/pricing/query-keys";
+import { getContractPricing } from "@/features/pricing/services/get-contract-pricing";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import {
   toPropertyContractType,
   type ContractTypeId,
 } from "@/features/create-contract/types/contract-type";
 import { DEED_TYPES } from "@/features/create-contract/types/deed-type";
-import { meterFeeSettingsKeys, settingContractsKeys } from "@/features/shared/query-keys";
-import { getMeterFeeSettings } from "@/features/shared/services/get-meter-fee-settings";
+import { settingContractsKeys } from "@/features/shared/query-keys";
 import { getSettingContracts } from "@/features/shared/services/get-setting-contracts";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
@@ -54,8 +53,8 @@ export default async function CreateContractPage({
       .catch(() => undefined),
     queryClient
       .prefetchQuery({
-        queryKey: contractServicesPricingKeys.list(propertyContractType),
-        queryFn: () => getServicesPricing(propertyContractType),
+        queryKey: contractPricingKeys.detail(),
+        queryFn: () => getContractPricing(),
       })
       .catch(() => undefined),
     queryClient
@@ -68,12 +67,6 @@ export default async function CreateContractPage({
       .prefetchQuery({
         queryKey: settingContractsKeys.list(),
         queryFn: () => getSettingContracts(),
-      })
-      .catch(() => undefined),
-    queryClient
-      .prefetchQuery({
-        queryKey: meterFeeSettingsKeys.detail(),
-        queryFn: () => getMeterFeeSettings(),
       })
       .catch(() => undefined),
   ]);
@@ -411,6 +404,12 @@ export default async function CreateContractPage({
         waqfSectionTitle: t("owner.representative.waqfSectionTitle"),
         waqfSectionDescription: t("owner.representative.waqfSectionDescription"),
         capacityDocumentLabel: t("owner.representative.capacityDocumentLabel"),
+        deceasedFields: t.raw(
+          "owner.representative.deceasedFields",
+        ) as CreateContractLabels["owner"]["representative"]["deceasedFields"],
+        waqfFields: t.raw(
+          "owner.representative.waqfFields",
+        ) as CreateContractLabels["owner"]["representative"]["waqfFields"],
       },
     },
     tenant: {
@@ -629,6 +628,9 @@ export default async function CreateContractPage({
             subtitle: t("tenant.rentedUnit.meterRegistration.owner.subtitle"),
             noFee: t("tenant.rentedUnit.meterRegistration.owner.noFee"),
           },
+          shared: t.raw(
+            "tenant.rentedUnit.meterRegistration.shared",
+          ) as CreateContractLabels["tenant"]["rentedUnit"]["meterRegistration"]["shared"],
           notice: {
             beforeFee: t("tenant.rentedUnit.meterRegistration.notice.beforeFee"),
             feeAmount: t("tenant.rentedUnit.meterRegistration.notice.feeAmount"),
@@ -912,6 +914,12 @@ export default async function CreateContractPage({
         services: t("payment.summary.services"),
         servicesTotal: t("payment.summary.servicesTotal"),
         docFee: t("payment.summary.docFee"),
+        documentSurcharge: t("payment.summary.documentSurcharge"),
+        documentSurchargeHint: t("payment.summary.documentSurchargeHint"),
+        sharedMetersTitle: t("payment.summary.sharedMetersTitle"),
+        sharedElectricityMeter: t("payment.summary.sharedElectricityMeter"),
+        sharedWaterMeter: t("payment.summary.sharedWaterMeter"),
+        sharedMetersNote: t("payment.summary.sharedMetersNote"),
         total: t("payment.summary.total"),
         priceBeforeCoupon: t("payment.summary.priceBeforeCoupon"),
         discount: t("payment.summary.discount"),

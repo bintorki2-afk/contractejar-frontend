@@ -21,8 +21,10 @@ export type RealEstateUnitPayload = {
   type_furnished?: string | boolean | null;
   electricity_meter?: boolean;
   water_meter?: boolean;
-  electricity_meter_ownership?: "owner" | "tenant" | null;
-  water_meter_ownership?: "owner" | "tenant" | null;
+  electricity_meter_ownership?: "owner" | "tenant" | "shared" | null;
+  electricity_shared_monthly_fee?: number | string | null;
+  water_meter_ownership?: "owner" | "tenant" | "shared" | null;
+  water_shared_monthly_fee?: number | string | null;
   Number_parking_spaces?: string;
   Services?: [];
   number_of_rooms?: number;

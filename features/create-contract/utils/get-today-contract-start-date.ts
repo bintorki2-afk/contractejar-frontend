@@ -48,7 +48,7 @@ function getHijriTodayParts() {
 }
 
 export function getTodayContractStartDate(
-  calendarType: CalendarType = "hijri",
+  calendarType: CalendarType = "gregorian",
 ): BirthDateValue {
   const parts =
     calendarType === "hijri" ? getHijriTodayParts() : getGregorianTodayParts();

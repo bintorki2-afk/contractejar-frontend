@@ -9,10 +9,12 @@ import {
   useUnitTypeOptions,
   useUnitUsageOptions,
 } from "@/features/create-unit/hooks/use-unit-lookup-options";
-import { useMeterFeeSettings } from "@/features/shared/hooks/use-meter-fee-settings";
+import { useContractPricing } from "@/features/pricing/hooks/use-contract-pricing";
+import { getMeterTransferFee } from "@/features/pricing/types/contract-pricing";
 import { buildRentedUnitTypeOptions } from "@/features/create-contract/utils/build-rented-unit-type-options";
+import { resolveFinanceDurationMonths } from "@/features/create-contract/utils/resolve-finance-duration-months";
+import { useContractPeriods } from "@/features/create-contract/hooks/use-contract-periods";
 import { buildUnitFormSummary } from "@/features/shared/utils/build-unit-form-summary";
-import { resolveMeterTransferFee } from "@/features/shared/utils/resolve-meter-transfer-fee";
 
 type CreateContractRentedUnitDataPhaseProps = {
   labels: CreateContractLabels["tenant"]["rentedUnit"];
@@ -42,18 +44,25 @@ export default function CreateContractRentedUnitDataPhase({
   const housingUnitTypesQuery = useUnitTypeOptions("housing");
   const commercialUnitTypesQuery = useUnitTypeOptions("commercial");
   const unitUsageQuery = useUnitUsageOptions(contractType);
-  const meterFeesQuery = useMeterFeeSettings();
+  // Meter transfer fees come from the public price sheet (`GET /pricing`).
+  const { pricing } = useContractPricing();
+  // Contract length (when the finance step was already filled) feeds the
+  // «× مدة العقد» helper of a shared meter.
+  const financeData = useCreateContractDraftStore((state) => state.financeData);
+  const contractPeriodsQuery = useContractPeriods(contractType);
+  const contractMonths = resolveFinanceDurationMonths(
+    financeData,
+    contractPeriodsQuery.data ?? [],
+  );
 
   const isLoadingOptions =
     housingUnitTypesQuery.isLoading ||
     commercialUnitTypesQuery.isLoading ||
-    unitUsageQuery.isLoading ||
-    meterFeesQuery.isLoading;
+    unitUsageQuery.isLoading;
   const optionsError =
     housingUnitTypesQuery.error ??
     commercialUnitTypesQuery.error ??
-    unitUsageQuery.error ??
-    meterFeesQuery.error;
+    unitUsageQuery.error;
 
   if (optionsError) {
     return (
@@ -72,16 +81,12 @@ export default function CreateContractRentedUnitDataPhase({
     );
   }
 
-  const electricityMeterFee = resolveMeterTransferFee(
-    meterFeesQuery.data,
+  const electricityMeterFee = getMeterTransferFee(
+    pricing,
+    contractType,
     "electricity",
-    contractType,
   );
-  const waterMeterFee = resolveMeterTransferFee(
-    meterFeesQuery.data,
-    "water",
-    contractType,
-  );
+  const waterMeterFee = getMeterTransferFee(pricing, contractType, "water");
   const housingUnitTypes = housingUnitTypesQuery.data ?? [];
   const commercialUnitTypes = commercialUnitTypesQuery.data ?? [];
   // Combined list so an already-selected unit type name still resolves in the
@@ -125,6 +130,7 @@ export default function CreateContractRentedUnitDataPhase({
           contractType={contractType}
           electricityMeterFee={electricityMeterFee}
           waterMeterFee={waterMeterFee}
+          contractMonths={contractMonths}
           showFieldErrors={showFieldErrors}
           requireMeterRegistration
         />

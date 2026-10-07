@@ -5,7 +5,11 @@ import { useId } from "react";
 
 import { Input } from "@/components/ui/input";
 import CreateUnitFieldLabel from "@/features/create-unit/components/create-unit-field-label";
-import { fieldChromeNestedInputClass } from "@/lib/ui/field-chrome";
+import {
+  fieldChromeNestedInputClass,
+  fieldChromeSurfaceClass,
+  resolveFieldChromeState,
+} from "@/lib/ui/field-chrome";
 import { cn } from "@/lib/utils";
 
 type CreateUnitIconInputFieldProps = {
@@ -20,6 +24,7 @@ type CreateUnitIconInputFieldProps = {
   maxLength?: number;
   required?: boolean;
   hideLabel?: boolean;
+  errorMessage?: string;
 };
 
 export default function CreateUnitIconInputField({
@@ -34,14 +39,17 @@ export default function CreateUnitIconInputField({
   maxLength,
   required = true,
   hideLabel = false,
+  errorMessage,
 }: CreateUnitIconInputFieldProps) {
   const inputId = useId();
+  const showInvalid = Boolean(errorMessage);
+  const chrome = resolveFieldChromeState({ invalid: showInvalid });
 
   return (
     <div>
       {hideLabel ? null : (
         required ? (
-          <CreateUnitFieldLabel label={label} />
+          <CreateUnitFieldLabel label={label} invalid={showInvalid} />
         ) : (
           <label className="mb-2 block text-sm font-semibold text-black dark:text-white">
             {label}
@@ -51,7 +59,12 @@ export default function CreateUnitIconInputField({
 
       <div
         dir={dir}
-        className="flex h-10 w-full items-center gap-2 rounded-full border border-[#e8e8e8] bg-[#FBFBFA] px-2 dark:border-[#2f403b] dark:bg-[#0d1614]"
+        className={cn(
+          "flex h-10 w-full items-center gap-2 rounded-full border px-2",
+          showInvalid
+            ? fieldChromeSurfaceClass(chrome)
+            : "border-[#e8e8e8] bg-[#FBFBFA] dark:border-[#2f403b] dark:bg-[#0d1614]",
+        )}
       >
         <span className="inline-flex size-10 shrink-0 items-center justify-center text-brand-secondary">
           <Icon className="size-5" aria-hidden="true" />
@@ -68,12 +81,17 @@ export default function CreateUnitIconInputField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
+          aria-invalid={showInvalid}
           className={cn(
             "h-auto px-2 text-sm",
             fieldChromeNestedInputClass,
           )}
         />
       </div>
+
+      {errorMessage ? (
+        <p className="mt-1.5 text-xs font-medium text-[#c62828]">{errorMessage}</p>
+      ) : null}
     </div>
   );
 }

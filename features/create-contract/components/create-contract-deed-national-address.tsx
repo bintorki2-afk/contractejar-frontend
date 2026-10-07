@@ -1,17 +1,18 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
-import { IdCard, Link2, MapPin, PenLine } from "lucide-react";
+import { useId } from "react";
+import { Link2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { FaMapMarkerAlt } from "react-icons/fa";
 
 import { Input } from "@/components/ui/input";
 import CreateContractDeedImageUpload from "@/features/create-contract/components/create-contract-deed-image-upload";
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
 import { NationalAddressLinkHelp } from "@/features/create-contract/components/create-contract-field-help";
+import CreateContractFormSelect from "@/features/create-contract/components/create-contract-form-select";
 import {
   isValidNationalAddressLink,
+  NATIONAL_ADDRESS_METHOD_ORDER,
   type NationalAddressMethodId,
 } from "@/features/create-contract/types/national-address";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
@@ -33,32 +34,6 @@ type CreateContractDeedNationalAddressProps = {
   showFieldErrors?: boolean;
 };
 
-const METHOD_CARDS: {
-  id: NationalAddressMethodId;
-  icon: ReactNode;
-}[] = [
-  {
-    id: "link",
-    icon: <FaMapMarkerAlt className="size-5 text-[#ea4335]" aria-hidden />,
-  },
-  {
-    id: "manual",
-    icon: <PenLine className="size-5 text-brand-secondary" aria-hidden />,
-  },
-  {
-    id: "photo",
-    icon: (
-      <span className="relative inline-flex size-6 items-center justify-center">
-        <IdCard className="size-5 text-brand" aria-hidden />
-        <MapPin
-          className="absolute -inset-e-0.5 -top-0.5 size-2.5 text-brand-secondary"
-          aria-hidden
-        />
-      </span>
-    ),
-  },
-];
-
 export default function CreateContractDeedNationalAddress({
   labels,
   method,
@@ -74,8 +49,16 @@ export default function CreateContractDeedNationalAddress({
 }: CreateContractDeedNationalAddressProps) {
   const t = useTranslations("createContract");
   const linkInputId = useId();
-  const methodGroupId = useId();
   const methodInvalid = showFieldErrors && method === "";
+  // One select instead of three cards; "رابط موقع العقار (قوقل ماب)" is the
+  // default so the common path needs no choice at all.
+  const methodOptions = NATIONAL_ADDRESS_METHOD_ORDER.map((id) => {
+    const copy = labels.methods[id];
+    return {
+      value: id,
+      label: copy.description ? `${copy.title} (${copy.description})` : copy.title,
+    };
+  });
   const photoInvalid =
     showFieldErrors &&
     method === "photo" &&
@@ -93,59 +76,17 @@ export default function CreateContractDeedNationalAddress({
 
   return (
     <div className="space-y-3">
-      <div>
-        <CreateContractFieldLabel
-          label={labels.methodSelect.label}
-          invalid={methodInvalid}
-        />
-
-        <div
-          role="radiogroup"
-          aria-labelledby={methodGroupId}
-          aria-invalid={methodInvalid}
-          data-field-invalid={methodInvalid ? "true" : undefined}
-          className="grid grid-cols-3 gap-2"
-        >
-          <span id={methodGroupId} className="sr-only">
-            {labels.methodSelect.label}
-          </span>
-
-          {METHOD_CARDS.map((card) => {
-            const selected = method === card.id;
-            const copy = labels.methods[card.id];
-
-            return (
-              <button
-                key={card.id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                onClick={() => onMethodChange(card.id)}
-                className={cn(
-                  "flex min-w-0 flex-col items-center gap-1 rounded-xl border px-2 py-3 text-center transition-colors",
-                  selected
-                    ? "border-brand bg-brand-background-green/60 shadow-[0_0_0_1px_rgba(13,90,80,0.08)]"
-                    : methodInvalid
-                      ? "border-[#e57373] bg-white"
-                      : "border-[#e8e8e8] bg-white hover:border-brand/30",
-                )}
-              >
-                <span className="flex size-8 items-center justify-center">
-                  {card.icon}
-                </span>
-                <span className="text-xs font-extrabold text-brand">
-                  {copy.title}
-                </span>
-                <span className="line-clamp-2 text-[10px] leading-snug text-[#9a9a9a]">
-                  {copy.description}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {methodInvalid ? <CreateContractFieldError message={t("fieldRequired")} /> : null}
-      </div>
+      <CreateContractFormSelect
+        label={labels.methodSelect.label}
+        placeholder={labels.methodSelect.placeholder}
+        options={methodOptions}
+        value={method}
+        onChange={(nextMethod) =>
+          onMethodChange(nextMethod as NationalAddressMethodId)
+        }
+        invalid={methodInvalid}
+        valid={method !== ""}
+      />
 
       {method === "photo" ? (
         <CreateContractDeedImageUpload

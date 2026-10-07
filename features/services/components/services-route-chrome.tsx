@@ -26,3 +26,23 @@ export function FlowRouteOnly({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   return isAccountRoute(pathname) ? null : <>{children}</>;
 }
+
+// The contract wizard and the lessor-change flow are focused, full-attention
+// flows: no footer at all (copyright / terms / privacy live inside the payment
+// step's disclaimer).
+function isFocusedFlowRoute(pathname: string): boolean {
+  return (
+    pathname === "/create-contract" ||
+    pathname.startsWith("/create-contract/") ||
+    pathname === "/lessor-change" ||
+    pathname.startsWith("/lessor-change/")
+  );
+}
+
+/** Renders its children on service flows EXCEPT the focused flows above. */
+export function FlowRouteFooterOnly({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  return isAccountRoute(pathname) || isFocusedFlowRoute(pathname) ? null : (
+    <>{children}</>
+  );
+}

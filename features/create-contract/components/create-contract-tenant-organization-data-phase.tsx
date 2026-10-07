@@ -18,6 +18,7 @@ import {
   UNIFIED_RECORD_NUMBER_LENGTH,
 } from "@/lib/validation/format-unified-record-number-for-form";
 import { toSaudiMobileInputValue } from "@/lib/validation/format-saudi-mobile-for-form";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractTenantOrganizationDataPhaseProps = {
   labels: CreateContractLabels["tenant"]["organizationData"];
@@ -28,7 +29,7 @@ type CreateContractTenantOrganizationDataPhaseProps = {
 };
 
 function isIdNumberComplete(idNumber: string) {
-  return idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length === 10;
+  return digitsOnly(idNumber).length === 10;
 }
 
 function isUnifiedRecordNumberComplete(unifiedRecordNumber: string) {
@@ -36,7 +37,7 @@ function isUnifiedRecordNumberComplete(unifiedRecordNumber: string) {
     return false;
   }
 
-  const digits = unifiedRecordNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+  const digits = digitsOnly(unifiedRecordNumber);
   return digits.length === UNIFIED_RECORD_NUMBER_LENGTH && digits.startsWith("7");
 }
 
@@ -109,7 +110,7 @@ export default function CreateContractTenantOrganizationDataPhase({
           onChange={(ownerIdNumber) =>
             updateField(
               "ownerIdNumber",
-              ownerIdNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").slice(0, 10),
+              digitsOnly(ownerIdNumber).slice(0, 10),
             )
           }
           icon={IdCard}

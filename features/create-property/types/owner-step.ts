@@ -55,7 +55,7 @@ export const EMPTY_PROPERTY_OWNER_DATA: PropertyOwnerDataState = {
 
 export const EMPTY_PROPERTY_AGENT_DATA: PropertyAgentDataState = {
   idNumber: "",
-  birthDate: { ...EMPTY_PROPERTY_BIRTH_DATE, calendarType: "gregorian" },
+  birthDate: { ...EMPTY_PROPERTY_BIRTH_DATE },
   phone: "",
   powerOfAttorneyFiles: [],
 };

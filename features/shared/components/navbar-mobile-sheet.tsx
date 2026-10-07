@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import {
+  ArrowLeftRight,
   ArrowUpLeft,
   BookOpen,
   Building2,
@@ -124,6 +125,11 @@ export default function NavbarMobileSheet({
     { href: "/guide", label: guide, icon: <BookOpen className="size-4" aria-hidden="true" /> },
     { href: "/support", label: support, icon: <LifeBuoy className="size-4" aria-hidden="true" /> },
     { href: "/track", label: track, icon: <Search className="size-4" aria-hidden="true" /> },
+    {
+      href: "/service/lessor-change",
+      label: tNav("nav.lessorChange"),
+      icon: <ArrowLeftRight className="size-4" aria-hidden="true" />,
+    },
   ];
 
   function renderRow({ href, label, icon }: MobileRow) {
@@ -166,18 +172,18 @@ export default function NavbarMobileSheet({
       >
         <SheetHeader className="border-b border-border/60 pb-4 flex flex-row items-center justify-between">
           <SheetTitle className="sr-only">{menu}</SheetTitle>
-          <div className="flex items-center gap-3 pe-8">
+          <div className="flex min-w-0 items-center gap-3 pe-8">
             <Image
               src="/images/logo.png"
               alt=""
-              width={32}
-              height={32}
-              className="w-10 object-contain"
+              width={100}
+              height={100}
+              className="size-11 shrink-0 object-contain"
               aria-hidden="true"
             />
-            <div className="min-w-0 space-y-1">
-              <p className="text-xl font-bold text-brand">{brandName}</p>
-              <p className="truncate text-sm text-gray-600 dark:text-white/60 font-medium">
+            <div className="flex min-w-0 flex-col justify-center gap-0.5">
+              <p className="whitespace-nowrap text-xl font-bold leading-tight text-brand">{brandName}</p>
+              <p className="hidden whitespace-nowrap text-sm font-medium leading-tight text-gray-600 min-[400px]:block dark:text-white/60">
                 {brandTagline}
               </p>
             </div>

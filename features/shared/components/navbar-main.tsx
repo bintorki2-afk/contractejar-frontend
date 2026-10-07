@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import {
+  ArrowLeftRight,
   ArrowUpLeft,
   BookOpen,
   Building2,
@@ -95,6 +97,7 @@ export default function NavbarMain({
   notifications,
   dialogLabels,
 }: NavbarMainProps) {
+  const tNav = useTranslations("navbar.nav");
   const homeItem: NavItem = {
     href: "/",
     label: home,
@@ -137,6 +140,11 @@ export default function NavbarMain({
       label: track,
       icon: <Search className="size-4" aria-hidden="true" />,
     },
+    {
+      href: "/service/lessor-change",
+      label: tNav("lessorChange"),
+      icon: <ArrowLeftRight className="size-4" aria-hidden="true" />,
+    },
   ];
 
   return (
@@ -148,20 +156,21 @@ export default function NavbarMain({
           "dark:bg-[#151c1b] dark:border dark:border-[#232b2a]",
         )}
       >
-        <Link href="/" className="flex min-w-0 items-center gap-3">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3">
           <Image
             src="/images/logo.png"
             alt=""
             width={100}
             height={100}
-            className="w-8 object-contain"
+            className="size-11 shrink-0 object-contain md:size-12"
             aria-hidden="true"
           />
-          <div className="min-w-0 space-y-1">
-            <p className="text-xl font-bold leading-tight text-brand">
+          <div className="flex min-w-0 flex-col justify-center gap-0.5">
+            <p className="whitespace-nowrap text-xl font-bold leading-tight text-brand">
               {brandName}
             </p>
-            <p className="truncate text-sm font-medium text-gray-600 dark:text-white/55">
+            {/* The tagline is never ellipsised: shown whole from `sm`, hidden below. */}
+            <p className="hidden whitespace-nowrap text-sm font-medium leading-tight text-gray-600 sm:block dark:text-white/55">
               {brandTagline}
             </p>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -13,9 +13,10 @@ import CreateContractFormSelect from "@/features/create-contract/components/crea
 import CreateContractLeaseRenewalAddressChoice from "@/features/create-contract/components/create-contract-lease-renewal-address-choice";
 import CreateContractLeaseRenewalInstrumentUpload from "@/features/create-contract/components/create-contract-lease-renewal-instrument-upload";
 import CreateContractLeaseRenewalNotice from "@/features/create-contract/components/create-contract-lease-renewal-notice";
-import CreateContractStageAccordion, {
-  type StageAccordionState,
-} from "@/features/create-contract/components/create-contract-stage-accordion";
+import CreateContractStageCard, {
+  type StageCardState,
+} from "@/features/create-contract/components/create-contract-stage-card";
+import CreateContractDeedSurchargeNote from "@/features/create-contract/components/create-contract-deed-surcharge-note";
 import CreateContractStepNavigation from "@/features/create-contract/components/create-contract-step-navigation";
 import { Switch } from "@/components/ui/switch";
 import { useCreateContractDeedStep } from "@/features/create-contract/hooks/use-create-contract-deed-step";
@@ -124,30 +125,15 @@ export default function CreateContractDeedStep({
   const deedTypePopup = useInstrumentTypeDeedPopup("contract");
   const supportsManualEntry = deedTypeSupportsManualEntry(selectedDeedType);
 
-  // Progressive stages: only one open at a time. The deed stage opens first;
-  // once it's complete it folds up (keeping an edit affordance) and the national
-  // address stage opens automatically.
-  const [openStage, setOpenStage] = useState<"deed" | "address">("deed");
-  const deedWasComplete = useRef(isDeedComplete);
-
-  useEffect(() => {
-    if (!deedWasComplete.current && isDeedComplete && showNationalAddress) {
-      setOpenStage("address");
-    }
-    deedWasComplete.current = isDeedComplete;
-  }, [isDeedComplete, showNationalAddress]);
-
   const deedPhase = labels.phases[0];
   const addressPhase = labels.phases[1];
 
-  const selectedDeedTypeLabel =
-    selectedDeedType !== "" ? labels.deedType.types[selectedDeedType] : "";
-  const deedSummary = selectedDeedTypeLabel || deedPhase.title;
-  const addressSummary = addressPhase.subtitle;
-
-  const addressStageState: StageAccordionState = !isDeedComplete
+  // Stages never fold: the deed card is always editable, and the national
+  // address card stays locked (greyed) until the deed part is complete.
+  const deedStageState: StageCardState = isDeedComplete ? "complete" : "active";
+  const addressStageState: StageCardState = !isDeedComplete
     ? "locked"
-    : isAddressComplete && openStage !== "address"
+    : isAddressComplete
       ? "complete"
       : "active";
   const leaseRenewalNotice =
@@ -178,8 +164,6 @@ export default function CreateContractDeedStep({
 
     if (!canContinue) {
       setShowFieldErrors(true);
-      // Open whichever stage still has missing fields so the errors are visible.
-      setOpenStage(!isDeedComplete ? "deed" : "address");
       toast.error(tIncomplete("incompleteContinue"));
       setTimeout(scrollToFirstInvalidField, 0);
       return;
@@ -521,14 +505,11 @@ export default function CreateContractDeedStep({
     <>
       <div className="p-3 md:p-5">
         <div className="space-y-3">
-          <CreateContractStageAccordion
+          <CreateContractStageCard
             index={1}
             title={deedPhase.title}
             subtitle={deedPhase.subtitle}
-            state={openStage === "deed" ? "active" : "complete"}
-            open={openStage === "deed"}
-            onToggle={() => setOpenStage("deed")}
-            summary={deedSummary}
+            state={deedStageState}
           >
             <div className="space-y-3">
               <CreateContractDeedTypeSelect
@@ -538,6 +519,8 @@ export default function CreateContractDeedStep({
                 locked={isInstrumentTypeLocked}
                 invalid={showFieldErrors && selectedDeedType === ""}
               />
+
+              <CreateContractDeedSurchargeNote deedType={selectedDeedType} />
 
               {isLeaseRenewal && leaseRenewalNotice ? (
                 <CreateContractLeaseRenewalNotice message={leaseRenewalNotice} />
@@ -556,18 +539,15 @@ export default function CreateContractDeedStep({
 
               {renderDeedInstrumentContent()}
             </div>
-          </CreateContractStageAccordion>
+          </CreateContractStageCard>
 
           {showNationalAddress ? (
-            <CreateContractStageAccordion
+            <CreateContractStageCard
               index={2}
               title={addressPhase.title}
               subtitle={addressPhase.subtitle}
               state={addressStageState}
-              open={openStage === "address"}
-              onToggle={() => setOpenStage("address")}
-              summary={addressSummary}
-              lockedLabel={deedPhase.title}
+              lockedLabel={labels.phases[1].lockedHint ?? deedPhase.title}
             >
               <div className="space-y-3">
                 {isLeaseRenewal && labels.leaseRenewal ? (
@@ -594,7 +574,7 @@ export default function CreateContractDeedStep({
                   />
                 ) : null}
               </div>
-            </CreateContractStageAccordion>
+            </CreateContractStageCard>
           ) : null}
         </div>
 

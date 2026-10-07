@@ -48,7 +48,9 @@ export default function CreateUnitAreaField({
           inputMode="decimal"
           value={value}
           onChange={(event) => {
-            const nextValue = event.target.value.replace(/[^\d.]/g, "");
+            const nextValue = event.target.value
+              .replace(/٫/g, ".")
+              .replace(/[^\d.]/g, "");
             onChange(nextValue);
           }}
           placeholder={placeholder}

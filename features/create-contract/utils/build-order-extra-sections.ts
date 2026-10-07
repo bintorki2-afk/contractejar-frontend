@@ -1,13 +1,18 @@
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
-import type { BirthDateValue } from "@/features/create-contract/types/owner-step";
+import type { ContractPeriodOption } from "@/features/create-contract/types/contract-period";
+import { mapDeedTypeToInstrumentType } from "@/features/create-contract/utils/map-deed-type-to-instrument-type";
+import { resolveFinanceDurationMonths } from "@/features/create-contract/utils/resolve-finance-duration-months";
+import type { PropertyContractType } from "@/features/create-property/utils/contract-type";
 import {
-  deedTypeIsDeceasedOwner,
-  deedTypeIsWaqfOwner,
-} from "@/features/create-contract/types/deed-type";
-import type { TenantRole } from "@/features/create-contract/types/tenant-role";
-import { getFilledOtherConditions } from "@/features/create-contract/types/finance-step";
-import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
+  computeContractFee,
+  FALLBACK_CONTRACT_PRICING,
+  getMeterTransferFee,
+  getPricingTier,
+  instrumentTypeHasSurcharge,
+  type ContractPricing,
+} from "@/features/pricing/types/contract-pricing";
 import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
+import { digitsOnly } from "@/lib/utils/digits";
 
 export type OrderSection = {
   title: string;
@@ -15,20 +20,6 @@ export type OrderSection = {
 };
 
 export type LabelledAttachment = { file: File; label: string };
-
-function dateLabel(value: BirthDateValue): string {
-  if (!value.day || !value.month || !value.year) {
-    return "";
-  }
-
-  return `${value.day}/${value.month}/${value.year} (${
-    value.calendarType === "hijri" ? "هجري" : "ميلادي"
-  })`;
-}
-
-function yesNo(value: boolean): string {
-  return value ? "نعم" : "لا";
-}
 
 function pick(files: File[], persisted: PersistedFile[]): File[] {
   if (files.length > 0 && files[0] instanceof File) {
@@ -40,132 +31,112 @@ function pick(files: File[], persisted: PersistedFile[]): File[] {
 
 /**
  * Everything the review summary leaves out but the business needs to act on
- * the order (agent/representative, deed details, tenant obligations, extra
- * conditions, unit extras, coupon). Appended to the Telegram/intake payload.
+ * the order: the fee breakdown (duration rule + document surcharge + meter
+ * transfer fees), shared-meter contract terms, map location and coupon.
+ * Owner/agent, units, tenant obligations and extra conditions already come
+ * through the review sections. Appended to the Telegram/intake payload.
  */
-export function buildOrderExtraSections(roles: TenantRole[] = []): OrderSection[] {
-  const { deed, owner, tenant, financeData, paymentData } =
+export function buildOrderExtraSections(
+  pricing: ContractPricing = FALLBACK_CONTRACT_PRICING,
+  periods: ContractPeriodOption[] = [],
+): OrderSection[] {
+  const { deed, tenant, financeData, paymentData, contractSession } =
     useCreateContractDraftStore.getState();
   const sections: OrderSection[] = [];
+  const contractType: PropertyContractType =
+    contractSession?.contractType ?? "housing";
+
+  // ── الموقع على الخريطة ──
+  if (deed.mapLocation && (deed.mapLocation.lat || deed.mapLocation.lng)) {
+    sections.push({
+      title: "تفاصيل الصك",
+      fields: [
+        {
+          label: "الموقع على الخريطة",
+          value: `https://maps.google.com/?q=${deed.mapLocation.lat},${deed.mapLocation.lng}`,
+        },
+      ],
+    });
+  }
+
+  // ── الرسوم (تقديرية حسب لائحة الأسعار) ──
+  const feeFields: OrderSection["fields"] = [];
+  const totalMonths = resolveFinanceDurationMonths(financeData, periods);
+  const tier = getPricingTier(pricing, contractType);
+  let estimatedTotal = 0;
+
+  if (totalMonths !== null) {
+    const { billableYears, fee } = computeContractFee(tier, totalMonths);
+    estimatedTotal += fee;
+    feeFields.push({
+      label: "رسوم التوثيق",
+      value: `${fee} ريال (${totalMonths} شهر = ${billableYears} سنة محاسبية)`,
+    });
+  }
 
   const deedType = deed.selectedDeedType;
-  const isDeceased = deedTypeIsDeceasedOwner(deedType);
-  const isWaqf = deedTypeIsWaqfOwner(deedType);
-
-  // ── تفاصيل الصك ──
-  const deedFields: OrderSection["fields"] = [];
-  if (deed.useManualDeedEntry && isManualDeedEntryComplete(deed.manualDeedEntry)) {
-    const m = deed.manualDeedEntry;
-    deedFields.push(
-      { label: "رقم الصك", value: m.instrumentNumber },
-      {
-        label: "تاريخ الصك",
-        value: `${m.instrumentHistoryDay}/${m.instrumentHistoryMonth}/${m.instrumentHistoryYear} (${
-          m.typeInstrumentHistory === "hijri" ? "هجري" : "ميلادي"
-        })`,
-      },
-    );
-  }
-  if (isDeceased) {
-    deedFields.push({ label: "يوجد ورثة قاصرون", value: yesNo(deed.hasMinorHeirs) });
-  }
-  if (isWaqf) {
-    deedFields.push({
-      label: "صك نظارة متعدد النظار",
-      value: yesNo(deed.isMultipleTrusteeshipDeedCopy),
+  const surchargeApplies =
+    deedType !== "" &&
+    instrumentTypeHasSurcharge(pricing, mapDeedTypeToInstrumentType(deedType));
+  if (surchargeApplies) {
+    estimatedTotal += pricing.document_surcharge.fee;
+    feeFields.push({
+      label: "رسوم المستندات الإضافية",
+      value: `${pricing.document_surcharge.fee} ريال (مرة واحدة)`,
     });
   }
-  if (deed.mapLocation && (deed.mapLocation.lat || deed.mapLocation.lng)) {
-    deedFields.push({
-      label: "الموقع على الخريطة",
-      value: `https://maps.google.com/?q=${deed.mapLocation.lat},${deed.mapLocation.lng}`,
-    });
-  }
-  if (deedFields.length > 0) {
-    sections.push({ title: "تفاصيل الصك", fields: deedFields });
-  }
 
-  // ── الوكيل / الممثل القانوني ──
-  const hasAgent = owner.ownerData.hasAgent === "yes" || isDeceased || isWaqf;
-  if (hasAgent) {
-    const a = owner.agentData;
-    const title = isDeceased
-      ? "وكيل الورثة"
-      : isWaqf
-        ? "ناظر الوقف"
-        : "وكيل المالك";
-    const fields: OrderSection["fields"] = [
-      { label: "رقم الهوية", value: a.idNumber },
-      { label: "رقم الجوال", value: a.phone },
-      { label: "تاريخ الميلاد", value: dateLabel(a.birthDate) },
-    ];
-    if (a.poaNumber.trim()) {
-      fields.push({ label: "رقم الوكالة", value: a.poaNumber.trim() });
+  let meterTransferTotal = 0;
+  tenant.rentedUnits.forEach((unit) => {
+    if (unit.addElectricityMeter && unit.electricityMeterRegistration === "tenant") {
+      meterTransferTotal += getMeterTransferFee(pricing, contractType, "electricity");
     }
-    if (a.poaDate.trim()) {
-      fields.push({ label: "تاريخ الوكالة", value: a.poaDate.trim() });
-    }
-    const poaFiles = pick(a.powerOfAttorneyFiles, owner.agentPersistedFiles);
-    fields.push({ label: "صورة الوكالة", value: poaFiles.length > 0 ? "مرفقة" : "غير مرفقة" });
-    sections.push({ title, fields: fields.filter((f) => f.value !== "") });
-  }
-
-  // ── تفاصيل الوحدات الإضافية ──
-  tenant.rentedUnits.forEach((unit, index) => {
-    const prefix = tenant.rentedUnits.length > 1 ? `الوحدة ${index + 1} — ` : "";
-    const fields: OrderSection["fields"] = [];
-    if (unit.windowAcCount) {
-      fields.push({ label: "مكيفات شباك", value: unit.windowAcCount });
-    }
-    if (unit.splitAcCount) {
-      fields.push({ label: "مكيفات سبليت", value: unit.splitAcCount });
-    }
-    fields.push({
-      label: "مؤثثة",
-      value: unit.furnished ? `نعم${unit.furnishingType ? ` (${unit.furnishingType})` : ""}` : "لا",
-    });
-    if (unit.addElectricityMeter && unit.electricityMeterNumber) {
-      fields.push({
-        label: "عداد الكهرباء",
-        value: `${unit.electricityMeterNumber}${
-          unit.electricityMeterRegistration ? ` — باسم ${unit.electricityMeterRegistration}` : ""
-        }`,
-      });
-    }
-    if (unit.addWaterMeter && unit.waterMeterNumber) {
-      fields.push({
-        label: "عداد الماء",
-        value: `${unit.waterMeterNumber}${
-          unit.waterMeterRegistration ? ` — باسم ${unit.waterMeterRegistration}` : ""
-        }`,
-      });
-    }
-    if (fields.length > 0) {
-      sections.push({ title: `${prefix}تجهيزات الوحدة`, fields });
+    if (unit.addWaterMeter && unit.waterMeterRegistration === "tenant") {
+      meterTransferTotal += getMeterTransferFee(pricing, contractType, "water");
     }
   });
-
-  // ── التزامات المستأجر ──
-  if (financeData.selectedTenantRoleIds.length > 0) {
-    const byId = new Map(roles.map((role) => [role.id, role]));
-    const fields = financeData.selectedTenantRoleIds.map((id) => {
-      const role = byId.get(id);
-      const value = financeData.tenantRoleValues[String(id)]?.trim() ?? "";
-      return {
-        label: role?.name ?? `بند ${id}`,
-        value: value ? `${value}${role?.input_field_label ? ` (${role.input_field_label})` : ""}` : "نعم",
-      };
+  if (meterTransferTotal > 0) {
+    estimatedTotal += meterTransferTotal;
+    feeFields.push({
+      label: "رسوم نقل العدادات باسم المستأجر",
+      value: `${meterTransferTotal} ريال`,
     });
-    sections.push({ title: "التزامات المستأجر", fields });
   }
 
-  // ── الشروط الإضافية ──
-  const conditions = getFilledOtherConditions(financeData.otherConditionsList);
-  if (conditions.length > 0) {
-    sections.push({
-      title: "الشروط الإضافية",
-      fields: conditions.map((text, index) => ({ label: `شرط ${index + 1}`, value: text })),
+  if (feeFields.length > 0) {
+    feeFields.push({
+      label: "الإجمالي التقديري",
+      value: `${estimatedTotal} ريال (الإجمالي النهائي من الخادم)`,
     });
+    sections.push({ title: "الرسوم", fields: feeFields });
+  }
+
+  // ── بنود العداد المشترك (يدفعها المستأجر للمالك — ليست من رسومنا) ──
+  const sharedFields: OrderSection["fields"] = [];
+  tenant.rentedUnits.forEach((unit, index) => {
+    const prefix = tenant.rentedUnits.length > 1 ? `الوحدة ${index + 1} — ` : "";
+    const line = (label: string, fee: string) => {
+      const monthly = Number(digitsOnly(fee)) || 0;
+      if (monthly <= 0) {
+        return;
+      }
+      sharedFields.push({
+        label: `${prefix}${label}`,
+        value:
+          totalMonths !== null
+            ? `${monthly} ريال/شهر × ${totalMonths} شهر = ${monthly * totalMonths} ريال`
+            : `${monthly} ريال/شهر`,
+      });
+    };
+    if (unit.addElectricityMeter && unit.electricityMeterRegistration === "shared") {
+      line("عداد الكهرباء المشترك", unit.electricitySharedMonthlyFee);
+    }
+    if (unit.addWaterMeter && unit.waterMeterRegistration === "shared") {
+      line("عداد المياه المشترك", unit.waterSharedMonthlyFee);
+    }
+  });
+  if (sharedFields.length > 0) {
+    sections.push({ title: "بنود العداد المشترك (بند في العقد)", fields: sharedFields });
   }
 
   // ── الكوبون ──

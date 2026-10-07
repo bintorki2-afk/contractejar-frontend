@@ -3,10 +3,14 @@
 import { apiRequest } from "@/lib/api/api-request";
 
 export type TrackedOrder = {
+  /** `lessor_change` for a «تغيير المؤجر» request; absent/`contract` for a contract. */
+  kind?: "contract" | "lessor_change" | string;
   order_number: string;
   id: number;
   uuid: string;
-  contract_type: "housing" | "commercial";
+  contract_type: "housing" | "commercial" | "lessor_change";
+  /** Lessor-change requests only. */
+  fee?: number | null;
   name_real_estate: string | null;
   step: number;
   is_draft: boolean;

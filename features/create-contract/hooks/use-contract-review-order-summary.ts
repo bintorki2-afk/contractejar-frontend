@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import { useContractPeriods } from "@/features/create-contract/hooks/use-contract-periods";
 import { usePaymentTypes } from "@/features/create-contract/hooks/use-payment-types";
+import { useTenantRoles } from "@/features/create-contract/hooks/use-tenant-roles";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
@@ -12,150 +14,172 @@ import {
   deedTypeIsDeceasedOwner,
   deedTypeIsLeaseRenewal,
   deedTypeIsSalePaper,
+  deedTypeIsWaqfOwner,
   type DeedTypeId,
 } from "@/features/create-contract/types/deed-type";
+import { getFilledOtherConditions } from "@/features/create-contract/types/finance-step";
 import type { BirthDateValue } from "@/features/create-contract/types/owner-step";
 import type {
+  CreateContractReviewAttachment,
   CreateContractReviewField,
   CreateContractReviewOrderSummary,
   CreateContractReviewSection,
 } from "@/features/create-contract/types/create-contract-review-order";
+import { isRentedUnitDataComplete } from "@/features/create-contract/types/rented-unit-step";
 import { isOrganizationTenantStatus } from "@/features/create-contract/types/tenant-step";
 import { resolveContractAssetUrl } from "@/features/create-contract/utils/build-existing-contract-draft";
 import { isOwnerStepSkipped } from "@/features/create-contract/utils/is-owner-step-skipped";
 import { isSubleaseContract } from "@/features/create-contract/utils/is-sublease-contract";
-import { parseContractPeriodLabel } from "@/features/create-contract/utils/parse-contract-period-label";
+import { formatContractDurationLabel } from "@/features/create-contract/utils/format-contract-duration-label";
+import { resolveFinanceDurationMonths } from "@/features/create-contract/utils/resolve-finance-duration-months";
+import { getTenantRoleTitle } from "@/features/create-contract/utils/tenant-role-helpers";
 import {
   useUnitTypeOptions,
   useUnitUsageOptions,
 } from "@/features/create-unit/hooks/use-unit-lookup-options";
+import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
+import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
+import { digitsOnly } from "@/lib/utils/digits";
+import { convertToOtherCalendar, formatDateParts } from "@/lib/utils/hijri";
 
 type ReviewDialogLabels = CreateContractLabels["payment"]["reviewDialog"];
 
-function withCount(template: string, count: number) {
-  return template.replaceAll("{count}", String(count));
+type DeedAttachmentLabels = {
+  label: string;
+  salePaperLabel?: string;
+  frontLabel?: string;
+  backLabel?: string;
+  inheritanceLabel?: string;
+  heirsPoaLabel?: string;
+  endowmentCertLabel?: string;
+  trusteeshipLabel?: string;
+  guardiansPoaLabel?: string;
+  deceasedDeedLabel?: string;
+};
+
+function hasValue(value: string | null | undefined): value is string {
+  return typeof value === "string" && value.trim() !== "";
 }
 
-function displayValue(value: string | null | undefined, emptyValue: string) {
-  const trimmed = value?.trim() ?? "";
-  return trimmed === "" ? emptyValue : trimmed;
+/** Push a label/value row only when there is a value (no empty «—» rows). */
+function pushField(
+  fields: CreateContractReviewField[],
+  label: string,
+  value: string | null | undefined,
+  extra?: Partial<CreateContractReviewField>,
+) {
+  if (!hasValue(value)) {
+    return false;
+  }
+
+  fields.push({ label, value: value.trim(), ...extra });
+  return true;
+}
+
+function isBirthDateFilled(value: BirthDateValue) {
+  return Boolean(value.day && value.month && value.year);
 }
 
 function formatBirthDate(
   value: BirthDateValue,
   calendarLabels: ReviewDialogLabels["calendar"],
-  emptyValue: string,
-) {
-  if (!value.day || !value.month || !value.year) {
-    return emptyValue;
+): string | null {
+  if (!isBirthDateFilled(value)) {
+    return null;
   }
 
   const calendar =
-    value.calendarType === "hijri"
-      ? calendarLabels.hijri
-      : calendarLabels.gregorian;
+    value.calendarType === "hijri" ? calendarLabels.hijri : calendarLabels.gregorian;
 
-  return `${value.day}/${value.month}/${value.year} (${calendar})`;
+  return `${Number(digitsOnly(value.day))}/${Number(digitsOnly(value.month))}/${digitsOnly(value.year)} (${calendar})`;
 }
 
-function formatStartDate(value: BirthDateValue, emptyValue: string) {
-  if (!value.day || !value.month || !value.year) {
-    return emptyValue;
+/** Start date as typed plus the other calendar's equivalent for clarity. */
+function formatStartDate(
+  value: BirthDateValue,
+  calendarLabels: ReviewDialogLabels["calendar"],
+): string | null {
+  const typed = formatBirthDate(value, calendarLabels);
+  if (!typed) {
+    return null;
   }
 
-  const day = value.day.padStart(2, "0");
-  const month = value.month.padStart(2, "0");
-  return `${value.year}-${month}-${day}`;
-}
-
-function indexedLabel(baseLabel: string, index: number, total: number) {
-  return total > 1 ? `${baseLabel} (${index + 1})` : baseLabel;
-}
-
-function pushLocalAttachmentFields(
-  fields: CreateContractReviewField[],
-  files: File[],
-  label: string,
-  localKey: string,
-) {
-  files.forEach((_, index) => {
-    const displayLabel = indexedLabel(label, index, files.length);
-    fields.push({
-      label: displayLabel,
-      value: displayLabel,
-      viewUrl: `local:${localKey}:${index}`,
-    });
-  });
-}
-
-function pushRemoteAttachmentField(
-  fields: CreateContractReviewField[],
-  url: string | null | undefined,
-  label: string,
-) {
-  const resolved = resolveContractAssetUrl(url);
-  if (!resolved) {
-    return;
+  const other = convertToOtherCalendar(value);
+  if (!other) {
+    return typed;
   }
 
-  fields.push({
-    label,
-    value: label,
-    viewUrl: resolved,
-  });
+  const otherCalendar =
+    other.calendar === "hijri" ? calendarLabels.hijri : calendarLabels.gregorian;
+
+  return `${typed} ≈ ${formatDateParts(other)} (${otherCalendar})`;
 }
 
-function pushAttachmentGroup(args: {
-  fields: CreateContractReviewField[];
-  files: File[];
-  remoteUrl?: string | null;
-  label: string;
-  localKey: string;
-}) {
-  if (args.files.length > 0) {
-    pushLocalAttachmentFields(
-      args.fields,
-      args.files,
-      args.label,
-      args.localKey,
-    );
-    return;
-  }
-
-  pushRemoteAttachmentField(args.fields, args.remoteUrl, args.label);
-}
-
-function isUnitDataEmpty(unit: {
-  unitTypeId: string;
-  unitUsageId: string;
-  unitNumber: string;
-  floorNumber: string;
-  totalArea: string;
-} | undefined) {
-  if (!unit) {
+function isImageFile(name: string, type?: string) {
+  if (type && type.startsWith("image/")) {
     return true;
   }
 
-  return !(
-    unit.unitTypeId ||
-    unit.unitUsageId ||
-    unit.unitNumber.trim() ||
-    unit.floorNumber.trim() ||
-    unit.totalArea.trim()
-  );
+  return /\.(png|jpe?g|webp|gif|bmp|heic)$/i.test(name);
 }
 
-function buildManualAddressValue(
-  manual: {
-    neighborhood: string;
-    street: string;
-    buildingNumber: string;
-    postalCode: string;
-    extraFigure: string;
+function resolveFiles(files: File[], persisted: PersistedFile[]): File[] {
+  if (files.length > 0 && files[0] instanceof File) {
+    return files;
+  }
+
+  return persistedToFiles(persisted);
+}
+
+function pushAttachments(
+  attachments: CreateContractReviewAttachment[],
+  args: {
+    files: File[];
+    persisted?: PersistedFile[];
+    remoteUrl?: string | null;
+    label: string;
   },
-  emptyValue: string,
 ) {
-  const parts = [
+  const files = resolveFiles(args.files, args.persisted ?? []);
+
+  if (files.length > 0) {
+    files.forEach((file, index) => {
+      attachments.push({
+        label:
+          files.length > 1 ? `${args.label} (${index + 1}/${files.length})` : args.label,
+        fileName: file.name,
+        size: file.size,
+        isImage: isImageFile(file.name, file.type),
+        file,
+      });
+    });
+    return true;
+  }
+
+  const resolved = resolveContractAssetUrl(args.remoteUrl);
+  if (!resolved) {
+    return false;
+  }
+
+  const fileName = decodeURIComponent(resolved.split("?")[0].split("/").pop() ?? "");
+  attachments.push({
+    label: args.label,
+    fileName: fileName || args.label,
+    size: null,
+    isImage: isImageFile(fileName),
+    remoteUrl: resolved,
+  });
+  return true;
+}
+
+function buildManualAddressValue(manual: {
+  neighborhood: string;
+  street: string;
+  buildingNumber: string;
+  postalCode: string;
+  extraFigure: string;
+}): string {
+  return [
     manual.neighborhood,
     manual.street,
     manual.buildingNumber,
@@ -163,306 +187,207 @@ function buildManualAddressValue(
     manual.extraFigure,
   ]
     .map((part) => part.trim())
-    .filter(Boolean);
-
-  return parts.length > 0 ? parts.join("، ") : emptyValue;
+    .filter(Boolean)
+    .join("، ");
 }
 
 export function useContractReviewOrderSummary(
   labels: ReviewDialogLabels,
   contractType: ContractTypeId,
   deedTypeLabels: Record<DeedTypeId, string>,
-  deedAttachmentLabels: {
-    label: string;
-    salePaperLabel?: string;
-    frontLabel?: string;
-    backLabel?: string;
-    inheritanceLabel?: string;
-    heirsPoaLabel?: string;
-    endowmentCertLabel?: string;
-    trusteeshipLabel?: string;
-    guardiansPoaLabel?: string;
-    deceasedDeedLabel?: string;
-  },
+  deedAttachmentLabels: DeedAttachmentLabels,
 ): CreateContractReviewOrderSummary {
+  const t = useTranslations("createContract.review");
   const propertyContractType = toPropertyContractType(contractType);
   const contractPeriodsQuery = useContractPeriods(propertyContractType);
   const paymentTypesQuery = usePaymentTypes(propertyContractType);
   const unitTypesQuery = useUnitTypeOptions(propertyContractType);
   const unitUsageQuery = useUnitUsageOptions(propertyContractType);
+  const tenantRolesQuery = useTenantRoles();
 
-  const contractId = useCreateContractDraftStore(
-    (state) => state.contractSession?.contractId ?? state.contractStep1Data?.contract_id,
-  );
-  const contractUuid = useCreateContractDraftStore(
-    (state) => state.contractSession?.uuid ?? state.contractStep1Data?.uuid ?? "",
-  );
-  const selectedDeedType = useCreateContractDraftStore(
-    (state) => state.deed.selectedDeedType,
-  );
-  const instrumentType = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.instrument_type,
-  );
-  const instrumentTypeTrans = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.instrument_type_trans,
-  );
-  const deedFiles = useCreateContractDraftStore((state) => state.deed.deedFiles);
-  const deedFrontFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedFrontFiles,
-  );
-  const deedBackFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedBackFiles,
-  );
-  const deedInheritanceFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedInheritanceFiles,
-  );
-  const deedHeirsPoaFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedHeirsPoaFiles,
-  );
-  const deedEndowmentCertFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedEndowmentCertFiles,
-  );
-  const deedTrusteeshipFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedTrusteeshipFiles,
-  );
-  const deedGuardiansPoaFiles = useCreateContractDraftStore(
-    (state) => state.deed.deedGuardiansPoaFiles,
-  );
-  const imageInstrument = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.image_instrument,
-  );
-  const imageInstrumentFront = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.image_instrument_from_the_front,
-  );
-  const imageInstrumentBack = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.image_instrument_from_the_back,
-  );
-  const imageInheritance = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.Image_inheritance_certificate,
-  );
-  const imageHeirsPoa = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.copy_power_of_attorney_from_heirs_to_agent,
-  );
-  const imageEndowmentCert = useCreateContractDraftStore(
-    (state) =>
-      state.contractStep1Data?.copy_of_the_endowment_registration_certificate,
-  );
-  const imageTrusteeship = useCreateContractDraftStore(
-    (state) => state.contractStep1Data?.copy_of_the_trusteeship_deed,
-  );
-  const imageGuardiansPoa = useCreateContractDraftStore(
-    (state) =>
-      state.contractStep1Data?.copy_of_guardians_power_of_attorney_for_agent,
-  );
+  const contractSession = useCreateContractDraftStore((state) => state.contractSession);
+  const contractStep1Data = useCreateContractDraftStore((state) => state.contractStep1Data);
+  const contractStep2Data = useCreateContractDraftStore((state) => state.contractStep2Data);
   const existingPropertyImage = useCreateContractDraftStore(
     (state) => state.existingPropertyContext?.property.image_instrument,
   );
-  const leaseRenewalAddressMode = useCreateContractDraftStore(
-    (state) => state.deed.leaseRenewalAddressMode,
-  );
-  const leaseRenewalUnitMode = useCreateContractDraftStore(
-    (state) => state.tenant.leaseRenewalUnitMode,
-  );
-  const nationalAddressMethod = useCreateContractDraftStore(
-    (state) => state.deed.nationalAddressMethod,
-  );
-  const nationalAddressLinkUrl = useCreateContractDraftStore(
-    (state) => state.deed.nationalAddressLinkUrl,
-  );
-  const nationalAddressManual = useCreateContractDraftStore(
-    (state) => state.deed.nationalAddressManual,
-  );
-  const nationalAddressPhotoFiles = useCreateContractDraftStore(
-    (state) => state.deed.nationalAddressPhotoFiles,
-  );
-  const addressUrlFromApi = useCreateContractDraftStore(
-    (state) => state.contractStep2Data?.address_url,
-  );
-  const addressImageFromApi = useCreateContractDraftStore(
-    (state) => state.contractStep2Data?.image_address,
-  );
-  const ownerData = useCreateContractDraftStore((state) => state.owner.ownerData);
-  const tenantData = useCreateContractDraftStore((state) => state.tenant.tenantData);
-  const rentedUnits = useCreateContractDraftStore((state) => state.tenant.rentedUnits);
+  const deed = useCreateContractDraftStore((state) => state.deed);
+  const owner = useCreateContractDraftStore((state) => state.owner);
+  const tenant = useCreateContractDraftStore((state) => state.tenant);
   const financeData = useCreateContractDraftStore((state) => state.financeData);
 
   return useMemo(() => {
     const empty = labels.emptyValue;
+    const selectedDeedType = deed.selectedDeedType;
+    const instrumentType = contractStep1Data?.instrument_type;
     const isSublease = isSubleaseContract({ selectedDeedType, instrumentType });
     const ownerSkipped = isOwnerStepSkipped({ selectedDeedType, instrumentType });
     const isLeaseRenewal = deedTypeIsLeaseRenewal(selectedDeedType);
+    const isDeceased = deedTypeIsDeceasedOwner(selectedDeedType);
+    const isWaqf = deedTypeIsWaqfOwner(selectedDeedType);
+    const periods = contractPeriodsQuery.data ?? [];
 
     const contractTypeLabel =
       contractType === "commercial"
         ? labels.contractTypeCommercial
         : labels.contractTypeResidential;
 
-    const durationLabel = financeData.isCustomDuration
-      ? [
-          financeData.customDurationYears !== "" &&
-          financeData.customDurationYears > 0
-            ? withCount(labels.yearsCount, financeData.customDurationYears)
-            : null,
-          financeData.customDurationMonths !== "" &&
-          financeData.customDurationMonths > 0
-            ? withCount(labels.monthsCount, financeData.customDurationMonths)
-            : null,
-        ]
-          .filter((part): part is string => Boolean(part))
-          .join(" ")
-      : parseContractPeriodLabel(
-          (contractPeriodsQuery.data ?? []).find(
-            (period) => period.id === financeData.contractPeriodId,
-          )?.period ?? "",
-        ).title;
+    const durationLabel = formatContractDurationLabel(financeData, periods, {
+      yearsCount: labels.yearsCount,
+      monthsCount: labels.monthsCount,
+      oneYear: t("durationOneYear"),
+      twoYears: t("durationTwoYears"),
+    });
+    const totalMonths = resolveFinanceDurationMonths(financeData, periods);
 
     const overview = {
       contractType: contractTypeLabel,
-      startDate: formatStartDate(financeData.contractStartDate, empty),
-      duration: displayValue(durationLabel, empty),
+      startDate: formatStartDate(financeData.contractStartDate, labels.calendar) ?? empty,
+      duration: durationLabel || empty,
     };
 
-    const deedTypeLabel =
-      (selectedDeedType ? deedTypeLabels[selectedDeedType] : "") ||
-      instrumentTypeTrans ||
-      empty;
+    const sections: CreateContractReviewSection[] = [];
 
-    const deedAttachmentLabel = deedTypeIsSalePaper(selectedDeedType)
-      ? deedAttachmentLabels.salePaperLabel || deedAttachmentLabels.label
-      : deedTypeIsDeceasedOwner(selectedDeedType)
-        ? deedAttachmentLabels.deceasedDeedLabel || deedAttachmentLabels.label
-        : deedAttachmentLabels.label;
+    // ── 1) Deed ──────────────────────────────────────────────────────────
+    {
+      const fields: CreateContractReviewField[] = [];
+      const attachments: CreateContractReviewAttachment[] = [];
+      const deedTypeLabel =
+        (selectedDeedType ? deedTypeLabels[selectedDeedType] : "") ||
+        contractStep1Data?.instrument_type_trans ||
+        "";
 
-    const deedFields: CreateContractReviewField[] = [
-      {
-        label: labels.fields.documentType,
-        value: displayValue(deedTypeLabel, empty),
-      },
-    ];
+      pushField(fields, labels.fields.documentType, deedTypeLabel);
 
-    const mainDeedLabel = isLeaseRenewal
-      ? labels.fields.leaseRenewalAttachment
-      : deedAttachmentLabel;
+      if (deed.useManualDeedEntry && isManualDeedEntryComplete(deed.manualDeedEntry)) {
+        const m = deed.manualDeedEntry;
+        pushField(fields, t("fields.instrumentNumber"), m.instrumentNumber);
+        pushField(
+          fields,
+          t("fields.instrumentDate"),
+          `${m.instrumentHistoryDay}/${m.instrumentHistoryMonth}/${m.instrumentHistoryYear} (${
+            m.typeInstrumentHistory === "hijri"
+              ? labels.calendar.hijri
+              : labels.calendar.gregorian
+          })`,
+        );
+      }
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedFiles,
-      remoteUrl: imageInstrument ?? existingPropertyImage,
-      label: mainDeedLabel,
-      localKey: "deed",
-    });
+      if (isDeceased) {
+        pushField(
+          fields,
+          t("fields.minorHeirs"),
+          deed.hasMinorHeirs ? t("yes") : t("no"),
+        );
+      }
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedFrontFiles,
-      remoteUrl: imageInstrumentFront,
-      label: deedAttachmentLabels.frontLabel || deedAttachmentLabels.label,
-      localKey: "deed-front",
-    });
+      if (isWaqf) {
+        pushField(
+          fields,
+          t("fields.multipleTrustees"),
+          deed.isMultipleTrusteeshipDeedCopy ? t("yes") : t("no"),
+        );
+      }
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedBackFiles,
-      remoteUrl: imageInstrumentBack,
-      label: deedAttachmentLabels.backLabel || deedAttachmentLabels.label,
-      localKey: "deed-back",
-    });
+      const mainDeedLabel = isLeaseRenewal
+        ? labels.fields.leaseRenewalAttachment
+        : deedTypeIsSalePaper(selectedDeedType)
+          ? deedAttachmentLabels.salePaperLabel || deedAttachmentLabels.label
+          : isDeceased
+            ? deedAttachmentLabels.deceasedDeedLabel || deedAttachmentLabels.label
+            : deedAttachmentLabels.label;
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedInheritanceFiles,
-      remoteUrl: imageInheritance,
-      label:
-        deedAttachmentLabels.inheritanceLabel || deedAttachmentLabels.label,
-      localKey: "deed-inheritance",
-    });
+      pushAttachments(attachments, {
+        files: deed.deedFiles,
+        persisted: deed.deedPersistedFiles,
+        remoteUrl: contractStep1Data?.image_instrument ?? existingPropertyImage,
+        label: mainDeedLabel,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedFrontFiles,
+        persisted: deed.deedFrontPersistedFiles,
+        remoteUrl: contractStep1Data?.image_instrument_from_the_front,
+        label: deedAttachmentLabels.frontLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedBackFiles,
+        persisted: deed.deedBackPersistedFiles,
+        remoteUrl: contractStep1Data?.image_instrument_from_the_back,
+        label: deedAttachmentLabels.backLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedInheritanceFiles,
+        persisted: deed.deedInheritancePersistedFiles,
+        remoteUrl: contractStep1Data?.Image_inheritance_certificate,
+        label: deedAttachmentLabels.inheritanceLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedHeirsPoaFiles,
+        persisted: deed.deedHeirsPoaPersistedFiles,
+        remoteUrl: contractStep1Data?.copy_power_of_attorney_from_heirs_to_agent,
+        label: deedAttachmentLabels.heirsPoaLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedEndowmentCertFiles,
+        persisted: deed.deedEndowmentCertPersistedFiles,
+        remoteUrl: contractStep1Data?.copy_of_the_endowment_registration_certificate,
+        label: deedAttachmentLabels.endowmentCertLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedTrusteeshipFiles,
+        persisted: deed.deedTrusteeshipPersistedFiles,
+        remoteUrl: contractStep1Data?.copy_of_the_trusteeship_deed,
+        label: deedAttachmentLabels.trusteeshipLabel || deedAttachmentLabels.label,
+      });
+      pushAttachments(attachments, {
+        files: deed.deedGuardiansPoaFiles,
+        persisted: deed.deedGuardiansPoaPersistedFiles,
+        remoteUrl: contractStep1Data?.copy_of_guardians_power_of_attorney_for_agent,
+        label: deedAttachmentLabels.guardiansPoaLabel || deedAttachmentLabels.label,
+      });
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedHeirsPoaFiles,
-      remoteUrl: imageHeirsPoa,
-      label: deedAttachmentLabels.heirsPoaLabel || deedAttachmentLabels.label,
-      localKey: "deed-heirs-poa",
-    });
+      const deedIncomplete =
+        selectedDeedType === "" ||
+        (attachments.length === 0 &&
+          !(deed.useManualDeedEntry && isManualDeedEntryComplete(deed.manualDeedEntry)));
 
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedEndowmentCertFiles,
-      remoteUrl: imageEndowmentCert,
-      label:
-        deedAttachmentLabels.endowmentCertLabel || deedAttachmentLabels.label,
-      localKey: "deed-endowment",
-    });
-
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedTrusteeshipFiles,
-      remoteUrl: imageTrusteeship,
-      label:
-        deedAttachmentLabels.trusteeshipLabel || deedAttachmentLabels.label,
-      localKey: "deed-trusteeship",
-    });
-
-    pushAttachmentGroup({
-      fields: deedFields,
-      files: deedGuardiansPoaFiles,
-      remoteUrl: imageGuardiansPoa,
-      label:
-        deedAttachmentLabels.guardiansPoaLabel || deedAttachmentLabels.label,
-      localKey: "deed-guardians-poa",
-    });
-
-    const sections: CreateContractReviewSection[] = [
-      {
+      sections.push({
         id: "deed",
         title: labels.sections.deed,
         editTarget: "deed",
-        fields: deedFields,
-      },
-    ];
+        fields,
+        attachments,
+        incomplete: deedIncomplete,
+        incompleteHint: deedIncomplete ? t("incomplete.deed") : undefined,
+      });
+    }
 
+    // ── 2) National address (not for sublease) ───────────────────────────
     if (!isSublease) {
-      const addressFields: CreateContractReviewField[] = [];
+      const fields: CreateContractReviewField[] = [];
+      const attachments: CreateContractReviewAttachment[] = [];
+      let complete = false;
 
-      if (isLeaseRenewal && leaseRenewalAddressMode === "same") {
-        addressFields.push({
-          label: labels.fields.addressManual,
-          value: labels.sameAddress,
-        });
-      } else if (nationalAddressMethod === "link") {
+      if (isLeaseRenewal && deed.leaseRenewalAddressMode === "same") {
+        pushField(fields, labels.fields.addressManual, labels.sameAddress);
+        complete = true;
+      } else if (deed.nationalAddressMethod === "link") {
         const link =
-          nationalAddressLinkUrl.trim() || addressUrlFromApi?.trim() || "";
-        addressFields.push({
-          label: labels.fields.mapsLink,
-          value: displayValue(link, empty),
-          href: link || null,
-        });
-      } else if (nationalAddressMethod === "manual") {
-        addressFields.push({
-          label: labels.fields.addressManual,
-          value: buildManualAddressValue(nationalAddressManual, empty),
-        });
-      } else if (nationalAddressMethod === "photo") {
-        if (nationalAddressPhotoFiles.length > 0) {
-          pushLocalAttachmentFields(
-            addressFields,
-            nationalAddressPhotoFiles,
-            labels.fields.addressPhoto,
-            "address-photo",
-          );
-        } else {
-          pushRemoteAttachmentField(
-            addressFields,
-            addressImageFromApi,
-            labels.fields.addressPhoto,
-          );
-        }
-      } else {
-        const fallbackLink = addressUrlFromApi?.trim() ?? "";
-        addressFields.push({
-          label: labels.fields.mapsLink,
-          value: displayValue(fallbackLink, empty),
-          href: fallbackLink || null,
+          deed.nationalAddressLinkUrl.trim() || contractStep2Data?.address_url?.trim() || "";
+        complete = pushField(fields, labels.fields.mapsLink, link, { href: link || null });
+      } else if (deed.nationalAddressMethod === "manual") {
+        complete = pushField(
+          fields,
+          labels.fields.addressManual,
+          buildManualAddressValue(deed.nationalAddressManual),
+          { wide: true },
+        );
+      } else if (deed.nationalAddressMethod === "photo") {
+        complete = pushAttachments(attachments, {
+          files: deed.nationalAddressPhotoFiles,
+          persisted: deed.nationalAddressPhotoPersistedFiles,
+          remoteUrl: contractStep2Data?.image_address,
+          label: labels.fields.addressPhoto,
         });
       }
 
@@ -470,97 +395,165 @@ export function useContractReviewOrderSummary(
         id: "nationalAddress",
         title: labels.sections.nationalAddress,
         editTarget: "nationalAddress",
-        fields: addressFields,
+        fields,
+        attachments,
+        incomplete: !complete,
+        incompleteHint: complete ? undefined : t("incomplete.address"),
       });
     }
 
+    // ── 3) Owner / representative ────────────────────────────────────────
     if (!ownerSkipped) {
-      sections.push({
-        id: "owner",
-        title:
-          ownerData.hasAgent === "yes"
-            ? labels.sections.ownerWithAgent
-            : labels.sections.ownerSelf,
-        editTarget: "owner",
-        fields: [
-          {
-            label: labels.fields.ownerId,
-            value: displayValue(ownerData.idNumber, empty),
-          },
-          {
-            label: labels.fields.ownerPhone,
-            value: displayValue(ownerData.phone, empty),
-          },
-          {
-            label: labels.fields.ownerBirthDate,
-            value: formatBirthDate(
-              ownerData.birthDate,
-              labels.calendar,
-              empty,
-            ),
-          },
-        ],
-      });
+      const fields: CreateContractReviewField[] = [];
+      const attachments: CreateContractReviewAttachment[] = [];
+      const agent = owner.agentData;
+      const isRepresentative = isDeceased || isWaqf;
+
+      if (isRepresentative) {
+        // Deceased / waqf: the representative's data IS the owner section.
+        const idLabel = isWaqf
+          ? t("fields.trusteeId")
+          : t("fields.heirsAgentId");
+        const phoneLabel = isWaqf
+          ? t("fields.trusteePhone")
+          : t("fields.heirsAgentPhone");
+        const birthLabel = isWaqf
+          ? t("fields.trusteeBirthDate")
+          : t("fields.heirsAgentBirthDate");
+
+        pushField(fields, idLabel, agent.idNumber);
+        pushField(fields, phoneLabel, agent.phone);
+        pushField(fields, birthLabel, formatBirthDate(agent.birthDate, labels.calendar));
+        const hasDocument = pushAttachments(attachments, {
+          files: agent.powerOfAttorneyFiles,
+          persisted: owner.agentPersistedFiles,
+          label: t("fields.capacityDocument"),
+        });
+
+        const complete =
+          hasValue(agent.idNumber) &&
+          hasValue(agent.phone) &&
+          isBirthDateFilled(agent.birthDate) &&
+          hasDocument;
+
+        sections.push({
+          id: "owner",
+          title: isWaqf ? t("sections.waqfTrustee") : t("sections.heirsAgent"),
+          editTarget: "owner",
+          fields,
+          attachments,
+          incomplete: !complete,
+          incompleteHint: complete ? undefined : t("incomplete.owner"),
+        });
+      } else {
+        const self = owner.ownerData;
+        const hasAgent = self.hasAgent === "yes";
+
+        pushField(fields, labels.fields.ownerId, self.idNumber);
+        pushField(fields, labels.fields.ownerPhone, self.phone);
+        pushField(
+          fields,
+          labels.fields.ownerBirthDate,
+          formatBirthDate(self.birthDate, labels.calendar),
+        );
+
+        let agentComplete = true;
+        if (hasAgent) {
+          pushField(fields, t("fields.agentId"), agent.idNumber);
+          pushField(fields, t("fields.agentPhone"), agent.phone);
+          pushField(
+            fields,
+            t("fields.agentBirthDate"),
+            formatBirthDate(agent.birthDate, labels.calendar),
+          );
+          pushField(fields, t("fields.poaNumber"), agent.poaNumber);
+          pushField(fields, t("fields.poaDate"), agent.poaDate);
+          const hasPoa = pushAttachments(attachments, {
+            files: agent.powerOfAttorneyFiles,
+            persisted: owner.agentPersistedFiles,
+            label: t("fields.poaDocument"),
+          });
+          agentComplete =
+            hasValue(agent.idNumber) &&
+            hasValue(agent.phone) &&
+            isBirthDateFilled(agent.birthDate) &&
+            hasValue(agent.poaNumber) &&
+            hasValue(agent.poaDate) &&
+            hasPoa;
+        }
+
+        const complete =
+          hasValue(self.idNumber) &&
+          hasValue(self.phone) &&
+          isBirthDateFilled(self.birthDate) &&
+          agentComplete;
+
+        sections.push({
+          id: "owner",
+          title: hasAgent ? labels.sections.ownerWithAgent : labels.sections.ownerSelf,
+          editTarget: "owner",
+          fields,
+          attachments,
+          incomplete: !complete,
+          incompleteHint: complete ? undefined : t("incomplete.owner"),
+        });
+      }
     }
 
+    // ── 4) Tenant ────────────────────────────────────────────────────────
     {
+      const fields: CreateContractReviewField[] = [];
+      const attachments: CreateContractReviewAttachment[] = [];
+      const tenantData = tenant.tenantData;
       const isOrganization = isOrganizationTenantStatus(tenantData.status);
-      const tenantFields: CreateContractReviewField[] = isOrganization
-        ? [
-            {
-              label: labels.fields.tenantDelegation,
-              value: displayValue(
-                tenantData.organization.delegationType
-                  ? labels.delegation[tenantData.organization.delegationType]
-                  : "",
-                empty,
-              ),
-            },
-            {
-              label: labels.fields.tenantUnifiedRecord,
-              value: displayValue(
-                tenantData.organization.unifiedRecordNumber,
-                empty,
-              ),
-            },
-            {
-              label: labels.fields.tenantOwnerId,
-              value: displayValue(
-                tenantData.organization.ownerIdNumber,
-                empty,
-              ),
-            },
-            {
-              label: labels.fields.tenantOwnerPhone,
-              value: displayValue(tenantData.organization.ownerPhone, empty),
-            },
-            {
-              label: labels.fields.tenantOwnerBirthDate,
-              value: formatBirthDate(
-                tenantData.organization.ownerBirthDate,
-                labels.calendar,
-                empty,
-              ),
-            },
-          ]
-        : [
-            {
-              label: labels.fields.tenantId,
-              value: displayValue(tenantData.individual.idNumber, empty),
-            },
-            {
-              label: labels.fields.tenantPhone,
-              value: displayValue(tenantData.individual.phone, empty),
-            },
-            {
-              label: labels.fields.tenantBirthDate,
-              value: formatBirthDate(
-                tenantData.individual.birthDate,
-                labels.calendar,
-                empty,
-              ),
-            },
-          ];
+      let complete: boolean;
+
+      if (isOrganization) {
+        const org = tenantData.organization;
+        pushField(
+          fields,
+          labels.fields.tenantDelegation,
+          org.delegationType ? labels.delegation[org.delegationType] : "",
+        );
+        pushField(fields, labels.fields.tenantUnifiedRecord, org.unifiedRecordNumber);
+        pushField(fields, labels.fields.tenantOwnerId, org.ownerIdNumber);
+        pushField(fields, labels.fields.tenantOwnerPhone, org.ownerPhone);
+        pushField(
+          fields,
+          labels.fields.tenantOwnerBirthDate,
+          formatBirthDate(org.ownerBirthDate, labels.calendar),
+        );
+        pushAttachments(attachments, {
+          files: org.powerOfAttorneyFiles,
+          persisted: tenant.tenantPersistedFiles,
+          label: t("fields.tenantPoaDocument"),
+        });
+        complete =
+          hasValue(org.delegationType) &&
+          hasValue(org.unifiedRecordNumber) &&
+          hasValue(org.ownerIdNumber) &&
+          hasValue(org.ownerPhone) &&
+          isBirthDateFilled(org.ownerBirthDate);
+      } else {
+        const individual = tenantData.individual;
+        pushField(fields, labels.fields.tenantId, individual.idNumber);
+        pushField(fields, labels.fields.tenantPhone, individual.phone);
+        pushField(
+          fields,
+          labels.fields.tenantBirthDate,
+          formatBirthDate(individual.birthDate, labels.calendar),
+        );
+        complete =
+          hasValue(individual.idNumber) &&
+          hasValue(individual.phone) &&
+          isBirthDateFilled(individual.birthDate);
+      }
+
+      if (isLeaseRenewal && tenant.leaseRenewalAddNotes && tenant.leaseRenewalNotes.trim()) {
+        pushField(fields, t("fields.leaseRenewalNotes"), tenant.leaseRenewalNotes, {
+          wide: true,
+        });
+      }
 
       sections.push({
         id: "tenant",
@@ -568,198 +561,251 @@ export function useContractReviewOrderSummary(
           ? labels.sections.tenantOrganization
           : labels.sections.tenantIndividual,
         editTarget: "tenant",
-        fields: tenantFields,
+        fields,
+        attachments,
+        incomplete: !complete,
+        incompleteHint: complete ? undefined : t("incomplete.tenant"),
       });
     }
 
-    const isSameUnit = isLeaseRenewal && leaseRenewalUnitMode === "same";
-
-    if (isSameUnit) {
+    // ── 5) Units (with meters) ───────────────────────────────────────────
+    if (isLeaseRenewal && tenant.leaseRenewalUnitMode === "same") {
       sections.push({
         id: "unit",
         title: labels.sections.unit,
         editTarget: "unit",
-        fields: [
-          {
-            label: labels.fields.unitType,
-            value: labels.sameUnit,
-          },
-        ],
+        fields: [{ label: labels.fields.unitType, value: labels.sameUnit }],
       });
     } else {
-      const unitsToShow =
-        rentedUnits.length > 0 ? rentedUnits : [undefined];
+      const units = tenant.rentedUnits;
 
-      unitsToShow.forEach((unit, unitIndex) => {
+      units.forEach((unit, unitIndex) => {
+        const fields: CreateContractReviewField[] = [];
         const unitTypeName =
-          (unitTypesQuery.data ?? []).find(
-            (option) => String(option.id) === unit?.unitTypeId,
-          )?.name ?? "";
+          (unitTypesQuery.data ?? []).find((option) => String(option.id) === unit.unitTypeId)
+            ?.name ?? "";
         const unitUsageName =
-          (unitUsageQuery.data ?? []).find(
-            (option) => String(option.id) === unit?.unitUsageId,
-          )?.name ?? "";
+          (unitUsageQuery.data ?? []).find((option) => String(option.id) === unit.unitUsageId)
+            ?.name ?? "";
 
-        const unitIncomplete = isUnitDataEmpty(unit);
-        const unitTitle =
-          rentedUnits.length > 1
-            ? `${labels.sections.unit} (${unitIndex + 1})`
-            : labels.sections.unit;
+        pushField(fields, labels.fields.unitType, unitTypeName);
+        pushField(fields, labels.fields.unitUsage, unitUsageName);
+        pushField(
+          fields,
+          labels.fields.floor,
+          unit.floorNumber === "ground" ? t("groundFloor") : unit.floorNumber,
+        );
+        pushField(fields, labels.fields.unitNumber, unit.unitNumber);
+        pushField(
+          fields,
+          labels.fields.area,
+          unit.totalArea.trim() ? `${unit.totalArea} ${labels.areaUnit}` : "",
+        );
+        pushField(fields, labels.fields.rooms, unit.roomsCount);
+        pushField(fields, labels.fields.bathrooms, unit.bathroomsCount);
+        pushField(fields, labels.fields.kitchens, unit.kitchensCount);
+        pushField(fields, t("fields.splitAc"), unit.splitAcCount);
+        pushField(fields, t("fields.windowAc"), unit.windowAcCount);
+        if (unit.kitchensCount) {
+          pushField(
+            fields,
+            labels.fields.kitchenCabinets,
+            unit.kitchenCabinetsInstalled
+              ? labels.kitchenCabinets.installed
+              : labels.kitchenCabinets.notInstalled,
+          );
+        }
+        if (unit.furnished) {
+          pushField(
+            fields,
+            t("fields.furnished"),
+            unit.furnishingType === "new"
+              ? t("furnishingNew")
+              : unit.furnishingType === "used"
+                ? t("furnishingUsed")
+                : t("yes"),
+          );
+        }
 
-        const unitFields: CreateContractReviewField[] = unitIncomplete
-          ? []
-          : [
-              {
-                label: labels.fields.unitType,
-                value: displayValue(unitTypeName, empty),
-              },
-              {
-                label: labels.fields.unitUsage,
-                value: displayValue(unitUsageName, empty),
-              },
-              {
-                label: labels.fields.floor,
-                value: displayValue(unit?.floorNumber, empty),
-              },
-              {
-                label: labels.fields.unitNumber,
-                value: displayValue(unit?.unitNumber, empty),
-              },
-              {
-                label: labels.fields.area,
-                value: unit?.totalArea?.trim()
-                  ? `${unit.totalArea} ${labels.areaUnit}`
-                  : empty,
-              },
-              {
-                label: labels.fields.rooms,
-                value: displayValue(unit?.roomsCount, empty),
-              },
-              {
-                label: labels.fields.bathrooms,
-                value: displayValue(unit?.bathroomsCount, empty),
-              },
-              {
-                label: labels.fields.kitchens,
-                value: displayValue(unit?.kitchensCount, empty),
-              },
-              {
-                label: labels.fields.kitchenCabinets,
-                value: unit?.kitchenCabinetsInstalled
-                  ? labels.kitchenCabinets.installed
-                  : labels.kitchenCabinets.notInstalled,
-              },
-            ];
+        const meterLine = (
+          enabled: boolean,
+          number: string,
+          registration: string,
+          sharedFee: string,
+        ) => {
+          if (!enabled) {
+            return null;
+          }
+
+          const parts = [number.trim() || null];
+          if (registration === "owner") parts.push(t("meter.owner"));
+          if (registration === "tenant") parts.push(t("meter.tenant"));
+          if (registration === "shared") {
+            const monthly = Number(digitsOnly(sharedFee)) || 0;
+            parts.push(
+              totalMonths && monthly > 0
+                ? t("meter.sharedWithTotal", {
+                    monthly: monthly.toLocaleString("en-US"),
+                    months: totalMonths,
+                    total: (monthly * totalMonths).toLocaleString("en-US"),
+                  })
+                : t("meter.shared", { monthly: monthly.toLocaleString("en-US") }),
+            );
+          }
+
+          return parts.filter(Boolean).join(" — ");
+        };
+
+        pushField(
+          fields,
+          t("fields.electricityMeter"),
+          meterLine(
+            unit.addElectricityMeter,
+            unit.electricityMeterNumber,
+            unit.electricityMeterRegistration,
+            unit.electricitySharedMonthlyFee,
+          ),
+          { wide: true },
+        );
+        pushField(
+          fields,
+          t("fields.waterMeter"),
+          meterLine(
+            unit.addWaterMeter,
+            unit.waterMeterNumber,
+            unit.waterMeterRegistration,
+            unit.waterSharedMonthlyFee,
+          ),
+          { wide: true },
+        );
+
+        const complete = isRentedUnitDataComplete(unit);
 
         sections.push({
           id: `unit-${unitIndex}`,
-          title: unitTitle,
+          title:
+            units.length > 1
+              ? `${labels.sections.unit} (${unitIndex + 1})`
+              : labels.sections.unit,
           editTarget: "unit",
-          fields: unitFields,
-          incomplete: unitIncomplete,
+          fields,
+          incomplete: !complete,
+          incompleteHint: complete ? undefined : labels.unitIncomplete,
         });
+      });
+
+      if (units.length === 0) {
+        sections.push({
+          id: "unit-0",
+          title: labels.sections.unit,
+          editTarget: "unit",
+          fields: [],
+          incomplete: true,
+          incompleteHint: labels.unitIncomplete,
+        });
+      }
+    }
+
+    // ── 6) Finance (rent + terms) ────────────────────────────────────────
+    {
+      const fields: CreateContractReviewField[] = [];
+      const paymentTypeName =
+        (paymentTypesQuery.data ?? []).find((option) => option.id === financeData.paymentTypeId)
+          ?.name ?? "";
+      const rentDigits = digitsOnly(financeData.totalRentAmount);
+      const rentAmount = rentDigits
+        ? `${Number(rentDigits).toLocaleString("en-US")} ${labels.currency}`
+        : "";
+
+      pushField(fields, labels.fields.startDate, overview.startDate);
+      pushField(fields, labels.fields.duration, durationLabel);
+      pushField(fields, t("fields.rentAmount"), rentAmount);
+      pushField(fields, labels.fields.paymentMethod, paymentTypeName);
+
+      const roles = tenantRolesQuery.data ?? [];
+      financeData.selectedTenantRoleIds.forEach((id) => {
+        const role = roles.find((item) => item.id === id);
+        const value = financeData.tenantRoleValues[String(id)]?.trim() ?? "";
+        pushField(
+          fields,
+          role ? getTenantRoleTitle(role) : t("fields.tenantRole", { id }),
+          value
+            ? `${value}${role?.input_field_label ? ` (${role.input_field_label})` : ""}`
+            : t("yes"),
+        );
+      });
+
+      getFilledOtherConditions(financeData.otherConditionsList).forEach((text, index) => {
+        pushField(fields, t("fields.extraCondition", { index: index + 1 }), text, {
+          wide: true,
+        });
+      });
+
+      const complete =
+        Boolean(rentAmount) &&
+        Boolean(paymentTypeName || financeData.paymentTypeId !== "") &&
+        Boolean(durationLabel) &&
+        isBirthDateFilled(financeData.contractStartDate);
+
+      sections.push({
+        id: "rent",
+        title: labels.sections.rent,
+        editTarget: "rent",
+        variant: "rent",
+        fields,
+        incomplete: !complete,
+        incompleteHint: complete ? undefined : t("incomplete.finance"),
       });
     }
 
-    const paymentTypeName =
-      (paymentTypesQuery.data ?? []).find(
-        (option) => option.id === financeData.paymentTypeId,
-      )?.name ?? "";
-
-    const rentAmount = displayValue(financeData.totalRentAmount, empty);
-    const rentAmountDisplay =
-      rentAmount === empty
-        ? empty
-        : `${rentAmount} ${labels.currency}`;
-
-    sections.push({
-      id: "rent",
-      title: labels.sections.rent,
-      editTarget: "rent",
-      variant: "rent",
-      fields: [
-        {
-          label: labels.fields.paymentMethod,
-          value: labels.paymentMethodPrefix.replace(
-            "{method}",
-            displayValue(paymentTypeName, empty),
-          ),
-        },
-        {
-          label: labels.sections.rent,
-          value: rentAmountDisplay,
-        },
-      ],
-    });
-
     const orderNumber =
-      contractId != null && String(contractId).trim() !== ""
-        ? String(contractId)
+      contractSession?.serverUuid ??
+      contractSession?.orderReference ??
+      (contractSession?.uuid != null ? String(contractSession.uuid) : "") ??
+      empty;
+    const contractUuidValue =
+      contractSession?.uuid != null && String(contractSession.uuid).trim() !== ""
+        ? String(contractSession.uuid)
         : empty;
 
-    const contractUuidValue =
-      contractUuid != null && contractUuid.trim() !== "" ? contractUuid : empty;
-
     const copyLines = [
-      `${labels.orderNumber}: ${orderNumber}`,
-      `${labels.contractUuid}: ${contractUuidValue}`,
+      `${labels.orderNumber}: ${orderNumber || empty}`,
       `${labels.fields.contractType}: ${overview.contractType}`,
       `${labels.fields.startDate}: ${overview.startDate}`,
       `${labels.fields.duration}: ${overview.duration}`,
       ...sections.flatMap((section) => [
         section.title,
         ...section.fields.map((field) => `${field.label}: ${field.value}`),
+        ...(section.attachments ?? []).map(
+          (attachment) => `${attachment.label}: ${attachment.fileName}`,
+        ),
       ]),
     ];
 
     return {
-      orderNumber,
+      orderNumber: orderNumber || empty,
       contractUuid: contractUuidValue,
       overview,
       sections,
       copyText: copyLines.join("\n"),
     };
   }, [
-    addressImageFromApi,
-    addressUrlFromApi,
-    contractId,
-    contractUuid,
     contractPeriodsQuery.data,
+    contractSession,
+    contractStep1Data,
+    contractStep2Data,
     contractType,
+    deed,
     deedAttachmentLabels,
-    deedBackFiles,
-    deedEndowmentCertFiles,
-    deedFiles,
-    deedFrontFiles,
-    deedGuardiansPoaFiles,
-    deedHeirsPoaFiles,
-    deedInheritanceFiles,
-    deedTrusteeshipFiles,
     deedTypeLabels,
     existingPropertyImage,
     financeData,
-    imageEndowmentCert,
-    imageGuardiansPoa,
-    imageHeirsPoa,
-    imageInheritance,
-    imageInstrument,
-    imageInstrumentBack,
-    imageInstrumentFront,
-    imageTrusteeship,
-    instrumentType,
-    instrumentTypeTrans,
     labels,
-    leaseRenewalAddressMode,
-    leaseRenewalUnitMode,
-    nationalAddressLinkUrl,
-    nationalAddressManual,
-    nationalAddressMethod,
-    nationalAddressPhotoFiles,
-    ownerData,
+    owner,
     paymentTypesQuery.data,
-    rentedUnits,
-    selectedDeedType,
-    tenantData,
+    t,
+    tenant,
+    tenantRolesQuery.data,
     unitTypesQuery.data,
     unitUsageQuery.data,
   ]);

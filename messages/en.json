@@ -32,7 +32,8 @@
       "guide": "Guide",
       "support": "Support",
       "downloadApp": "Download the app now",
-      "track": "Track order"
+      "track": "Track order",
+      "lessorChange": "Lessor change"
     },
     "cta": "Start with Rental Contract",
     "profile": "Profile",
@@ -108,7 +109,9 @@
     "appStore": "Apple Store",
     "whatsapp": "Contact via WhatsApp",
     "visualAlt": "Rental Contract app showing a successfully issued lease contract",
-    "compliantWith": "Compliant with official entities"
+    "compliantWith": "Compliant with official entities",
+    "lessorChangeCta": "Lessor change",
+    "lessorChangeHint": "New owner? Move the contracts to the new deed"
   },
   "trustedEntities": {
     "badge": "Trusted and certified entities",
@@ -261,9 +264,9 @@
           "value": "+98%",
           "label": "Customer satisfaction"
         },
-        "experience": {
-          "value": "+4",
-          "label": "Years of experience"
+        "contractsValue": {
+          "value": "+7B SAR",
+          "label": "Total value of documented contracts"
         },
         "commercial": {
           "value": "+2M",
@@ -387,6 +390,10 @@
         {
           "label": "Document a commercial lease",
           "href": "/service/commercial"
+        },
+        {
+          "label": "Lessor change",
+          "href": "/service/lessor-change"
         }
       ]
     },
@@ -1721,7 +1728,7 @@
   "createContract": {
     "submit": {
       "title": "Review and submit your order",
-      "reviewIntro": "Check your details before submitting, and enter a WhatsApp number so we can reach you about the contract.",
+      "reviewIntro": "Review your details before submitting. On submit we ask for your mobile and a verification code to link the order to your account.",
       "whatsappLabel": "WhatsApp contact number",
       "whatsappPlaceholder": "05XXXXXXXX",
       "whatsappHint": "Enter a Saudi mobile number starting with 05 so we can send you the contract details on WhatsApp.",
@@ -1755,7 +1762,9 @@
         "finance": "Saving financial details...",
         "contact": "Finishing..."
       },
-      "smartLinkHint": "Your direct order link (opens the app when installed):"
+      "smartLinkHint": "Your direct order link (opens the app when installed):",
+      "reviewIntroLoggedIn": "Review your details before submitting; we'll contact you on your account number.",
+      "incompleteSections": "Some sections are incomplete — check the red hints and try again."
     },
     "incompleteContinue": "Please complete all required fields before continuing",
     "fieldRequired": "This field is required",
@@ -1814,11 +1823,20 @@
       "startContractLoading": "Starting contract...",
       "startContractError": "Failed to start contract",
       "priceDialog": {
-        "title": "Fees for creating and documenting a lease contract:",
+        "title": "Contract creation & documentation fees",
         "close": "Close",
-        "yearOrLess": "One year or less: {price} SAR.",
+        "yearOrLess": "Contract price for one year or less",
         "additionalYear": "If the customer wishes to add another year to the contract: {price} SAR per additional year",
-        "disclaimer": "Prices include Ejar platform, brokerage, and documentation fees. There are no other fees."
+        "disclaimer": "Prices include Ejar platform, brokerage, and documentation fees. There are no other fees.",
+        "residentialTitle": "Residential contract",
+        "commercialTitle": "Commercial contract",
+        "extraYear": "Each additional year or part of it",
+        "surchargeLabel": "Additional fee for specific document types",
+        "surchargeOnce": "one time",
+        "meterTransferLabel": "Meter transfer fee (to the tenant's name)",
+        "perMeter": "per meter",
+        "footerNote": "Prices include all fees, including Ejar platform fees",
+        "ejarLogoAlt": "Ejar"
       }
     },
     "prices": {
@@ -1842,7 +1860,8 @@
         },
         {
           "title": "National address for the property",
-          "subtitle": "Identify the property location using one of the three methods"
+          "subtitle": "Identify the property location using one of the three methods",
+          "lockedHint": "Unlocks once the ownership document is complete"
         }
       ],
       "deedType": {
@@ -2020,6 +2039,10 @@
           "monthPlaceholder": "Month",
           "yearPlaceholder": "Year"
         }
+      },
+      "surcharge": {
+        "before": "This document type carries an additional fee of",
+        "after": "(one time)"
       }
     },
     "owner": {
@@ -2132,7 +2155,19 @@
         "deceasedSectionDescription": "Since the owner is deceased, please enter the details of the heirs' authorized agent.",
         "waqfSectionTitle": "Waqf trustee details",
         "waqfSectionDescription": "Since the property is a waqf, please enter the details of the authorized waqf trustee.",
-        "capacityDocumentLabel": "Agent / trustee capacity document"
+        "capacityDocumentLabel": "Agent / trustee capacity document",
+        "deceasedFields": {
+          "idNumber": "Heirs' agent ID number",
+          "phone": "Heirs' agent mobile number",
+          "birthDate": "Heirs' agent date of birth",
+          "capacityDocument": "Heirs' agent capacity document"
+        },
+        "waqfFields": {
+          "idNumber": "Trustee ID number",
+          "phone": "Trustee mobile number",
+          "birthDate": "Trustee date of birth",
+          "capacityDocument": "Waqf trustee capacity document"
+        }
       }
     },
     "tenant": {
@@ -2361,6 +2396,16 @@
             "afterNonRefundable": "if there is a reason preventing the transfer. It is added to the total request. If the contract period is",
             "lessThanMonth": "less than a month",
             "afterLessThanMonth": "transferring the meter to the tenant's name is not accepted."
+          },
+          "shared": {
+            "title": "Shared meter",
+            "subtitle": "The meter is shared with other units",
+            "footer": "Monthly amount set by the owner",
+            "amountLabel": "Shared meter charge paid by the tenant (monthly)",
+            "amountPlaceholder": "0",
+            "totalHint": "{monthly} {currency} × contract term ({months} months) = {total} {currency}",
+            "durationUnknownHint": "The total is calculated once the contract term is set in the “Finance” step.",
+            "termNote": "Recorded as a contract term paid by the tenant to the owner; not added to the order fees."
           }
         }
       },
@@ -2455,6 +2500,15 @@
           "monthOptionZero": "No months",
           "loadingPreview": "Calculating documentation fees...",
           "previewError": "Failed to load documentation fee preview"
+        },
+        "yearChip": "One year",
+        "twoYearsChip": "Two years",
+        "feePreview": {
+          "total": "Documentation fee",
+          "years": "{count, plural, =1 {1 year} other {# years}}",
+          "months": "{count, plural, =1 {1 month} other {# months}}",
+          "breakdown": "First year {firstYear} SAR + {extraYears, plural, =1 {1 extra year} other {# extra years}} × {extraYear} SAR",
+          "partYearNote": "Any part of a year counts as a full additional year."
         }
       },
       "totalRentAmount": {
@@ -2524,13 +2578,13 @@
         "shareError": "Failed to share order",
         "sections": {
           "deed": "Ownership document",
-          "nationalAddress": "National address (attach address card)",
+          "nationalAddress": "Property national address",
           "ownerSelf": "Owner details (self)",
           "ownerWithAgent": "Owner details (with agent)",
           "tenantIndividual": "Tenant details (individual)",
           "tenantOrganization": "Tenant details (establishment or company)",
           "unit": "Unit details",
-          "rent": "Rent amount"
+          "rent": "Financial details"
         },
         "fields": {
           "contractType": "Contract type",
@@ -2618,7 +2672,13 @@
         "contractTypeResidential": "Residential contract",
         "contractTypeCommercial": "Commercial contract",
         "yearsCount": "'{'count'}' year(s)",
-        "monthsCount": "'{'count'}' month(s)"
+        "monthsCount": "'{'count'}' month(s)",
+        "documentSurcharge": "Additional document fee:",
+        "documentSurchargeHint": "One-time fee for the selected document type",
+        "sharedMetersTitle": "Shared meter terms (paid by the tenant to the owner)",
+        "sharedElectricityMeter": "Shared electricity meter (monthly × term)",
+        "sharedWaterMeter": "Shared water meter (monthly × term)",
+        "sharedMetersNote": "Recorded as a contract term; not added to the order total."
       },
       "savePropertyData": {
         "label": "Would you like to save the property data?",
@@ -2720,6 +2780,88 @@
         "whatsappCta": "Rental Contract team is happy to hear from you",
         "whatsappHref": "https://wa.me/"
       }
+    },
+    "dateHelper": {
+      "correspondingHijri": "Hijri equivalent: {date} AH",
+      "correspondingGregorian": "Gregorian equivalent: {date}",
+      "approximate": "approximately"
+    },
+    "review": {
+      "durationOneYear": "One year",
+      "durationTwoYears": "Two years",
+      "yes": "Yes",
+      "no": "No",
+      "groundFloor": "Ground",
+      "furnishingNew": "Furnished (new)",
+      "furnishingUsed": "Furnished (used)",
+      "sections": {
+        "heirsAgent": "Heirs' agent details",
+        "waqfTrustee": "Waqf trustee details"
+      },
+      "fields": {
+        "instrumentNumber": "Deed number",
+        "instrumentDate": "Deed date",
+        "minorHeirs": "Minor heirs",
+        "multipleTrustees": "Multiple trustees deed",
+        "trusteeId": "Trustee ID number",
+        "trusteePhone": "Trustee mobile",
+        "trusteeBirthDate": "Trustee date of birth",
+        "heirsAgentId": "Heirs' agent ID number",
+        "heirsAgentPhone": "Heirs' agent mobile",
+        "heirsAgentBirthDate": "Heirs' agent date of birth",
+        "capacityDocument": "Capacity document",
+        "agentId": "Agent ID number",
+        "agentPhone": "Agent mobile",
+        "agentBirthDate": "Agent date of birth",
+        "poaNumber": "POA number",
+        "poaDate": "POA date",
+        "poaDocument": "POA copy",
+        "tenantPoaDocument": "Organization authorization",
+        "leaseRenewalNotes": "Renewal notes",
+        "splitAc": "Split AC units",
+        "windowAc": "Window AC units",
+        "furnished": "Furnishing",
+        "electricityMeter": "Electricity meter",
+        "waterMeter": "Water meter",
+        "rentAmount": "Total rent amount",
+        "tenantRole": "Term {id}",
+        "extraCondition": "Extra condition {index}",
+        "contactMobile": "Contact mobile"
+      },
+      "meter": {
+        "owner": "In the owner's name",
+        "tenant": "Transferred to the tenant",
+        "shared": "Shared meter — {monthly} SAR monthly paid by the tenant",
+        "sharedWithTotal": "Shared meter — {monthly} SAR monthly × {months} months = {total} SAR (contract term)"
+      },
+      "incomplete": {
+        "deed": "Ownership document incomplete — add the document type and attachments.",
+        "address": "National address incomplete.",
+        "owner": "Owner details incomplete.",
+        "tenant": "Tenant details incomplete.",
+        "finance": "Financial details incomplete."
+      },
+      "attachmentsTitle": "Attachments",
+      "attachmentPreview": "Preview",
+      "sectionsTitle": "Order summary",
+      "contact": {
+        "title": "Contact mobile",
+        "accountMobile": "We will contact you on your account number",
+        "loginHint": "We'll ask for your mobile number and a verification code when you submit, to link the order to your account."
+      }
+    },
+    "otpDialog": {
+      "phoneTitle": "Your mobile to complete the order",
+      "phoneDescription": "We send a verification code so the order is linked to your account and visible under “My orders”.",
+      "otpTitle": "Verification code",
+      "otpDescription": "Enter the code sent to your mobile to submit the order.",
+      "close": "Close",
+      "mobileLabel": "Mobile number",
+      "mobileInvalid": "Please enter a valid Saudi mobile number (e.g. 05XXXXXXXX).",
+      "mobileHint": "We contact you on this number via WhatsApp about the contract.",
+      "sendCode": "Send verification code",
+      "otpLengthHint": "The code is 4 to 6 digits",
+      "verifyAndSubmit": "Verify and submit"
     }
   },
   "paymentStatus": {
@@ -3021,7 +3163,13 @@
     "ctaButton": "Create a lease",
     "faqTitle": "Have a question?",
     "faqButton": "FAQ",
-    "supportButton": "Support & help"
+    "supportButton": "Support & help",
+    "tutorials": {
+      "title": "Video tutorials",
+      "subtitle": "Short walkthroughs for every service. Tutorials not recorded yet are marked “Coming soon”.",
+      "comingSoon": "Coming soon",
+      "watch": "Watch video"
+    }
   },
   "supportPage": {
     "metaTitle": "Support & Help",
@@ -3116,6 +3264,93 @@
     "lastUpdate": "Last update: {date}",
     "smartLinkTitle": "Order {order} | Contract Ejar",
     "smartLinkHeading": "Your order is ready to follow",
-    "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status."
+    "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
+    "typeLessorChange": "Lessor change request",
+    "lessorChangeFee": "Service fee: {fee} SAR"
+  },
+  "lessorChange": {
+    "landing": {
+      "title": "Lessor change service",
+      "description": "Has the property moved to a new owner? We transfer every tenancy contract linked to the old deed to the new deed on the Ejar platform in two steps: upload both deeds and enter the new owner's details, then pay the service fee.",
+      "cta": "Start lessor change",
+      "fee": "{fee} SAR",
+      "feeNote": "A flat fee per request, inclusive of all charges.",
+      "eligibility": "The new owner or their agent, and licensed real-estate brokerages.",
+      "responseTime": "Within one business day after payment and complete documents.",
+      "features": [
+        "All contracts linked to the old deed are moved at once",
+        "No account needed — your mobile number and a verification code",
+        "A flat, transparent fee per request",
+        "Track the request with the order number and mobile"
+      ],
+      "steps": [
+        "Upload the old owner's deed and the new owner's deed",
+        "Enter the new owner's ID number and date of birth",
+        "Acknowledge that linked contracts move to the new deed",
+        "Verify your mobile and pay the service fee",
+        "We complete the transfer on Ejar and notify you"
+      ],
+      "requirements": [
+        "A clear copy of the old owner's deed",
+        "A clear copy of the new owner's deed",
+        "The new owner's ID number",
+        "The new owner's date of birth"
+      ],
+      "faq": [
+        {
+          "q": "What happens to existing contracts?",
+          "a": "Every contract linked to the old deed is transferred to the new deed under the new owner, with no need to recreate it."
+        },
+        {
+          "q": "Do I need an account?",
+          "a": "No — your mobile number and a verification code are enough to submit and track the request."
+        },
+        {
+          "q": "How much does it cost?",
+          "a": "A flat fee per request shown before payment, inclusive of all charges."
+        },
+        {
+          "q": "When is the transfer done?",
+          "a": "Processing starts once payment is complete and the documents are in order; you are notified on completion."
+        }
+      ]
+    },
+    "flow": {
+      "back": "Back to service page",
+      "title": "Lessor change",
+      "subtitle": "Move contracts from the old deed to the new deed",
+      "serviceLabel": "Lessor change",
+      "stepDocuments": "Documents",
+      "stepOwner": "New owner",
+      "documentsHint": "Upload a clear copy of each deed (image or PDF). Electronic and paper deeds are accepted.",
+      "oldDeedLabel": "Old owner's deed",
+      "newDeedLabel": "New owner's deed",
+      "continue": "Continue",
+      "previous": "Back",
+      "newOwnerTitle": "New owner details",
+      "newOwnerDescription": "As recorded on the new deed",
+      "idNumberLabel": "New owner ID number",
+      "idNumberPlaceholder": "1XXXXXXXXX",
+      "idNumberRequired": "ID number is required",
+      "idNumberLength": "ID number must be 10 digits",
+      "birthDateLabel": "New owner date of birth",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Anything else we should know (optional)",
+      "acknowledge": "I confirm I have read the above and agree that all contracts linked to the old deed will move to the new deed.",
+      "acknowledgeRequired": "Please acknowledge before continuing",
+      "feeLabel": "Service fee",
+      "submit": "Continue",
+      "incomplete": "Complete the required details to continue",
+      "submitError": "Could not submit the request right now. Please try again.",
+      "submitted": "Request received",
+      "paymentUnavailable": "Could not open the payment page right now. You can pay later from the order tracking page.",
+      "alreadyPaid": "This request has already been paid",
+      "successTitle": "Lessor change request received",
+      "successBody": "Processing starts as soon as payment is complete. Keep the order number to track the status.",
+      "orderNumberLabel": "Order number",
+      "payNow": "Pay now",
+      "homeCta": "Home",
+      "trackCta": "Track order"
+    }
   }
 }

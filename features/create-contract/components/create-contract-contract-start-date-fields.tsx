@@ -1,5 +1,6 @@
 "use client";
 
+import CreateContractDateEquivalentHint from "@/features/create-contract/components/create-contract-date-equivalent-hint";
 import CreateContractFormSelect from "@/features/create-contract/components/create-contract-form-select";
 import type {
   BirthDateValue,
@@ -62,13 +63,6 @@ export default function CreateContractContractStartDateFields({
   invalid = false,
 }: CreateContractContractStartDateFieldsProps) {
   const dayCount = value.calendarType === "hijri" ? 30 : 31;
-  const day = value.day.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
-  const month = value.month.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
-  const year = value.year.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
-  const hasCompleteDate = Boolean(day && month && year);
-  const selectedDateLabel = hasCompleteDate
-    ? `${Number(day)}/${Number(month)}/${year}`
-    : null;
 
   function updateField<K extends keyof BirthDateValue>(
     field: K,
@@ -142,16 +136,8 @@ export default function CreateContractContractStartDateFields({
         />
       </div>
 
-      {selectedDateLabel ? (
-        <p className="text-xs text-[#9a9a9a]">
-          {value.calendarType === "hijri"
-            ? labels.correspondingHijri.replace("{date}", selectedDateLabel)
-            : labels.correspondingGregorian.replace(
-                "{date}",
-                selectedDateLabel,
-              )}
-        </p>
-      ) : null}
+      {/* «الموافق …» always shows the OTHER calendar's equivalent. */}
+      <CreateContractDateEquivalentHint value={value} />
     </div>
   );
 }

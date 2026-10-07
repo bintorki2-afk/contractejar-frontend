@@ -1,5 +1,6 @@
 "use client";
 
+import CreateContractDateEquivalentHint from "@/features/create-contract/components/create-contract-date-equivalent-hint";
 import CreateContractFormSelect from "@/features/create-contract/components/create-contract-form-select";
 import type { BirthDateValue } from "@/features/create-contract/types/owner-step";
 import {
@@ -178,6 +179,8 @@ export default function CreateContractBirthDateFields({
           variant="compact"
         />
       </div>
+
+      {birthDateValid ? <CreateContractDateEquivalentHint value={value} /> : null}
     </div>
   );
 }

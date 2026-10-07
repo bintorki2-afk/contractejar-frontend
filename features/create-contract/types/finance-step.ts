@@ -1,6 +1,7 @@
 import type { BirthDateValue } from "@/features/create-contract/types/owner-step";
 import { areTenantRoleValuesComplete } from "@/features/create-contract/utils/tenant-role-helpers";
 import { getTodayContractStartDate } from "@/features/create-contract/utils/get-today-contract-start-date";
+import { digitsOnly } from "@/lib/utils/digits";
 
 export type FinanceDataState = {
   contractStartDate: BirthDateValue;
@@ -21,7 +22,9 @@ export const MAX_OTHER_CONDITIONS = 50;
 
 export function createEmptyFinanceData(): FinanceDataState {
   return {
-    contractStartDate: getTodayContractStartDate("hijri"),
+    // The contract start date is the one date in the wizard that defaults to
+    // the Gregorian calendar (everything else defaults to hijri).
+    contractStartDate: getTodayContractStartDate("gregorian"),
     contractPeriodId: "",
     isCustomDuration: false,
     customDurationYears: "",
@@ -48,7 +51,7 @@ const LEGACY_PAYMENT_METHOD_TO_TYPE_ID: Record<string, number> = {
 function resolveContractStartDate(
   contractStartDate: BirthDateValue | undefined,
 ): BirthDateValue {
-  const calendarType = contractStartDate?.calendarType ?? "hijri";
+  const calendarType = contractStartDate?.calendarType ?? "gregorian";
 
   if (
     !contractStartDate ||
@@ -158,7 +161,7 @@ function isContractStartDateComplete(contractStartDate: BirthDateValue) {
 }
 
 function isRentAmountComplete(totalRentAmount: string) {
-  const digits = totalRentAmount.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+  const digits = digitsOnly(totalRentAmount);
   return digits.length > 0 && Number(digits) > 0;
 }
 

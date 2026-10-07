@@ -7,13 +7,28 @@ export type CreateContractReviewEditTarget =
   | "owner"
   | "tenant"
   | "unit"
-  | "rent";
+  | "rent"
+  | "contact";
+
+export type CreateContractReviewAttachment = {
+  label: string;
+  fileName: string;
+  /** Bytes; null for a remote (already uploaded) file. */
+  size: number | null;
+  isImage: boolean;
+  /** Local draft file (preview via object URL) … */
+  file?: File;
+  /** … or an already-uploaded file on the server. */
+  remoteUrl?: string | null;
+};
 
 export type CreateContractReviewField = {
   label: string;
   value: string;
+  /** Opens in a new tab (Google Maps link …). */
   href?: string | null;
-  viewUrl?: string | null;
+  /** Full-width row (long texts such as extra conditions). */
+  wide?: boolean;
 };
 
 export type CreateContractReviewSection = {
@@ -21,8 +36,11 @@ export type CreateContractReviewSection = {
   title: string;
   editTarget: CreateContractReviewEditTarget;
   fields: CreateContractReviewField[];
+  attachments?: CreateContractReviewAttachment[];
   variant?: "default" | "rent";
+  /** Required data is missing — the card gets a red hint. */
   incomplete?: boolean;
+  incompleteHint?: string;
 };
 
 export type CreateContractReviewOrderSummary = {
@@ -52,5 +70,7 @@ export function reviewEditTargetToStep(
     case "tenant":
     case "unit":
       return "tenant";
+    case "contact":
+      return "payment";
   }
 }

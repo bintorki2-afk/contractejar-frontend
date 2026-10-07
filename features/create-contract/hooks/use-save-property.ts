@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { saveProperty } from "@/features/create-contract/services/save-property";
+import {
+  saveProperty,
+  unsaveProperty,
+} from "@/features/create-contract/services/save-property";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 
 export function useSaveProperty() {
@@ -78,8 +81,46 @@ export function useSaveProperty() {
     }
   }
 
+  async function submitUnsaveProperty(messages: {
+    missingContractSession: string;
+    submitError: string;
+  }) {
+    if (isSaving) {
+      return { ok: false as const };
+    }
+
+    const contractId =
+      contractSession?.contractId ??
+      contractStep1Data?.contract_id ??
+      contractStep2Data?.contract_id ??
+      contractStep3Data?.contract_id ??
+      contractStep4Data?.contract_id ??
+      contractStep5Data?.contract_id;
+
+    if (!contractId) {
+      toast.error(messages.missingContractSession);
+      return { ok: false as const };
+    }
+
+    setIsSaving(true);
+
+    try {
+      const result = await unsaveProperty(contractId);
+
+      if (!result.ok) {
+        toast.error(result.error || messages.submitError);
+        return { ok: false as const };
+      }
+
+      return { ok: true as const };
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return {
     submitSaveProperty,
+    submitUnsaveProperty,
     isSaving,
   };
 }

@@ -1,8 +1,9 @@
 import type { PropertyContractType } from "@/features/create-property/utils/contract-type";
 import type { UnitDataState } from "@/features/create-unit/types/unit-data";
+import { digitsOnly, toAsciiDigits } from "@/lib/utils/digits";
 
 function parseCount(value: string) {
-  const parsed = Number(value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, ""));
+  const parsed = Number(digitsOnly(value));
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
@@ -15,7 +16,7 @@ function parseFloorNumber(value: string) {
 }
 
 function parseArea(value: string) {
-  const parsed = Number(value.replace(/,/g, "").trim());
+  const parsed = Number(toAsciiDigits(value).replace(/,/g, "").trim());
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
@@ -86,6 +87,12 @@ export function buildUnitFieldsPayload(unitData: UnitDataState) {
   ) {
     payload.electricity_meter_ownership =
       unitData.electricityMeterRegistration;
+
+    if (unitData.electricityMeterRegistration === "shared") {
+      payload.electricity_shared_monthly_fee = parseArea(
+        unitData.electricitySharedMonthlyFee,
+      );
+    }
   }
 
   const waterMeterNumber = unitData.waterMeterNumber.trim();
@@ -96,6 +103,12 @@ export function buildUnitFieldsPayload(unitData: UnitDataState) {
 
   if (unitData.addWaterMeter && unitData.waterMeterRegistration !== "") {
     payload.water_meter_ownership = unitData.waterMeterRegistration;
+
+    if (unitData.waterMeterRegistration === "shared") {
+      payload.water_shared_monthly_fee = parseArea(
+        unitData.waterSharedMonthlyFee,
+      );
+    }
   }
 
   return payload;

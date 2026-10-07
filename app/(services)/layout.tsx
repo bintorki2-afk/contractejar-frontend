@@ -3,6 +3,7 @@ import FooterBottomBar from "@/features/footer/components/footer-bottom-bar";
 import { ServicesPageProvider } from "@/features/services/components/services-page-provider";
 import {
   AccountRouteOnly,
+  FlowRouteFooterOnly,
   FlowRouteOnly,
 } from "@/features/services/components/services-route-chrome";
 import ServicesSideBackNav from "@/features/services/components/services-side-back-nav";
@@ -38,11 +39,12 @@ export default async function ServicesLayout({
         </div>
       </ServicesPageProvider>
 
-      {/* Full site footer on account pages; the compact bar on service flows. */}
+      {/* Full site footer on account pages; the compact bar on service flows
+          (never inside the contract wizard). */}
       <AccountRouteOnly>
         <Footer />
       </AccountRouteOnly>
-      <FlowRouteOnly>
+      <FlowRouteFooterOnly>
         <FooterBottomBar
           copyright={footer("copyright", {
             year: String(new Date().getFullYear()),
@@ -53,7 +55,7 @@ export default async function ServicesLayout({
           privacyHref={footer("privacyHref")}
           className="container pb-6 pt-8"
         />
-      </FlowRouteOnly>
+      </FlowRouteFooterOnly>
     </div>
   );
 }

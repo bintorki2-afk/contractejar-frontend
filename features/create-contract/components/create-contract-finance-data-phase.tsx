@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import CreateContractContractStartDateFields from "@/features/create-contract/components/create-contract-contract-start-date-fields";
 import CreateContractCustomDurationFields, {
   CUSTOM_CONTRACT_DURATION_VALUE,
 } from "@/features/create-contract/components/create-contract-custom-duration-fields";
+import CreateContractDurationFeePreview from "@/features/create-contract/components/create-contract-duration-fee-preview";
 import CreateContractFinanceConditionsSection from "@/features/create-contract/components/create-contract-finance-conditions-section";
 import CreateContractFinanceDurationSelect from "@/features/create-contract/components/create-contract-finance-duration-select";
 import CreateContractFinancePaymentMethodSelect from "@/features/create-contract/components/create-contract-finance-payment-method-select";
@@ -13,7 +15,6 @@ import CreateContractFinancePermissionsSection from "@/features/create-contract/
 import CreateContractRentAmountField from "@/features/create-contract/components/create-contract-rent-amount-field";
 import { useContractPeriods } from "@/features/create-contract/hooks/use-contract-periods";
 import { usePaymentTypes } from "@/features/create-contract/hooks/use-payment-types";
-import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
@@ -23,13 +24,14 @@ import {
   isFinanceScheduleComplete,
   type FinanceDataState,
 } from "@/features/create-contract/types/finance-step";
-import { getDocFeeLinesFromStep6 } from "@/features/create-contract/utils/build-finance-data-from-step6";
+import { resolveContractPeriodMonths } from "@/features/create-contract/types/contract-period";
 import { parseContractPeriodLabel } from "@/features/create-contract/utils/parse-contract-period-label";
 import {
   classifyPaymentTypeName,
   isPaymentTypeAllowedForDuration,
   resolveContractDurationMonths,
 } from "@/features/create-contract/utils/payment-type-availability";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractFinanceDataPhaseProps = {
   labels: CreateContractLabels["finance"];
@@ -47,31 +49,22 @@ export default function CreateContractFinanceDataPhase({
   showFieldErrors = false,
 }: CreateContractFinanceDataPhaseProps) {
   const apiContractType = toPropertyContractType(contractType);
-  const contractId = useCreateContractDraftStore(
-    (state) =>
-      state.contractSession?.contractId ??
-      state.contractStep5Data?.contract_id ??
-      state.contractStep6Data?.contract_id ??
-      null,
-  );
-  const contractStep6Data = useCreateContractDraftStore(
-    (state) => state.contractStep6Data,
-  );
+  const tDuration = useTranslations("createContract.finance.contractDuration");
   const contractPeriodsQuery = useContractPeriods(apiContractType);
   const paymentTypesQuery = usePaymentTypes(apiContractType);
 
+  // Chips are exactly: «سنة» (12 months) / «سنتين» (24 months) / «مدة أخرى».
   const durationOptions = [
     ...(contractPeriodsQuery.data ?? []).map((period) => {
-      const parsed = parseContractPeriodLabel(period.period);
+      const months = resolveContractPeriodMonths(period);
+      const title =
+        months === 12
+          ? tDuration("yearChip")
+          : months === 24
+            ? tDuration("twoYearsChip")
+            : parseContractPeriodLabel(period.period).title;
 
-      return {
-        value: String(period.id),
-        title: parsed.title,
-        fee: parsed.fee,
-        feeLabel: parsed.fee
-          ? labels.contractDuration.feeLabel
-          : undefined,
-      };
+      return { value: String(period.id), title };
     }),
     {
       value: CUSTOM_CONTRACT_DURATION_VALUE,
@@ -88,12 +81,25 @@ export default function CreateContractFinanceDataPhase({
 
   const durationMonths = resolveContractDurationMonths({
     isCustomDuration: value.isCustomDuration,
+    periodMonths: resolveContractPeriodMonths(selectedPeriod),
     periodLabel: selectedPeriod
       ? parseContractPeriodLabel(selectedPeriod.period).title
       : null,
     customYears: value.customDurationYears,
     customMonths: value.customDurationMonths,
   });
+
+  // Total months of the chosen duration for the client-side fee preview.
+  const feePreviewMonths: number | null = value.isCustomDuration
+    ? typeof value.customDurationYears === "number"
+      ? value.customDurationYears * 12 +
+        (typeof value.customDurationMonths === "number"
+          ? value.customDurationMonths
+          : 0)
+      : null
+    : typeof durationMonths === "number"
+      ? durationMonths
+      : null;
 
   const paymentTypeOptions = useMemo(
     () =>
@@ -113,10 +119,6 @@ export default function CreateContractFinanceDataPhase({
   const selectedPaymentTypeNotes = (paymentTypesQuery.data ?? [])
     .find((paymentType) => paymentType.id === value.paymentTypeId)
     ?.notes?.trim();
-
-  const initialDocFeeLines = value.isCustomDuration
-    ? getDocFeeLinesFromStep6(contractStep6Data)
-    : [];
 
   function updateField<K extends keyof FinanceDataState>(
     field: K,
@@ -167,8 +169,8 @@ export default function CreateContractFinanceDataPhase({
       : value.contractPeriodId === "");
   const rentInvalid =
     showFieldErrors &&
-    (value.totalRentAmount.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length === 0 ||
-      Number(value.totalRentAmount.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "")) <= 0);
+    (digitsOnly(value.totalRentAmount).length === 0 ||
+      Number(digitsOnly(value.totalRentAmount)) <= 0);
   const paymentInvalid = showFieldErrors && value.paymentTypeId === "";
   const contractStartDateInvalid =
     showFieldErrors &&
@@ -177,8 +179,8 @@ export default function CreateContractFinanceDataPhase({
       value.contractStartDate.year === "");
   const rentValid =
     !rentInvalid &&
-    value.totalRentAmount.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length > 0 &&
-    Number(value.totalRentAmount.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "")) > 0;
+    digitsOnly(value.totalRentAmount).length > 0 &&
+    Number(digitsOnly(value.totalRentAmount)) > 0;
   const showRentAmount = isFinanceScheduleComplete(value);
   const showPaymentMethod = showRentAmount && isFinanceRentComplete(value);
   const showRemainingSections =
@@ -206,7 +208,6 @@ export default function CreateContractFinanceDataPhase({
           options={durationOptions}
           value={durationValue}
           note={selectedPeriodNote}
-          currencyLabel={labels.contractDuration.currency}
           disabled={contractPeriodsQuery.isLoading}
           invalid={durationInvalid}
           onChange={handleDurationChange}
@@ -218,9 +219,6 @@ export default function CreateContractFinanceDataPhase({
               labels={labels.contractDuration.custom}
               years={value.customDurationYears}
               months={value.customDurationMonths}
-              contractId={contractId}
-              contractType={apiContractType}
-              initialLines={initialDocFeeLines}
               onYearsChange={(customDurationYears) =>
                 updateField("customDurationYears", customDurationYears)
               }
@@ -230,6 +228,11 @@ export default function CreateContractFinanceDataPhase({
             />
           </div>
         ) : null}
+
+        <CreateContractDurationFeePreview
+          contractType={apiContractType}
+          totalMonths={feePreviewMonths}
+        />
       </div>
 
       {contractPeriodsQuery.error ? (

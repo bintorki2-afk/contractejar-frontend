@@ -4,7 +4,6 @@ import { Building2, ChevronDown, Lock, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type MouseEvent } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -171,16 +170,8 @@ export default function CreateContractDeedTypeSelect({
                   value={option.id}
                   className="text-base! [&>span:last-child]:w-full"
                 >
-                  <span className="flex w-full min-w-0 items-center justify-between gap-3">
-                    <span className="truncate">{labels.types[option.id]}</span>
-                    {option.badgeLabel ? (
-                      <Badge
-                        variant="secondary"
-                        className="max-w-[40%] shrink-0 truncate rounded-full bg-brand-background px-2.5 py-0.5 text-[11px] font-semibold text-brand-secondary"
-                      >
-                        {option.badgeLabel}
-                      </Badge>
-                    ) : null}
+                  <span className="block w-full min-w-0 truncate">
+                    {labels.types[option.id]}
                   </span>
                 </SelectItem>
               ))}
