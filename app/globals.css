@@ -198,7 +198,7 @@
   --card-foreground: #e9f1ee;
   --popover: #193a32;
   --popover-foreground: #e9f1ee;
-  --primary: #00a880;
+  --primary: #169963;
   --primary-foreground: #ffffff;
   --secondary: #12231e;
   --secondary-foreground: #e9f1ee;
@@ -209,7 +209,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: #2b443d;
   --input: #0b1a16;
-  --ring: #00a880;
+  --ring: #169963;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -217,12 +217,12 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: #12231e;
   --sidebar-foreground: #e9f1ee;
-  --sidebar-primary: #00a880;
+  --sidebar-primary: #169963;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #16302a;
   --sidebar-accent-foreground: #eaf5f1;
   --sidebar-border: #2b443d;
-  --sidebar-ring: #00a880;
+  --sidebar-ring: #169963;
   /* Brand surface tokens themed globally in dark (public pages + flows), so
      bg-brand-background / bg-brand-background-green follow the dark theme. */
   --color-brand-background: #10231d;
@@ -241,7 +241,7 @@
   }
 }
 
-/* The brand green (#005848) is too dark to read on the dark background. Lighten
+/* The brand green (#0B5A3C) is too dark to read on the dark background. Lighten
    brand-colored TEXT and icons (via currentColor) in dark mode for contrast.
    Buttons that use bg-brand keep the original brand green. */
 .dark .text-brand {
@@ -249,8 +249,8 @@
 }
 
 @theme {
-  --color-brand: #005848;
-  --color-brand-secondary: #00a880;
+  --color-brand: #0B5A3C;
+  --color-brand-secondary: #169963;
   --color-brand-background: #f5f5f5;
   --color-brand-background-green: #e9fbf5;
 
@@ -435,7 +435,7 @@
   height: 20px;
   border: 2px solid #ffffff;
   border-radius: 9999px;
-  background: #00a880;
+  background: #169963;
   box-shadow: 0 0 0 4px rgb(13 179 139 / 25%);
 }
 
@@ -701,8 +701,8 @@
 
 /* Requests / services dark palette — match product dark mock */
 .services-dark-shell.dark {
-  --color-brand: #00a880;
-  --color-brand-secondary: #00a880;
+  --color-brand: #169963;
+  --color-brand-secondary: #169963;
   --color-brand-background: #0d1413;
   --color-brand-background-green: #0e312a;
   background-color: #0d1413;
@@ -721,11 +721,11 @@
 }
 
 .services-dark-shell.dark .bg-brand {
-  background-color: #00a880 !important;
+  background-color: #169963 !important;
 }
 
 .services-dark-shell.dark .text-brand {
-  color: #00a880 !important;
+  color: #169963 !important;
 }
 
 .services-dark-shell.dark .text-\[\#7f7f7f\],
@@ -793,7 +793,7 @@
 }
 
 .services-dark-shell.dark .bg-\[\#e8f8ee\] {
-  background-color: #00a880 !important;
+  background-color: #169963 !important;
 }
 
 .services-dark-shell.dark .text-\[\#25D366\] {
