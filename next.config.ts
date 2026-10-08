@@ -28,9 +28,14 @@ const CSP = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // clarity.ms: Microsoft Clarity session recordings (features/analytics/clarity-script.tsx).
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms",
+  // Ad pixels loaded from GTM (docs/ads-tracking.md): Google Ads conversion
+  // (googleadservices / googleads.g.doubleclick), TikTok Pixel
+  // (analytics.tiktok.com) and Snap Pixel (sc-static.net). Without these the
+  // CSP silently blocks the tags and no conversion is recorded.
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://www.googleadservices.com https://googleads.g.doubleclick.net https://analytics.tiktok.com https://sc-static.net",
   `connect-src 'self' https: wss:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
-  "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
+  // td.doubleclick.net: Google Ads conversion/remarketing iframe (docs/ads-tracking.md).
+  "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com https://td.doubleclick.net",
   "worker-src 'self' blob:",
   "object-src 'none'",
 ].join("; ");
