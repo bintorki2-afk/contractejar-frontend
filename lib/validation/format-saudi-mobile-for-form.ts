@@ -18,6 +18,12 @@ export function toSaudiMobileInputValue(raw: string) {
     return "";
   }
 
+  // Still typing the country code digit by digit ("+9", "+96", "009"…): keep it
+  // as typed. Forcing "05" here turned "+966501234567" into "0596650123".
+  if (digits !== "0" && ("00966".startsWith(digits) || "966".startsWith(digits))) {
+    return digits;
+  }
+
   if (digits.startsWith("00966")) {
     digits = digits.slice(5);
   } else if (digits.startsWith("966")) {
