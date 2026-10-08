@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Building2, ClipboardList, FileText, LogOut, ShieldCheck } from "lucide-react";
+import { Building2, ClipboardList, FileText, LogOut, ShieldCheck, Trash2 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -127,6 +127,11 @@ export default function UserSheet({ children }: UserSheetProps) {
                     aria-label={t("accountSettings.notifications")}
                   />
                 }
+              />
+              <UserSheetMenuRow
+                label="حذف الحساب"
+                icon={<Trash2 className="size-4 text-destructive" aria-hidden="true" />}
+                href="/account/delete"
               />
               <UserSheetMenuRow
                 label={t("accountSettings.logout")}
