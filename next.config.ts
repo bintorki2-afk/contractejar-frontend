@@ -11,6 +11,14 @@ const MAX_UPLOAD_BODY_SIZE = 50 * 1024 * 1024; // 50 MB
 //   - object-src 'none': no plugins/embeds.
 // 'unsafe-inline'/'unsafe-eval' remain for now because GTM and the Next.js runtime
 // rely on inline scripts; removing them requires per-request nonces (follow-up).
+// Local development only: when the API runs on plain http (e.g.
+// http://localhost:8010) the browser must be allowed to call it. Production
+// uses https, so this adds nothing there.
+const apiBase = process.env.NEXT_PUBLIC_BASE_URL || "";
+const localApiOrigin = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(apiBase)
+  ? new URL(apiBase).origin
+  : "";
+
 const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -20,7 +28,7 @@ const CSP = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com",
-  "connect-src 'self' https: wss:",
+  `connect-src 'self' https: wss:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
   "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
   "worker-src 'self' blob:",
   "object-src 'none'",

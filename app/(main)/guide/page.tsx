@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 
 import GuideTutorialsSection from "@/features/guide/components/guide-tutorials-section";
+import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import { buildNeutralJourney } from "@/features/requests/data/order-journey";
 
 type Step = { title: string; desc: string };
 
@@ -80,6 +82,18 @@ export default async function GuidePage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* رحلة الطلب بعد الإرسال (ف2) — نفس الخطوات الست التي يراها العميل في التتبّع */}
+        <section className="flex flex-col gap-6 rounded-3xl border border-border/60 bg-white p-7 shadow-sm dark:bg-white/[0.03]">
+          <div className="flex flex-col gap-2">
+            <h2 className="inline-flex items-center gap-2 text-2xl font-bold text-foreground">
+              <CheckCircle2 className="size-6 text-brand" aria-hidden="true" />
+              {t("journeyTitle")}
+            </h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">{t("journeySubtitle")}</p>
+          </div>
+          <OrderJourneySteps steps={buildNeutralJourney()} showSentence neutral />
         </section>
 
         {/* Docs + Tips */}

@@ -19,7 +19,7 @@
     },
     "brand": {
       "name": "Rental Contract",
-      "tagline": "For a flourishing rental sector"
+      "tagline": "Lease documentation platform"
     },
     "nav": {
       "home": "Home",
@@ -663,7 +663,8 @@
   },
   "auth": {
     "hero": {
-      "imageAlt": "Rental Contract app showing a successfully issued lease contract"
+      "imageAlt": "Rental Contract app showing a successfully issued lease contract",
+      "tagline": "Lease documentation platform"
     },
     "login": {
       "back": "Back to home",
@@ -876,7 +877,7 @@
       "steps": [
         {
           "title": "Track your request status",
-          "description": "Know each request's status in real time: under review, in progress, or completed and documented."
+          "description": "Follow every order through six steps: received, paid, review, WhatsApp draft, your review, then documentation in Ejar."
         },
         {
           "title": "All your requests in one place",
@@ -1098,7 +1099,7 @@
         "draftBadge": "Draft",
         "statusUpdatedToast": "Your request status was updated",
         "expectedDurationTitle": "Expected duration",
-        "expectedDurationBody": "The expected time to send the contract draft via WhatsApp for review is less than 30 minutes during working hours from 9:00 AM to 1:00 AM daily.",
+        "expectedDurationBody": "After payment we send the contract draft on WhatsApp during working hours (9:00 AM – 1:00 AM daily) for your review; the contract is documented in Ejar only after you review the draft.",
         "contactPrompt": "For more help, feel free to contact us",
         "whatsappCta": "Contact via WhatsApp",
         "whatsappHref": "https://wa.me/"
@@ -1748,7 +1749,7 @@
       "errorBody": "Something went wrong while submitting your order. You can try again or contact us directly on WhatsApp.",
       "retry": "Try again",
       "back": "Back",
-      "successBodyPayLater": "Your order is saved. Pay now to start documentation right away, or later from your orders page or the link we send on WhatsApp.",
+      "successBodyPayLater": "Your order is saved. Pay now so we start the review and send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft. You can also pay later from your orders page or the link we send you.",
       "payNowCta": "Pay now",
       "trackOrderCta": "Track order",
       "syncing": {
@@ -2867,18 +2868,22 @@
   "paymentStatus": {
     "backLabel": "Back",
     "checkingTitle": "Checking payment status",
-    "checkingDescription": "Waiting for the backend to confirm the payment and update the contract status.",
+    "checkingDescription": "Confirming the payment and updating your order — one moment.",
     "success": {
       "pageTitle": "Payment result",
       "title": "Payment successful",
-      "description": "Your payment was received successfully"
+      "description": "Your payment was received successfully",
+      "headline": "Payment received ✅",
+      "nextStep": "Next step: the contract draft reaches you on WhatsApp during working hours for review, then we document the contract in Ejar.",
+      "nextStepLessorChange": "Next step: our team reviews both deeds, transfers the contracts to the new owner in Ejar, and notifies you on WhatsApp when done.",
+      "journeyTitle": "Your order journey"
     },
     "error": {
       "pageTitle": "Payment failed",
       "title": "Payment failed",
       "description": "Your payment could not be completed"
     },
-    "contractNumberLabel": "Contract number",
+    "contractNumberLabel": "Order number",
     "contractTypeLabel": "Contract type",
     "paidAmountLabel": "Paid amount",
     "housingContractTypeLabel": "Residential",
@@ -2888,8 +2893,12 @@
     "retryPayment": "Retry payment",
     "retryPaymentLoading": "Redirecting to payment...",
     "retryPaymentError": "Failed to start payment. Please try again.",
-    "completedMessage": "Payment succeeded and the contract status was updated to completed",
-    "failedMessage": "Payment was not completed"
+    "completedMessage": "Payment succeeded and our team has started reviewing your order.",
+    "failedMessage": "Payment was not completed",
+    "lessorChangeTypeLabel": "Lessor change",
+    "trackOrder": "Track order",
+    "whatsappSupport": "Contact support on WhatsApp",
+    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the contract draft."
   },
   "startWithAqdi": {
     "dialog": {
@@ -2987,14 +2996,16 @@
       ],
       "cta": "Create a residential lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Documented within minutes after the parties approve.",
+      "responseTime": "Draft within working hours; documented after your review.",
       "fee": "From SAR 249 / year",
       "steps": [
         "Fill in the property and unit details",
         "Enter the parties' details (landlord and tenant)",
         "Financial details, rent amount and term",
         "Terms and conditions",
-        "Review, pay and document"
+        "Review, submit the order, then pay",
+        "Receive the contract draft on WhatsApp for review",
+        "Contract documented in Ejar after you review the draft"
       ],
       "requirements": [
         "Valid national ID or residency for the parties",
@@ -3012,8 +3023,8 @@
           "a": "No. Fill in your details directly with no sign-up, and we follow up on WhatsApp to finalize the documentation."
         },
         {
-          "q": "How long does it take?",
-          "a": "Just a few minutes after the details are entered and the parties approve."
+          "q": "When is the contract documented in Ejar?",
+          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
         },
         {
           "q": "What is the fee?",
@@ -3032,14 +3043,16 @@
       ],
       "cta": "Create a commercial lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Documented within minutes after the parties approve.",
+      "responseTime": "Draft within working hours; documented after your review.",
       "fee": "From SAR 349 / year",
       "steps": [
         "Fill in the commercial property and unit details",
         "Enter the parties' details (landlord and tenant)",
         "Financial details, rent amount and term",
         "Terms and conditions",
-        "Review, pay and document"
+        "Review, submit the order, then pay",
+        "Receive the contract draft on WhatsApp for review",
+        "Contract documented in Ejar after you review the draft"
       ],
       "requirements": [
         "Valid commercial registration (if applicable)",
@@ -3057,8 +3070,8 @@
           "a": "Yes — it covers shops, offices, warehouses and commercial units of all kinds."
         },
         {
-          "q": "Do I need an account?",
-          "a": "No. Fill in your details with no sign-up, and we finalize the documentation with you on WhatsApp."
+          "q": "When is the contract documented in Ejar?",
+          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
         },
         {
           "q": "What is the fee?",
@@ -3141,8 +3154,8 @@
         "desc": "Enter the rent amount, payment method, duration, and agreed clauses."
       },
       {
-        "title": "Review, document & pay",
-        "desc": "Review the contract, document it officially via the Ejar network, and complete secure payment."
+        "title": "Review, submit, then pay",
+        "desc": "Review your details and submit the order, then pay securely via Moyasar — our team starts the review right away."
       }
     ],
     "docsTitle": "Required documents",
@@ -3169,7 +3182,9 @@
       "subtitle": "Short walkthroughs for every service. Tutorials not recorded yet are marked “Coming soon”.",
       "comingSoon": "Coming soon",
       "watch": "Watch video"
-    }
+    },
+    "journeyTitle": "Your order journey after submission",
+    "journeySubtitle": "Six clear steps from receiving your order to documenting the contract in Ejar."
   },
   "supportPage": {
     "metaTitle": "Support & Help",
@@ -3258,7 +3273,7 @@
     "typeHousing": "Residential contract",
     "typeCommercial": "Commercial contract",
     "awaitingPaymentTitle": "Awaiting payment",
-    "awaitingPaymentBody": "Your order is complete; documentation starts as soon as payment is made.",
+    "awaitingPaymentBody": "Your order is complete. After payment we send you the contract draft on WhatsApp for review, then document the contract in Ejar.",
     "payNow": "Pay now",
     "nextStep": "Next step: {step}",
     "lastUpdate": "Last update: {date}",
@@ -3266,7 +3281,8 @@
     "smartLinkHeading": "Your order is ready to follow",
     "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
     "typeLessorChange": "Lessor change request",
-    "lessorChangeFee": "Service fee: {fee} SAR"
+    "lessorChangeFee": "Service fee: {fee} SAR",
+    "journeyTitle": "Your order journey"
   },
   "lessorChange": {
     "landing": {
@@ -3352,5 +3368,14 @@
       "homeCta": "Home",
       "trackCta": "Track order"
     }
+  },
+  "orderJourney": {
+    "badge": "Your order journey",
+    "titlePrefix": "From order to",
+    "titleAccent": "documentation in Ejar",
+    "description": "Six clear steps so you always know where your order stands.",
+    "sentence": "After payment we send you the contract draft on WhatsApp for review, and we document the contract in Ejar only after you review the draft.",
+    "cta": "Start your contract",
+    "trackCta": "Track your order"
   }
 }

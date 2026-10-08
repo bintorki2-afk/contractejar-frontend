@@ -11,11 +11,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import RequestCompletePaymentButton from "@/features/requests/components/request-complete-payment-button";
+import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
 import type { ContractPaymentMethodLabels } from "@/features/create-contract/hooks/use-contract-payment-method-flow";
+import { buildTemplateJourney } from "@/features/requests/data/order-journey";
 import { useContractJourney } from "@/features/requests/hooks/use-contract-journey";
-import type { ContractJourneyStepState } from "@/features/requests/types/contract-journey";
 import type { RequestActionType } from "@/features/requests/types/request";
-import { cn } from "@/lib/utils";
 
 export type RequestReceiveContractDialogLabels = {
   title: string;
@@ -45,28 +45,6 @@ type RequestReceiveContractDialogProps = {
   labels: RequestReceiveContractDialogLabels;
 };
 
-function JourneyDot({ status }: { status: ContractJourneyStepState }) {
-  if (status === "completed") {
-    return (
-      <span className="relative z-10 mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-brand">
-        <span className="size-1.5 rounded-full bg-white" aria-hidden="true" />
-      </span>
-    );
-  }
-
-  if (status === "current") {
-    return (
-      <span className="relative z-10 mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-[#f59e0b] bg-white">
-        <span className="size-1.5 rounded-full bg-[#f59e0b]" aria-hidden="true" />
-      </span>
-    );
-  }
-
-  return (
-    <span className="relative z-10 mt-0.5 size-4 shrink-0 rounded-full border-2 border-[#d9d9d9] bg-white" />
-  );
-}
-
 export default function RequestReceiveContractDialog({
   open,
   onOpenChange,
@@ -85,11 +63,25 @@ export default function RequestReceiveContractDialog({
   });
 
   const showPayButton = actionType === "complete-payment";
-  const requestId = detail?.contractId ?? contractId;
+  // رقم الطلب الظاهر للعميل هو الـ uuid (6 أرقام) وليس المعرّف الداخلي.
+  const requestId = detail?.uuid || contractUuid || String(contractId);
   const subtitle = labels.subtitle.replace("{number}", String(requestId));
   const badgeLabel =
     detail?.journey_status_label || detail?.status_label || null;
-  const journey = detail?.journey ?? [];
+  // الخادم يعيد الرحلة الست (ف2)؛ عند غيابها نعرض القالب بحالة مشتقة من
+  // الدفع فقط (مدفوع ← الخطوتان الأوليان منجزتان).
+  const journey =
+    detail?.journey && detail.journey.length > 0
+      ? detail.journey.map((step) => ({
+          key: step.key,
+          label: step.status_label,
+          description: step.description,
+          state: step.state,
+          at: step.at ?? null,
+        }))
+      : detail
+        ? buildTemplateJourney(detail.is_completed ? 2 : 1)
+        : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -155,62 +147,7 @@ export default function RequestReceiveContractDialog({
         ) : null}
 
         {journey.length > 0 ? (
-          <ol className="relative space-y-0">
-            {journey.map((step, index) => {
-              const isLast = index === journey.length - 1;
-              const nextState = isLast ? null : journey[index + 1]?.state;
-              const lineClass =
-                step.state === "completed" &&
-                (nextState === "completed" || nextState === "current")
-                  ? nextState === "current"
-                    ? "bg-[#f59e0b]"
-                    : "bg-brand"
-                  : step.state === "current"
-                    ? "bg-[#f59e0b]/40"
-                    : "bg-[#e8e8e8]";
-
-              return (
-                <li key={`${step.key}-${index}`} className="relative flex gap-3 pb-5 last:pb-0">
-                  {!isLast ? (
-                    <span
-                      className={cn(
-                        "absolute inset-s-1.5 top-4 bottom-0 w-0.5",
-                        lineClass,
-                      )}
-                      aria-hidden="true"
-                    />
-                  ) : null}
-
-                  <JourneyDot status={step.state} />
-
-                  <div className="min-w-0 space-y-1 pt-0.5">
-                    <p
-                      className={cn(
-                        "text-sm font-extrabold leading-snug",
-                        step.state === "completed" && "text-brand",
-                        step.state === "current" && "text-[#f59e0b]",
-                        step.state === "pending" && "text-[#b0b0b0]",
-                      )}
-                    >
-                      {step.status_label}
-                    </p>
-                    {step.description ? (
-                      <p
-                        className={cn(
-                          "text-xs leading-5",
-                          step.state === "current"
-                            ? "font-semibold text-[#f59e0b]"
-                            : "text-[#9a9a9a]",
-                        )}
-                      >
-                        {step.description}
-                      </p>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <OrderJourneySteps steps={journey} showSentence />
         ) : null}
 
         {!loading && detail && journey.length === 0 && !error ? (

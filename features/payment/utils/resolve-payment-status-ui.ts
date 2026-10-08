@@ -22,6 +22,7 @@ type RawPaymentStatusPayload = {
   data?: {
     result: "success" | "error";
     resolved_result?: "success" | "error" | null;
+    kind?: string | null;
     contract_uuid: string;
     contract_id: number;
     contract_type?: string | null;
@@ -46,6 +47,7 @@ export function normalizePaymentStatusData(
   return {
     result: data.result,
     resolvedResult: data.resolved_result ?? null,
+    kind: asNullableString(data.kind),
     contractUuid: data.contract_uuid,
     contractId: data.contract_id,
     contractType: asNullableString(data.contract_type),

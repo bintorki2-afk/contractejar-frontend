@@ -8,6 +8,7 @@ import { getContentPageSeo } from "@/features/content-pages/services/get-content
 import { resolveContentPageMetadata } from "@/features/content-pages/utils/resolve-content-page-metadata";
 import FaqSectionBoundary from "@/features/faq/components/faq-section-boundary";
 import HeroSection from "@/features/home/components/hero-section";
+import OrderJourneySection from "@/features/home/components/order-journey-section";
 import Reveal from "@/features/shared/motion/reveal";
 import TrustedEntitiesSection from "@/features/home/components/trusted-entities-section";
 import { trustedEntitiesConfig } from "@/features/home/data/trusted-entities";
@@ -136,6 +137,9 @@ export default async function Home() {
       </Reveal>
       <Reveal>
         <ServicesSection />
+      </Reveal>
+      <Reveal>
+        <OrderJourneySection />
       </Reveal>
       <Reveal>
         <AdvantagesSection content={content.features} />

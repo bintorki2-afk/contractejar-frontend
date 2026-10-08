@@ -27,6 +27,7 @@ type PaymentStatusVerifierLabels = {
   paidAmountLabel: string;
   housingContractTypeLabel: string;
   commercialContractTypeLabel: string;
+  lessorChangeTypeLabel: string;
   backToRequestsLabel: string;
   backToHomeLabel: string;
   retryPaymentLabel: string;
@@ -36,6 +37,13 @@ type PaymentStatusVerifierLabels = {
   checkingDescription: string;
   completedMessage: string;
   failedMessage: string;
+  successHeadline: string;
+  successNextStep: string;
+  successNextStepLessorChange: string;
+  journeyTitle: string;
+  trackOrderLabel: string;
+  whatsappSupportLabel: string;
+  whatsappSupportMessage: string;
 };
 
 type PaymentStatusVerifierProps = {
@@ -165,7 +173,7 @@ export default function PaymentStatusVerifier({
   if (verification.state === "loading") {
     return (
       <section className="container py-8 lg:py-10">
-        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm md:p-12">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm md:p-12 dark:bg-[#1a2421]">
           <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-brand-background text-brand">
             <LoaderCircle className="size-9 animate-spin" aria-hidden="true" />
           </div>
@@ -197,12 +205,20 @@ export default function PaymentStatusVerifier({
       paidAmountLabel={labels.paidAmountLabel}
       housingContractTypeLabel={labels.housingContractTypeLabel}
       commercialContractTypeLabel={labels.commercialContractTypeLabel}
+      lessorChangeTypeLabel={labels.lessorChangeTypeLabel}
       contractNumber={contractUuid}
       backToRequestsLabel={labels.backToRequestsLabel}
       backToHomeLabel={labels.backToHomeLabel}
       retryPaymentLabel={labels.retryPaymentLabel}
       retryPaymentLoadingLabel={labels.retryPaymentLoadingLabel}
       retryPaymentErrorLabel={labels.retryPaymentErrorLabel}
+      successHeadline={labels.successHeadline}
+      successNextStep={labels.successNextStep}
+      successNextStepLessorChange={labels.successNextStepLessorChange}
+      journeyTitle={labels.journeyTitle}
+      trackOrderLabel={labels.trackOrderLabel}
+      whatsappSupportLabel={labels.whatsappSupportLabel}
+      whatsappSupportMessage={labels.whatsappSupportMessage}
       paymentContent={paymentContent}
       status={verification.statusData}
     />

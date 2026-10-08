@@ -1,7 +1,7 @@
+import { normalizeOrderJourney } from "@/features/requests/data/order-journey";
 import type {
   ContractDetail,
   ContractJourneyStep,
-  ContractJourneyStepState,
   ContractStatusSnapshot,
   ContractStatusType,
 } from "@/features/requests/types/contract-journey";
@@ -12,32 +12,6 @@ function asString(value: unknown) {
 
 function asNullableString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
-function asLocalizedString(value: unknown) {
-  if (typeof value === "string") {
-    return value.trim();
-  }
-
-  if (value && typeof value === "object") {
-    const record = value as Record<string, unknown>;
-    const localized =
-      record.ar ?? record.en ?? record.ar_SA ?? record["ar-SA"];
-    if (typeof localized === "string") {
-      return localized.trim();
-    }
-  }
-
-  return "";
-}
-
-function resolveJourneyStepDescription(row: Record<string, unknown>) {
-  return (
-    asLocalizedString(row.description) ||
-    asLocalizedString(row.client_explanation) ||
-    asLocalizedString(row.status_client_explanation) ||
-    asLocalizedString(row.status_description)
-  );
 }
 
 function asNullableNumber(value: unknown) {
@@ -52,38 +26,26 @@ function asNullableNumber(value: unknown) {
   return null;
 }
 
-function normalizeJourneyState(value: unknown): ContractJourneyStepState {
-  if (value === "completed" || value === "current" || value === "pending") {
-    return value;
-  }
-
-  return "pending";
-}
-
 function normalizeStatusType(value: unknown): ContractStatusType {
   return value === "draft" ? "draft" : "contract";
 }
 
 export function normalizeJourneySteps(raw: unknown): ContractJourneyStep[] {
-  if (!Array.isArray(raw)) {
+  // The API now returns the 6-step ف2 journey (`label/done/current/at`);
+  // older payloads used `status_label/state`. Both map onto the same model.
+  const steps = normalizeOrderJourney(raw);
+  if (!steps) {
     return [];
   }
 
-  return raw.map((item, index) => {
-    const row = (item && typeof item === "object" ? item : {}) as Record<
-      string,
-      unknown
-    >;
-    const key = asString(row.key) || asString(row.status) || `step-${index + 1}`;
-
-    return {
-      key,
-      status: asString(row.status) || key,
-      status_label: asString(row.status_label) || key,
-      description: resolveJourneyStepDescription(row),
-      state: normalizeJourneyState(row.state),
-    };
-  });
+  return steps.map((step) => ({
+    key: step.key,
+    status: step.key,
+    status_label: step.label,
+    description: step.description,
+    state: step.state,
+    at: step.at,
+  }));
 }
 
 export function normalizeContractStatusSnapshot(
@@ -121,6 +83,7 @@ export function normalizeContractStatusSnapshot(
     journey_status_label:
       asNullableString(raw.journey_status_label) || statusLabel,
     journey: normalizeJourneySteps(raw.journey),
+    journey_sentence: asNullableString(raw.journey_sentence),
   };
 }
 

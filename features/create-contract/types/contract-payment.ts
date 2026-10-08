@@ -19,6 +19,8 @@ export type ContractEmployeePaidRecord = {
 export type ContractPaymentStatusData = {
   result: "success" | "error";
   resolvedResult?: "success" | "error" | null;
+  /** `contract` (default) or `lessor_change` — drives the success copy. */
+  kind?: "contract" | "lessor_change" | string | null;
   contractUuid: string;
   contractId: number;
   contractType: string | null;

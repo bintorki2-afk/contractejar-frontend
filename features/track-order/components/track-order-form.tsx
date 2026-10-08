@@ -21,6 +21,11 @@ import {
   type TrackedOrder,
 } from "@/features/guest-session/services/track-order";
 import { getLessorChangePaymentUrl } from "@/features/lessor-change/services/get-lessor-change-payment-url";
+import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import {
+  buildTemplateJourney,
+  normalizeOrderJourney,
+} from "@/features/requests/data/order-journey";
 import { cn } from "@/lib/utils";
 import { digitsOnly } from "@/lib/utils/digits";
 
@@ -55,6 +60,12 @@ export default function TrackOrderForm({
 
   const isLessorChange =
     result?.kind === "lessor_change" || result?.contract_type === "lessor_change";
+  // رحلة الطلب (ف2): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
+  const journey =
+    result && !isLessorChange
+      ? (normalizeOrderJourney(result.journey) ??
+        buildTemplateJourney(result.is_paid ? 2 : 1))
+      : null;
   const orderDigits = digitsOnly(order);
   const mobileValid = getSaudiNationalMobile(mobile) !== null;
   const canSubmit = orderDigits.length >= 4 && mobileValid && !isLoading;
@@ -253,7 +264,12 @@ export default function TrackOrderForm({
             </p>
           ) : null}
 
-          {(result.timeline ?? []).length > 0 ? (
+          {journey ? (
+            <div className="space-y-2">
+              <p className="text-sm font-extrabold text-foreground">{t("journeyTitle")}</p>
+              <OrderJourneySteps steps={journey} showSentence />
+            </div>
+          ) : (result.timeline ?? []).length > 0 ? (
             <ol className="space-y-3 border-s-2 border-brand/20 ps-4">
               {result.timeline.map((item, index) => {
                 const isLast = index === result.timeline.length - 1;
