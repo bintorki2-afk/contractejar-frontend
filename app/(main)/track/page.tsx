@@ -30,7 +30,7 @@ export default async function TrackOrderPage() {
       <div className="container flex flex-col gap-10">
         <div className="flex flex-col gap-4 text-center">
           <nav className="mx-auto text-xs text-muted-foreground">
-            <Link href="/" className="transition hover:text-brand">
+            <Link href="/" className="inline-flex min-h-10 items-center px-1 transition hover:text-brand">
               {t("breadcrumbHome")}
             </Link>
             <span className="px-2">/</span>

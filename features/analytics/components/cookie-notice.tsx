@@ -65,7 +65,7 @@ export default function CookieNotice() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 sm:px-6 sm:pb-6">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 pb-safe sm:px-6 sm:pb-6">
       <div className="pointer-events-auto mx-auto flex w-full max-w-2xl flex-col gap-3 rounded-2xl border border-brand/20 bg-white p-4 shadow-lg shadow-black/5 sm:flex-row sm:items-center sm:gap-4 dark:border-[#2f403b] dark:bg-[#1a2421]">
         <p className="flex-1 text-sm leading-relaxed text-[#4a4a4a] dark:text-[#c9d6d1]">
           {t("message")}{" "}

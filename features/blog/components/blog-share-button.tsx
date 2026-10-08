@@ -34,7 +34,7 @@ export default function BlogShareButton({ label }: BlogShareButtonProps) {
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-brand"
+      className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-brand"
     >
       {label}
       <Share2 className="size-4" aria-hidden="true" />

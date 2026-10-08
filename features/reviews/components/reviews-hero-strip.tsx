@@ -18,7 +18,7 @@ export default async function ReviewsHeroStrip() {
     <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-muted-foreground lg:justify-start">
       <Link
         href="/reviews"
-        className="group inline-flex items-center gap-2 transition hover:text-foreground"
+        className="group inline-flex min-h-10 items-center gap-2 transition hover:text-foreground"
       >
         <span className="text-base font-extrabold text-brand">
           {reviewsSummary.average.toFixed(1)}

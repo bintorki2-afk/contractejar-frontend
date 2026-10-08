@@ -159,7 +159,7 @@ export default function ManualDeedEntryForm({
                 type="button"
                 onClick={() => updateField("typeInstrumentHistory", calendarType)}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors sm:px-5",
+                  "min-h-9 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors sm:px-5",
                   value.typeInstrumentHistory === calendarType
                     ? "bg-brand text-white"
                     : "text-[#555555] dark:text-white/60 hover:text-[#333333] dark:hover:text-white/80",

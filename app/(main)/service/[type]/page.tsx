@@ -117,7 +117,7 @@ export default async function ServicePage({
           aria-label="breadcrumb"
           className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <Link href="/" className="transition-colors hover:text-brand">
+          <Link href="/" className="inline-flex min-h-10 items-center transition-colors hover:text-brand">
             {t("breadcrumbHome")}
           </Link>
           <ChevronLeft className="size-3.5 rtl:rotate-180" aria-hidden="true" />
@@ -232,7 +232,7 @@ export default async function ServicePage({
                   <li>
                     <Link
                       href="/faq"
-                      className="inline-flex items-center gap-1.5 text-foreground transition-colors hover:text-brand"
+                      className="inline-flex min-h-10 items-center gap-1.5 text-foreground transition-colors hover:text-brand"
                     >
                       <ChevronLeft
                         className="size-3.5 rtl:rotate-180"
@@ -244,7 +244,7 @@ export default async function ServicePage({
                   <li>
                     <Link
                       href="/terms"
-                      className="inline-flex items-center gap-1.5 text-foreground transition-colors hover:text-brand"
+                      className="inline-flex min-h-10 items-center gap-1.5 text-foreground transition-colors hover:text-brand"
                     >
                       <ChevronLeft
                         className="size-3.5 rtl:rotate-180"
@@ -256,7 +256,7 @@ export default async function ServicePage({
                   <li>
                     <Link
                       href="/blog"
-                      className="inline-flex items-center gap-1.5 text-foreground transition-colors hover:text-brand"
+                      className="inline-flex min-h-10 items-center gap-1.5 text-foreground transition-colors hover:text-brand"
                     >
                       <ChevronLeft
                         className="size-3.5 rtl:rotate-180"

@@ -144,7 +144,7 @@ export default function CreateContractIntroStep({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-sm font-medium text-brand dark:text-[#48c0b8]"
+          className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-1 py-1 text-sm font-medium text-brand dark:text-[#48c0b8]"
         >
           {labels.viewAllPrices}
           <ArrowUpLeft className="size-4" aria-hidden="true" />

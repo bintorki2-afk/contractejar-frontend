@@ -12,7 +12,7 @@ type FooterLinksColumnProps = {
 };
 
 const linkClassName =
-  "inline-flex items-center gap-2 text-sm text-foreground transition hover:text-brand";
+  "inline-flex min-h-10 items-center gap-2 py-1 text-sm text-foreground transition hover:text-brand";
 
 function isExternalHref(href: string) {
   return /^https?:\/\//i.test(href);
@@ -22,7 +22,7 @@ export default function FooterLinksColumn({ title, items }: FooterLinksColumnPro
   return (
     <div className="space-y-4">
       <h3 className="text-base font-bold text-brand">{title}</h3>
-      <ul className="space-y-3">
+      <ul className="space-y-1">
         {items.map((item) => (
           <li key={item.label}>
             {item.href ? (

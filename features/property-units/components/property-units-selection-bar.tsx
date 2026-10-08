@@ -33,7 +33,7 @@ export default function PropertyUnitsSelectionBar({
       : t("selectedCommercial", { count });
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 px-4 sm:bottom-6">
+    <div className="pointer-events-none fixed inset-x-0 bottom-safe-4 z-40 px-4 sm:bottom-6">
       <div className="pointer-events-auto mx-auto flex max-w-4xl flex-col gap-3 rounded-[28px] border border-[#ececec] bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4">
         <p className="text-center text-sm font-bold text-brand sm:text-start">
           {countLabel}

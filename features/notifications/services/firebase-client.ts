@@ -44,14 +44,20 @@ export async function initFirebaseAnalytics() {
     return null;
   }
 
-  const { getAnalytics, isSupported } = await import("firebase/analytics");
-  const supported = await isSupported();
-  if (!supported) {
+  try {
+    const { getAnalytics, isSupported } = await import("firebase/analytics");
+    const supported = await isSupported();
+    if (!supported) {
+      return null;
+    }
+
+    analytics = getAnalytics(firebaseApp);
+    return analytics;
+  } catch {
+    // Offline / blocked (ad blockers, proxies): analytics is best-effort and
+    // must never surface as an unhandled rejection.
     return null;
   }
-
-  analytics = getAnalytics(firebaseApp);
-  return analytics;
 }
 
 export async function getFirebaseMessagingAsync(): Promise<Messaging | null> {

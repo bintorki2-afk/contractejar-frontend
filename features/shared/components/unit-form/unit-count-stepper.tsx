@@ -79,7 +79,7 @@ export default function UnitCountStepper({
           disabled={!canDecrease}
           onClick={() => setCount(currentCount - 1)}
           className={cn(
-            "inline-flex size-8 shrink-0 items-center justify-center rounded-xl text-white transition-colors",
+            "inline-flex size-10 shrink-0 items-center justify-center rounded-xl text-white transition-colors sm:size-8",
             canDecrease ? "bg-brand" : "bg-[#c8d6d2] dark:bg-[#2f403b]",
           )}
         >
@@ -96,7 +96,7 @@ export default function UnitCountStepper({
           disabled={!canIncrease}
           onClick={() => setCount(currentCount + 1)}
           className={cn(
-            "inline-flex size-8 shrink-0 items-center justify-center rounded-xl text-white transition-colors",
+            "inline-flex size-10 shrink-0 items-center justify-center rounded-xl text-white transition-colors sm:size-8",
             canIncrease ? "bg-brand" : "bg-[#c8d6d2] dark:bg-[#2f403b]",
           )}
         >

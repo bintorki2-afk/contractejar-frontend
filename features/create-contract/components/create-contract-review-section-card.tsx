@@ -111,7 +111,7 @@ function EditPill({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand/20 bg-white px-3 py-1.5 text-xs font-bold text-brand transition-colors hover:bg-brand-background-green dark:border-[#2f403b] dark:bg-[#121a18] dark:text-[#48c0b8] dark:hover:bg-[#24302c]",
+        "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-brand/20 bg-white px-3 py-1.5 text-xs font-bold text-brand transition-colors hover:bg-brand-background-green dark:border-[#2f403b] dark:bg-[#121a18] dark:text-[#48c0b8] dark:hover:bg-[#24302c]",
         className,
       )}
     >

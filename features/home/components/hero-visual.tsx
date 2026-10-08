@@ -95,9 +95,9 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
                 </div>
 
                 <div className={styles.scrFoot}>
-                  <button type="button" className={styles.cta} tabIndex={-1} aria-hidden="true">
+                  <span className={styles.cta} aria-hidden="true">
                     إصدار العقد الآن
-                  </button>
+                  </span>
                   <div className={styles.home} />
                 </div>
 

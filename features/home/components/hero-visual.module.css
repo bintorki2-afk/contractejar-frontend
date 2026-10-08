@@ -21,7 +21,7 @@
 .ic{display:flex;align-items:center;gap:5px;}
 .contract{width:100%;display:block;}
 .scrFoot{flex:1;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 18px 16px;gap:12px;}
-.cta{width:100%;background:linear-gradient(135deg,#0d6a5c,#0d5a50);color:#fff;font-weight:700;font-size:17px;border:none;border-radius:16px;padding:15px;box-shadow:0 10px 24px rgba(13,90,80,.35);}
+.cta{display:block;text-align:center;box-sizing:border-box;width:100%;background:linear-gradient(135deg,#0d6a5c,#0d5a50);color:#fff;font-weight:700;font-size:17px;border:none;border-radius:16px;padding:15px;box-shadow:0 10px 24px rgba(13,90,80,.35);}
 .home{width:120px;height:5px;border-radius:3px;background:#111;opacity:.85;}
 .sheen{position:absolute;top:0;bottom:0;width:80px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);filter:blur(2px);animation:sheen 6s ease-in-out infinite;z-index:7;pointer-events:none;}
 .success{position:absolute;left:50%;bottom:98px;transform:translateX(-50%);width:calc(100% - 26px);display:flex;align-items:center;gap:12px;padding:13px 16px;background:#fff;border-radius:16px;box-shadow:0 12px 26px rgba(10,40,34,.16);z-index:9;animation:sfloat2 5s ease-in-out infinite;}

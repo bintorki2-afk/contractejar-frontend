@@ -94,7 +94,7 @@ export default function InstallPrompt() {
   return (
     <div
       className={cn(
-        "fixed inset-x-3 bottom-3 z-[70] mx-auto max-w-md rounded-3xl border p-4 shadow-2xl transition-all duration-300 lg:hidden",
+        "fixed inset-x-3 bottom-safe-4 z-[70] mx-auto max-w-md rounded-3xl border p-4 shadow-2xl transition-all duration-300 lg:hidden",
         "border-black/10 bg-white text-foreground dark:border-white/10 dark:bg-[#0f1a17]",
         shown ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
       )}

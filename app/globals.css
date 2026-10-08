@@ -1135,3 +1135,31 @@ html.a11y-motion .animate-shine,
 html.a11y-motion .animate-pulse-ring,
 html.a11y-motion .animate-marquee,
 html.a11y-motion .animate-marquee-vertical { animation: none !important; }
+
+/* ── التوافق مع الجوال (#34-1) ─────────────────────────────────────────────
+   - خطوط الحقول 16px على الشاشات اللمسية حتى لا يكبّر iOS Safari الصفحة عند التركيز.
+   - أهداف اللمس: الأزرار الأيقونية الصغيرة في الشريط العلوي والتذييل ≥ 44px على اللمس.
+   - الهوامش الآمنة (notch / home indicator) للأشرطة الثابتة أسفل الشاشة.          */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  button[data-size="icon-lg"],
+  button[data-size="icon"] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.bottom-safe-6 {
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+.bottom-safe-4 {
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}

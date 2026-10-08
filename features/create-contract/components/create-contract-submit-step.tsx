@@ -80,7 +80,7 @@ function OverviewEditIcon({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="inline-flex cursor-pointer items-center justify-center rounded-lg text-brand dark:text-[#48c0b8]"
+      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-brand hover:bg-brand-background-green dark:text-[#48c0b8]"
     >
       <Pencil className="size-3.5" aria-hidden="true" />
     </button>
@@ -425,7 +425,7 @@ export default function CreateContractSubmitStep({
                   className="relative flex flex-col items-start rounded-xl border border-[#dfe7e3] bg-white px-4 py-3 text-start shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-[#2f403b] dark:bg-[#1a2421] dark:shadow-none"
                 >
                   {item.editable ? (
-                    <div className="absolute inset-e-3 top-3">
+                    <div className="absolute inset-e-1 top-1">
                       <OverviewEditIcon
                         label={`${reviewLabels.edit} ${item.label}`}
                         onClick={() => handleEdit("overview")}

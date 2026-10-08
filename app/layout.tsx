@@ -92,7 +92,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0db38b",
+  width: "device-width",
+  initialScale: 1,
+  // Draw under the notch / home indicator; fixed bars use env(safe-area-inset-*).
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0B5A3C" },
+    { media: "(prefers-color-scheme: dark)", color: "#101614" },
+  ],
 };
 
 const RTL_LOCALES = new Set(["ar", "fa", "he", "ur"]);

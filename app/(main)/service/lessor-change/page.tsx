@@ -103,7 +103,7 @@ export default async function LessorChangeServicePage() {
           aria-label="breadcrumb"
           className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <Link href="/" className="transition-colors hover:text-brand">
+          <Link href="/" className="inline-flex min-h-10 items-center transition-colors hover:text-brand">
             {tService("breadcrumbHome")}
           </Link>
           <ChevronLeft className="size-3.5 rtl:rotate-180" aria-hidden="true" />

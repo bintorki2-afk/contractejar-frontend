@@ -18,7 +18,7 @@ type CreateContractStepperProps = {
 };
 
 const stepPillClassName =
-  "relative inline-flex h-9 shrink-0 items-center justify-center rounded-full px-2 text-[11px] font-semibold whitespace-nowrap transition-all sm:h-12 sm:grow sm:px-3 sm:text-sm";
+  "relative inline-flex h-10 shrink-0 items-center justify-center rounded-full px-2 text-[11px] font-semibold whitespace-nowrap transition-all sm:h-12 sm:grow sm:px-3 sm:text-sm";
 
 const skippedStrikeClassName =
   "after:pointer-events-none after:absolute after:inset-x-1.5 after:top-1/2 after:h-[1.5px] after:[transform-origin:right_center] after:rounded-full after:bg-brand after:content-['']";
