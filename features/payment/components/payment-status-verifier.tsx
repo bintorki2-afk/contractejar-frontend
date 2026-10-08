@@ -13,7 +13,7 @@ import {
 } from "@/features/payment/utils/resolve-payment-status-ui";
 import type { PaymentContentItem } from "@/features/payment/types/payment-content";
 import { trackPurchaseOnce } from "@/lib/analytics/track";
-import { BASE_URL } from "@/lib/api/constants";
+import { getPaymentStatusPayload } from "@/features/payment/services/get-payment-status-payload";
 
 type PaymentStatusVerifierLabels = {
   backLabel: string;
@@ -95,25 +95,16 @@ export default function PaymentStatusVerifier({
           verificationParams.set("status", paymentStatus);
         }
 
-        const query = verificationParams.toString();
-        const endpoint = `${BASE_URL}/status/${status}/${contractUuid}${
-          query ? `?${query}` : ""
-        }`;
-
-        const response = await fetch(endpoint, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-          cache: "no-store",
-        });
-
-        const payload = (await response.json().catch(() => null)) as Parameters<
-          typeof resolvePaymentStatusUi
-        >[0];
+        // Through the website server with the session token (the API hides
+        // contract/payment details from anonymous callers).
+        const payload = (await getPaymentStatusPayload(status, contractUuid, {
+          id: verificationParams.get("id"),
+          invoice_id: verificationParams.get("invoice_id"),
+          status: verificationParams.get("status"),
+        })) as Parameters<typeof resolvePaymentStatusUi>[0];
 
         if (process.env.NODE_ENV !== "production") {
-          console.log("[payment-status]", endpoint, payload);
+          console.log("[payment-status]", contractUuid, payload);
         }
 
         if (!isMounted) {
