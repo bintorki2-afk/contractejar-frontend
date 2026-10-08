@@ -98,7 +98,7 @@ export default function CreateContractDeedTypeSelect({
       >
         <button
           type="button"
-          className="flex min-w-0 flex-1 items-center gap-2 text-start disabled:cursor-not-allowed"
+          className="flex min-w-0 flex-1 items-center gap-2 self-stretch text-start disabled:cursor-not-allowed"
           onClick={openSelect}
           disabled={locked}
         >

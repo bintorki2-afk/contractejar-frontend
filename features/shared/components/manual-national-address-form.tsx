@@ -128,7 +128,7 @@ function AddressSelect({
         )}
       >
         <div
-          className="flex min-w-0 flex-1 items-center"
+          className="flex min-w-0 flex-1 cursor-pointer items-center self-stretch"
           onClick={openSelect}
         >
           {value ? (

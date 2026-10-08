@@ -90,7 +90,7 @@ export default function CreatePropertyDeedTypeSelect({
       >
         <button
           type="button"
-          className="flex min-w-0 flex-1 items-center gap-2 text-start"
+          className="flex min-w-0 flex-1 items-center gap-2 self-stretch text-start"
           onClick={openSelect}
         >
           <Building2
