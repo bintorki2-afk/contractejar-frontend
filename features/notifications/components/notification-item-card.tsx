@@ -142,7 +142,7 @@ export default function NotificationItemCard({
         {showAmount ? (
           <p className="text-xs font-bold text-foreground">
             {meta.key === "refund" ? "المبلغ المسترجع: " : "قيمة الخصم: "}
-            <span dir="ltr">{formatAmount(item.amount as number)}</span>
+            <span>{formatAmount(item.amount as number)}</span>
           </p>
         ) : null}
         {dateLabel ? (
