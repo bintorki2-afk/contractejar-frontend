@@ -14,6 +14,9 @@ export type RequestInvoiceDialogLabels = {
   platformSubtitle: string;
   printLabel: string;
   totalDueLabel: string;
+  subtotalLabel: string;
+  discountLabel: string;
+  vatLabel: string;
   unpaidStatusLabel: string;
   paidStatusLabel: string;
 };

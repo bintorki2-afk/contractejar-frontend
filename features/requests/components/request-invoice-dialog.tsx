@@ -1,7 +1,6 @@
 "use client";
 
 import { Printer, X } from "lucide-react";
-import { useLocale } from "next-intl";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -19,8 +18,6 @@ type RequestInvoiceDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contractId: number;
-  uuid: string;
-  contractTypeLabel: string;
   labels: RequestInvoiceDialogLabels;
 };
 
@@ -28,6 +25,74 @@ type InvoiceDocumentProps = {
   invoice: ContractInvoice;
   labels: RequestInvoiceDialogLabels;
 };
+
+/** الإجمالي الفرعي / الخصم / الضريبة / الإجمالي — كلها من الخادم (ف1). */
+function InvoiceTotals({
+  invoice,
+  labels,
+  print = false,
+}: InvoiceDocumentProps & { print?: boolean }) {
+  const rows: Array<{ key: string; label: string; value: string; discount?: boolean }> = [];
+
+  if (invoice.subtotal_label) {
+    rows.push({ key: "subtotal", label: labels.subtotalLabel, value: invoice.subtotal_label });
+  }
+  if (invoice.discount && invoice.discount > 0 && invoice.discount_label) {
+    rows.push({
+      key: "discount",
+      label: invoice.coupon_code
+        ? `${labels.discountLabel} (${invoice.coupon_code})`
+        : labels.discountLabel,
+      value: `- ${invoice.discount_label}`,
+      discount: true,
+    });
+  }
+  if (invoice.vat_label) {
+    rows.push({ key: "vat", label: labels.vatLabel, value: invoice.vat_label });
+  }
+
+  return (
+    <div
+      className={
+        print
+          ? "mt-5 overflow-hidden rounded-2xl border-2 border-brand"
+          : "mt-3 overflow-hidden rounded-2xl border border-[#ececec]"
+      }
+    >
+      {rows.map((row) => (
+        <div
+          key={row.key}
+          className="flex items-center justify-between gap-3 border-b border-[#f0f0f0] bg-white px-4 py-2.5 text-sm"
+        >
+          <span className="text-[#6f6f6f]">{row.label}</span>
+          <span
+            className={
+              row.discount ? "font-bold text-[#c0392b]" : "font-bold text-[#222222]"
+            }
+          >
+            {row.value}
+          </span>
+        </div>
+      ))}
+      {invoice.total_due_label || invoice.total_amount_label ? (
+        <div
+          className={
+            print
+              ? "flex items-center justify-between gap-3 bg-brand-background-green/60 px-5 py-4"
+              : "flex items-center justify-between gap-3 bg-[#f7f7f7] px-4 py-3"
+          }
+        >
+          <span className="text-sm font-bold text-[#3f4d4a]">
+            {invoice.total_due_label || labels.totalDueLabel}
+          </span>
+          <span className={print ? "text-xl font-extrabold text-brand" : "text-sm font-extrabold text-brand"}>
+            {invoice.total_amount_label}
+          </span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function InvoiceDocument({ invoice, labels }: InvoiceDocumentProps) {
   const statusColor = invoice.status_color || "#2f9e6f";
@@ -101,7 +166,11 @@ function InvoiceDocument({ invoice, labels }: InvoiceDocumentProps) {
               <span className="font-medium text-[#333333]">
                 {item.description}
               </span>
-              <span className="font-bold text-[#222222]">
+              <span
+                className={
+                  item.is_discount ? "font-bold text-[#c0392b]" : "font-bold text-[#222222]"
+                }
+              >
                 {item.amount_label}
               </span>
             </div>
@@ -109,16 +178,7 @@ function InvoiceDocument({ invoice, labels }: InvoiceDocumentProps) {
         </div>
       ) : null}
 
-      {invoice.total_due_label || invoice.total_amount_label ? (
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-[#f7f7f7] px-4 py-3">
-          <span className="text-sm font-bold text-[#555555]">
-            {invoice.total_due_label}
-          </span>
-          <span className="text-sm font-extrabold text-brand">
-            {invoice.total_amount_label}
-          </span>
-        </div>
-      ) : null}
+      <InvoiceTotals invoice={invoice} labels={labels} />
 
       {invoice.status_label ? (
         <div className="mt-4 flex justify-center">
@@ -253,7 +313,13 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
                   <td className="py-3 pe-3 align-top text-[#333333]">
                     {item.description}
                   </td>
-                  <td className="py-3 ps-3 pe-4 text-end align-top font-bold text-[#222222]">
+                  <td
+                    className={
+                      item.is_discount
+                        ? "py-3 ps-3 pe-4 text-end align-top font-bold text-[#c0392b]"
+                        : "py-3 ps-3 pe-4 text-end align-top font-bold text-[#222222]"
+                    }
+                  >
                     {item.amount_label}
                   </td>
                 </tr>
@@ -263,16 +329,7 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
           </div>
         ) : null}
 
-        {invoice.total_due_label || invoice.total_amount_label ? (
-          <div className="mt-5 flex items-center justify-between rounded-2xl border-2 border-brand bg-brand-background-green/60 px-5 py-4">
-            <span className="text-sm font-bold text-[#3f4d4a]">
-              {invoice.total_due_label}
-            </span>
-            <span className="text-xl font-extrabold text-brand">
-              {invoice.total_amount_label}
-            </span>
-          </div>
-        ) : null}
+        <InvoiceTotals invoice={invoice} labels={labels} print />
 
         {invoice.status_label ? (
           <div className="mt-6 flex justify-center">
@@ -303,11 +360,8 @@ export default function RequestInvoiceDialog({
   open,
   onOpenChange,
   contractId,
-  uuid,
-  contractTypeLabel,
   labels,
 }: RequestInvoiceDialogProps) {
-  const locale = useLocale();
   const [isLoading, setIsLoading] = useState(open);
   const [error, setError] = useState<string | null>(null);
   const [invoice, setInvoice] = useState<ContractInvoice | null>(null);
@@ -338,23 +392,8 @@ export default function RequestInvoiceDialog({
 
     let cancelled = false;
 
-    // Depend on the individual label strings (not the labels object) so a new
-    // labels identity doesn't trigger a re-fetch.
-    getContractInvoice({
-      contractId,
-      uuid,
-      contractTypeLabel,
-      locale,
-      chrome: {
-        title: labels.title,
-        platformName: labels.platformName,
-        platformSubtitle: labels.platformSubtitle,
-        printLabel: labels.printLabel,
-        totalDueLabel: labels.totalDueLabel,
-        unpaidStatusLabel: labels.unpaidStatusLabel,
-        paidStatusLabel: labels.paidStatusLabel,
-      },
-    })
+    // ف1: الفاتورة (البنود + الإجماليات) من الخادم فقط.
+    getContractInvoice({ contractId })
       .then((result) => {
         if (cancelled) {
           return;
@@ -384,22 +423,7 @@ export default function RequestInvoiceDialog({
     return () => {
       cancelled = true;
     };
-  }, [
-    open,
-    attempt,
-    contractId,
-    uuid,
-    contractTypeLabel,
-    locale,
-    labels.loadError,
-    labels.title,
-    labels.platformName,
-    labels.platformSubtitle,
-    labels.printLabel,
-    labels.totalDueLabel,
-    labels.unpaidStatusLabel,
-    labels.paidStatusLabel,
-  ]);
+  }, [open, attempt, contractId, labels.loadError]);
 
   function handlePrint() {
     if (!invoice) {

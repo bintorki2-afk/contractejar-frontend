@@ -1122,7 +1122,10 @@
         "printLabel": "Print / Download invoice",
         "paidStatusLabel": "Paid",
         "unpaidStatusLabel": "Unpaid",
-        "loadError": "Failed to load invoice"
+        "loadError": "Failed to load invoice",
+        "subtotalLabel": "Subtotal",
+        "discountLabel": "Discount",
+        "vatLabel": "VAT"
       },
       "whatsappLabel": "Contact via WhatsApp",
       "whatsappHref": "https://wa.me/",

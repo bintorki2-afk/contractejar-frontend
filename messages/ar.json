@@ -1162,7 +1162,10 @@
         "printLabel": "طباعة / تحميل الفاتورة",
         "paidStatusLabel": "مدفوعة",
         "unpaidStatusLabel": "غير مدفوعة",
-        "loadError": "تعذر تحميل الفاتورة"
+        "loadError": "تعذر تحميل الفاتورة",
+        "subtotalLabel": "الإجمالي الفرعي",
+        "discountLabel": "الخصم",
+        "vatLabel": "ضريبة القيمة المضافة"
       },
       "whatsappLabel": "تواصل عبر واتساب",
       "whatsappHref": "https://wa.me/",
