@@ -12,7 +12,8 @@ import {
   type PaymentStatusUiState,
 } from "@/features/payment/utils/resolve-payment-status-ui";
 import type { PaymentContentItem } from "@/features/payment/types/payment-content";
-import { BASE_URL } from "@/lib/api/constants";
+import { trackPurchaseOnce } from "@/lib/analytics/track";
+import { getPaymentStatusPayload } from "@/features/payment/services/get-payment-status-payload";
 
 type PaymentStatusVerifierLabels = {
   backLabel: string;
@@ -27,6 +28,7 @@ type PaymentStatusVerifierLabels = {
   paidAmountLabel: string;
   housingContractTypeLabel: string;
   commercialContractTypeLabel: string;
+  lessorChangeTypeLabel: string;
   backToRequestsLabel: string;
   backToHomeLabel: string;
   retryPaymentLabel: string;
@@ -36,6 +38,13 @@ type PaymentStatusVerifierLabels = {
   checkingDescription: string;
   completedMessage: string;
   failedMessage: string;
+  successHeadline: string;
+  successNextStep: string;
+  successNextStepLessorChange: string;
+  journeyTitle: string;
+  trackOrderLabel: string;
+  whatsappSupportLabel: string;
+  whatsappSupportMessage: string;
 };
 
 type PaymentStatusVerifierProps = {
@@ -86,25 +95,16 @@ export default function PaymentStatusVerifier({
           verificationParams.set("status", paymentStatus);
         }
 
-        const query = verificationParams.toString();
-        const endpoint = `${BASE_URL}/status/${status}/${contractUuid}${
-          query ? `?${query}` : ""
-        }`;
-
-        const response = await fetch(endpoint, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-          cache: "no-store",
-        });
-
-        const payload = (await response.json().catch(() => null)) as Parameters<
-          typeof resolvePaymentStatusUi
-        >[0];
+        // Through the website server with the session token (the API hides
+        // contract/payment details from anonymous callers).
+        const payload = (await getPaymentStatusPayload(status, contractUuid, {
+          id: verificationParams.get("id"),
+          invoice_id: verificationParams.get("invoice_id"),
+          status: verificationParams.get("status"),
+        })) as Parameters<typeof resolvePaymentStatusUi>[0];
 
         if (process.env.NODE_ENV !== "production") {
-          console.log("[payment-status]", endpoint, payload);
+          console.log("[payment-status]", contractUuid, payload);
         }
 
         if (!isMounted) {
@@ -122,6 +122,19 @@ export default function PaymentStatusVerifier({
         });
 
         if (outcome.isPaid) {
+          // GTM `purchase` — once per order per session (docs/analytics-events.md).
+          trackPurchaseOnce({
+            transaction_id: String(contractUuid),
+            value: outcome.statusData?.paidAmount ?? undefined,
+            currency: "SAR",
+            contract_type:
+              outcome.statusData?.kind === "lessor_change"
+                ? "lessor_change"
+                : (outcome.statusData?.contractType?.toLowerCase() === "commercial"
+                    ? "commercial"
+                    : "housing"),
+          });
+
           // The paid order now lives on the server: clear the local draft so
           // the next "create contract" starts clean (only when this draft is
           // the one that was just paid).
@@ -165,7 +178,7 @@ export default function PaymentStatusVerifier({
   if (verification.state === "loading") {
     return (
       <section className="container py-8 lg:py-10">
-        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm md:p-12">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm md:p-12 dark:bg-[#1a2421]">
           <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-brand-background text-brand">
             <LoaderCircle className="size-9 animate-spin" aria-hidden="true" />
           </div>
@@ -197,12 +210,20 @@ export default function PaymentStatusVerifier({
       paidAmountLabel={labels.paidAmountLabel}
       housingContractTypeLabel={labels.housingContractTypeLabel}
       commercialContractTypeLabel={labels.commercialContractTypeLabel}
+      lessorChangeTypeLabel={labels.lessorChangeTypeLabel}
       contractNumber={contractUuid}
       backToRequestsLabel={labels.backToRequestsLabel}
       backToHomeLabel={labels.backToHomeLabel}
       retryPaymentLabel={labels.retryPaymentLabel}
       retryPaymentLoadingLabel={labels.retryPaymentLoadingLabel}
       retryPaymentErrorLabel={labels.retryPaymentErrorLabel}
+      successHeadline={labels.successHeadline}
+      successNextStep={labels.successNextStep}
+      successNextStepLessorChange={labels.successNextStepLessorChange}
+      journeyTitle={labels.journeyTitle}
+      trackOrderLabel={labels.trackOrderLabel}
+      whatsappSupportLabel={labels.whatsappSupportLabel}
+      whatsappSupportMessage={labels.whatsappSupportMessage}
       paymentContent={paymentContent}
       status={verification.statusData}
     />

@@ -26,6 +26,7 @@ export default function BlogFeaturedCard({ post }: BlogFeaturedCardProps) {
         alt={post.featuredTitle}
         fill
         priority
+        fetchPriority="high"
         sizes="(max-width: 1024px) 100vw, 55vw"
         className="object-cover transition-transform duration-500 group-hover:scale-105"
       />

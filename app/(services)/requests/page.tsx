@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import RequestsLoadError from "@/features/requests/components/requests-load-error";
 import RequestsPageContent from "@/features/requests/components/requests-page-content";
 import { getContracts } from "@/features/requests/services/get-contracts";
 import type { RequestCardData } from "@/features/requests/types/request";
@@ -11,11 +12,18 @@ import { mapContractToRequestCard } from "@/features/requests/utils/map-contract
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 
 export default async function RequestsPage() {
+  let loadError: "unauthorized" | "failed" | null = null;
   const [t, tPayment, whatsappHref, contracts] = await Promise.all([
     getTranslations("requests"),
     getTranslations("createContract.payment"),
     getWhatsappHref(),
-    getContracts().catch(() => [] as Awaited<ReturnType<typeof getContracts>>),
+    getContracts().catch((error: unknown) => {
+      // Before: any failure (expired session, outage) rendered «لا توجد لديك
+      // طلبات حالياً» — the customer thought the orders were gone.
+      loadError =
+        (error as { status?: number } | null)?.status === 401 ? "unauthorized" : "failed";
+      return [] as Awaited<ReturnType<typeof getContracts>>;
+    }),
   ]);
 
   const labels: RequestLabels = {
@@ -366,6 +374,9 @@ export default async function RequestsPage() {
         platformSubtitle: t("card.invoiceDialog.platformSubtitle"),
         printLabel: t("card.invoiceDialog.printLabel"),
         totalDueLabel: t("card.invoiceDialog.totalDueLabel"),
+        subtotalLabel: t("card.invoiceDialog.subtotalLabel"),
+        discountLabel: t("card.invoiceDialog.discountLabel"),
+        vatLabel: t("card.invoiceDialog.vatLabel"),
         unpaidStatusLabel: t("card.invoiceDialog.unpaidStatusLabel"),
         paidStatusLabel: t("card.invoiceDialog.paidStatusLabel"),
       },
@@ -389,6 +400,10 @@ export default async function RequestsPage() {
       }),
     )
     .sort((a, b) => Number(b.contractId) - Number(a.contractId));
+
+  if (loadError) {
+    return <RequestsLoadError kind={loadError} />;
+  }
 
   return <RequestsPageContent labels={labels} items={items} />;
 }

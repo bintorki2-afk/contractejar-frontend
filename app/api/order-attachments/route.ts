@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 
+import {
+  clientIp,
+  createRateLimiter,
+  isSameOriginRequest,
+  sniffAllowedDocumentType,
+} from "@/lib/security/request-guards";
+
 // Best-effort forwarding of deed / document images that the customer attached
 // in the wizard. This runs AFTER the order itself has already been recorded
 // (see /api/order) — it is deliberately isolated so it can NEVER affect whether
@@ -17,6 +24,11 @@ const MAX_FILES = 15;
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8MB per file
 const MAX_TOTAL_BYTES = 30 * 1024 * 1024; // 30MB per submission
 
+// Public route (no login): it used to forward ANY file (.exe/.html tested), from
+// any site, without limit, into the business Telegram chat. Now: same-origin
+// only, a per-IP limit, and only real images/PDFs (checked by content).
+const isRateLimited = createRateLimiter(5, 10 * 60 * 1000); // 5 submissions / 10 min / IP
+
 async function sendDocument(
   token: string,
   chatId: string,
@@ -27,7 +39,9 @@ async function sendDocument(
     const form = new FormData();
     form.append("chat_id", chatId);
     form.append("caption", caption.slice(0, 1024));
-    form.append("document", file, file.name || "document");
+    // Neutral name: the visitor-supplied file name is not forwarded as-is.
+    const extension = /\.(jpe?g|png|webp|pdf|heic)$/i.exec(file.name)?.[0] ?? "";
+    form.append("document", file, `document${extension.toLowerCase()}`);
 
     const response = await fetch(
       `https://api.telegram.org/bot${token}/sendDocument`,
@@ -41,6 +55,22 @@ async function sendDocument(
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+  }
+
+  const declaredLength = Number(request.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_TOTAL_BYTES + 1024 * 1024) {
+    return NextResponse.json({ ok: false, error: "payload_too_large" }, { status: 413 });
+  }
+
+  if (isRateLimited(clientIp(request))) {
+    return NextResponse.json(
+      { ok: false, error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": "600" } },
+    );
+  }
+
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -72,12 +102,19 @@ export async function POST(request: Request) {
 
   let totalBytes = 0;
   let sent = 0;
+  let rejected = 0;
   const limited = files.slice(0, MAX_FILES);
 
   for (let index = 0; index < limited.length; index += 1) {
     const file = limited[index];
 
     if (file.size > MAX_FILE_BYTES) {
+      continue;
+    }
+
+    // Real content type (magic bytes), not the name/claimed MIME.
+    if (!(await sniffAllowedDocumentType(file))) {
+      rejected += 1;
       continue;
     }
 
@@ -95,7 +132,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    { ok: sent > 0, sent, received: files.length },
+    { ok: sent > 0, sent, received: files.length, rejected },
     { status: 200 },
   );
 }

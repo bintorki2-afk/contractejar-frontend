@@ -56,7 +56,7 @@ export default function BlogListCard({ post }: BlogListCardProps) {
       <Link
         href={`/blog/${post.slug}`}
         aria-label={post.listTitle}
-        className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand/10"
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand/10"
       >
         <ArrowUpLeft className="size-4" aria-hidden="true" />
       </Link>

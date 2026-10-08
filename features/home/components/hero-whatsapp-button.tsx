@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa";
+
+import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
 
 type HeroWhatsappButtonProps = {
   label: string;
@@ -11,12 +12,11 @@ export default function HeroWhatsappButton({
   href = "https://wa.me/",
 }: HeroWhatsappButtonProps) {
   return (
-    <Link
+    <WhatsappCtaLink
+      placement="hero_floating"
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
       aria-label={label}
-      className="fixed bottom-6 end-6 z-40 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 lg:absolute"
+      className="fixed bottom-safe-6 end-6 z-40 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 lg:absolute"
     >
       {/* Attention pulse ring toward the primary conversion channel. */}
       <span
@@ -24,6 +24,6 @@ export default function HeroWhatsappButton({
         className="pointer-events-none absolute inset-0 rounded-full bg-[#25D366] animate-pulse-ring"
       />
       <FaWhatsapp className="relative size-7" aria-hidden="true" />
-    </Link>
+    </WhatsappCtaLink>
   );
 }

@@ -28,7 +28,7 @@ export default function FooterNewsletter({
       />
       <button
         type="submit"
-        className="absolute inset-e-1.5 top-1/2 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-lg bg-brand-secondary text-white transition-colors hover:bg-brand"
+        className="absolute inset-e-1 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-lg bg-brand-secondary text-white transition-colors hover:bg-brand"
         aria-label={submitLabel}
       >
         <ArrowLeft className="size-4" aria-hidden="true" />

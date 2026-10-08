@@ -9,7 +9,16 @@ import {
   WEBSITE_CLIENT_HEADER,
   WEBSITE_CLIENT_ID,
 } from "@/lib/api/constants";
-import { getErrorMessage } from "@/lib/api/get-error-message";
+import { clientIpHeaders } from "@/lib/api/api-request";
+import {
+  getResponseErrorMessage,
+  NETWORK_ERROR_MESSAGE,
+} from "@/lib/api/get-error-message";
+
+// The API answers a gateway outage with a generic «غير مسموح» plus raw
+// `gateway_error` (cURL/host details): show a clear Arabic message instead.
+const GATEWAY_ERROR_MESSAGE =
+  "تعذّر الاتصال ببوابة الدفع حالياً. طلبك محفوظ — حاول بعد قليل أو تواصل معنا عبر واتساب.";
 
 function resolvePaymentUrl(data: ContractPaymentApiResponse | null | undefined) {
   if (!data) {
@@ -62,6 +71,8 @@ export async function getContractPaymentUrl(contractUuid: string): Promise<
       headers: {
         Accept: "application/json",
         [WEBSITE_CLIENT_HEADER]: WEBSITE_CLIENT_ID,
+        // Per-visitor rate limit on the API (not one budget for the whole site).
+        ...(await clientIpHeaders()),
       },
     });
 
@@ -69,7 +80,7 @@ export async function getContractPaymentUrl(contractUuid: string): Promise<
   } catch {
     return {
       ok: false,
-      error: "Network error",
+      error: NETWORK_ERROR_MESSAGE,
     };
   }
 
@@ -79,9 +90,11 @@ export async function getContractPaymentUrl(contractUuid: string): Promise<
     return {
       ok: false,
       error:
-        getErrorMessage(payload) ||
-        payload?.message ||
-        "Failed to initiate contract payment",
+        // Gateway outage: the API now answers 503 with its own Arabic message —
+        // shown as-is; older responses (400 «غير مسموح» + gateway_error) get ours.
+        payload && typeof payload === "object" && "gateway_error" in payload && response.status < 500
+          ? GATEWAY_ERROR_MESSAGE
+          : getResponseErrorMessage(response.status, payload),
     };
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { ensureGuestSession } from "@/features/guest-session/services/ensure-guest-session";
 import { setGuestContact } from "@/features/guest-session/services/set-guest-contact";
@@ -27,6 +27,12 @@ import { isSubleaseContract } from "@/features/create-contract/utils/is-sublease
 import { mapDeedTypeToInstrumentType } from "@/features/create-contract/utils/map-deed-type-to-instrument-type";
 import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
 import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
+import { MAX_SERVER_ACTION_UPLOAD_BYTES, totalBytes } from "@/lib/files/compress-image";
+
+// One step's attachments travel in one request (Vercel: 4.5 MB max) — say so
+// clearly instead of a failure the customer cannot act on.
+const STEP_UPLOAD_TOO_LARGE =
+  "حجم مرفقات هذه الخطوة أكبر من 4 ميجابايت مجتمعة. صوّر المستندات بدقة أقل أو أرسل ملفات PDF أصغر، ثم أعد الإرسال.";
 
 export type SyncContractStage =
   | "session"
@@ -41,7 +47,12 @@ export type SyncContractStage =
 
 export type SyncContractResult =
   | { ok: true; contractId: number; uuid: string }
-  | { ok: false; stage: SyncContractStage; error: string };
+  /**
+   * `status`: HTTP status of the failing call (0 = the request itself threw,
+   * e.g. offline or the upload was rejected before reaching the server).
+   * 4xx means the server rejected the data — the customer must fix it.
+   */
+  | { ok: false; stage: SyncContractStage; error: string; status: number };
 
 function firstFile(files: File[], persisted: PersistedFile[]): File | undefined {
   if (files.length > 0 && files[0] instanceof File) {
@@ -60,6 +71,58 @@ function allFiles(files: File[], persisted: PersistedFile[]): File[] {
 }
 
 /**
+ * The same draft open in two tabs: tab A sends it (server contract #1 is saved
+ * in localStorage), then tab B — whose in-memory draft never saw that id —
+ * sent it again and created a second order (tested: 445150 + 684391). Before
+ * creating a contract, adopt the server identity another tab stored for the
+ * same draft (same contract type, owner and tenant ID numbers).
+ */
+const DRAFT_STORAGE_KEY = "aqdi-create-contract-draft";
+
+function adoptServerIdentityFromOtherTab(rawValue?: string | null) {
+  const store = useCreateContractDraftStore.getState();
+  if (store.contractSession?.serverContractId || typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const raw = rawValue ?? window.localStorage.getItem(DRAFT_STORAGE_KEY);
+    const persisted = raw ? JSON.parse(raw)?.state : null;
+    const session = persisted?.contractSession;
+    if (!session?.serverContractId || !session?.serverUuid) {
+      return;
+    }
+
+    const sameDraft =
+      session.contractType === store.contractSession?.contractType &&
+      persisted?.owner?.ownerData?.idNumber === store.owner.ownerData.idNumber &&
+      persisted?.tenant?.tenantData?.individual?.idNumber ===
+        store.tenant.tenantData.individual.idNumber &&
+      persisted?.tenant?.tenantData?.organization?.unifiedRecordNumber ===
+        store.tenant.tenantData.organization.unifiedRecordNumber;
+
+    if (sameDraft) {
+      store.setServerContractIdentity({
+        contractId: Number(session.serverContractId),
+        uuid: String(session.serverUuid),
+      });
+    }
+  } catch {
+    // Unreadable storage: fall back to creating the contract as before.
+  }
+}
+
+// Tab B overwrites localStorage with its own copy on its next edit (e.g. the
+// OTP dialog storing the mobile), so catch tab A's write the moment it happens.
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === DRAFT_STORAGE_KEY && event.newValue) {
+      adoptServerIdentityFromOtherTab(event.newValue);
+    }
+  });
+}
+
+/**
  * Draft-first stays: the whole wizard is filled offline in the browser. This
  * hook replays the finished draft onto the backend in one go (start →
  * step1…6) so a real contract exists for payment, tracking and the dashboard.
@@ -70,7 +133,12 @@ function allFiles(files: File[], persisted: PersistedFile[]): File[] {
  */
 export function useSyncContractToServer(contractType: ContractTypeId) {
   const [isSyncing, setIsSyncing] = useState(false);
-  const [stage, setStage] = useState<SyncContractStage | null>(null);
+  const [stage, setStageState] = useState<SyncContractStage | null>(null);
+  const stageRef = useRef<SyncContractStage | null>(null);
+  function setStage(next: SyncContractStage | null) {
+    stageRef.current = next;
+    setStageState(next);
+  }
 
   async function syncContract({
     contactWhatsapp,
@@ -87,17 +155,23 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       setStage("session");
       const session = await ensureGuestSession();
       if (!session.ok) {
-        return { ok: false, stage: "session", error: session.error };
+        return { ok: false, stage: "session", error: session.error, status: 503 };
       }
 
       // 1) Contract id — reuse the server one when the draft already has it.
       setStage("start");
-      let contractId = store.contractSession?.serverContractId ?? null;
-      let uuid = store.contractSession?.serverUuid ?? null;
+      adoptServerIdentityFromOtherTab();
+      const current = useCreateContractDraftStore.getState();
+      let contractId = current.contractSession?.serverContractId ?? null;
+      let uuid = current.contractSession?.serverUuid ?? null;
 
       if (!contractId || !uuid) {
-        const existing = store.existingPropertyContext;
-        const currentSession = store.contractSession;
+        const existing = current.existingPropertyContext;
+        const currentSession = current.contractSession;
+        // Stable for this draft until the server id replaces it (WEBSITE-3).
+        const idempotencyKey = currentSession
+          ? `web-${currentSession.contractId}-${currentSession.orderReference ?? ""}`
+          : undefined;
         const started =
           existing && currentSession?.isReal
             ? await startContract({
@@ -105,14 +179,14 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
                 is_real: true,
                 real_id: currentSession.realId,
                 unit_ids: currentSession.unitIds,
-              })
+              }, idempotencyKey)
             : await startContract({
                 contract_type: toPropertyContractType(contractType),
                 is_real: false,
-              });
+              }, idempotencyKey);
 
         if (!started.ok) {
-          return { ok: false, stage: "start", error: started.error };
+          return { ok: false, stage: "start", error: started.error, status: started.status };
         }
 
         contractId = started.contractId;
@@ -122,7 +196,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
 
       const deedType = deed.selectedDeedType;
       if (deedType === "") {
-        return { ok: false, stage: "deed", error: "missing deed type" };
+        return { ok: false, stage: "deed", error: "missing deed type", status: 400 };
       }
 
       const skipState = { selectedDeedType: deedType };
@@ -138,6 +212,22 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         deed.useManualDeedEntry &&
         deedTypeSupportsManualEntry(deedType) &&
         isManualDeedEntryComplete(deed.manualDeedEntry);
+
+      const step1Files = [
+        ...deedPages,
+        firstFile(deed.deedFrontFiles, deed.deedFrontPersistedFiles),
+        firstFile(deed.deedBackFiles, deed.deedBackPersistedFiles),
+        isDeceased ? firstFile(deed.deedInheritanceFiles, deed.deedInheritancePersistedFiles) : undefined,
+        isDeceased ? firstFile(deed.deedHeirsPoaFiles, deed.deedHeirsPoaPersistedFiles) : undefined,
+        isWaqf ? firstFile(deed.deedEndowmentCertFiles, deed.deedEndowmentCertPersistedFiles) : undefined,
+        isWaqf ? firstFile(deed.deedTrusteeshipFiles, deed.deedTrusteeshipPersistedFiles) : undefined,
+        (isDeceased && deed.hasMinorHeirs) || (isWaqf && deed.isMultipleTrusteeshipDeedCopy)
+          ? firstFile(deed.deedGuardiansPoaFiles, deed.deedGuardiansPoaPersistedFiles)
+          : undefined,
+      ];
+      if (totalBytes(step1Files) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+        return { ok: false, stage: "deed", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+      }
 
       const step1 = await submitContractStep1({
         contractId,
@@ -166,7 +256,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         manualDeedEntry: useManual ? deed.manualDeedEntry : undefined,
       });
       if (!step1.ok) {
-        return { ok: false, stage: "deed", error: step1.error };
+        return { ok: false, stage: "deed", error: step1.error, status: step1.status };
       }
       store.setContractStep1Data(step1.data);
 
@@ -192,7 +282,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           manualAddress: deed.nationalAddressManual,
         });
         if (!step2.ok) {
-          return { ok: false, stage: "address", error: step2.error };
+          return { ok: false, stage: "address", error: step2.error, status: step2.status };
         }
         store.setContractStep2Data(step2.data);
       }
@@ -209,6 +299,9 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           owner.agentData.powerOfAttorneyFiles,
           owner.agentPersistedFiles,
         );
+        if (totalBytes(agentFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+          return { ok: false, stage: "owner", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+        }
         const step3 = await submitContractStep3({
           contractId,
           ownerData: owner.ownerData,
@@ -216,7 +309,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           representativeMode,
         });
         if (!step3.ok) {
-          return { ok: false, stage: "owner", error: step3.error };
+          return { ok: false, stage: "owner", error: step3.error, status: step3.status };
         }
         store.setContractStep3Data(step3.data);
       }
@@ -228,6 +321,9 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         tenantData.organization.powerOfAttorneyFiles,
         tenant.tenantPersistedFiles,
       );
+      if (totalBytes(tenantOrgFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+        return { ok: false, stage: "tenant", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+      }
       const step4 = await submitContractStep4({
         contractId,
         tenantData: {
@@ -244,7 +340,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
             : undefined,
       });
       if (!step4.ok) {
-        return { ok: false, stage: "tenant", error: step4.error };
+        return { ok: false, stage: "tenant", error: step4.error, status: step4.status };
       }
       store.setContractStep4Data(step4.data);
 
@@ -259,7 +355,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           rentedUnits: tenant.rentedUnits,
         });
         if (!step5.ok) {
-          return { ok: false, stage: "units", error: step5.error };
+          return { ok: false, stage: "units", error: step5.error, status: step5.status };
         }
         store.setContractStep5Data(step5.data);
       }
@@ -274,7 +370,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       }
       const step6 = await submitContractStep6({ contractId, financeData, roles });
       if (!step6.ok) {
-        return { ok: false, stage: "finance", error: step6.error };
+        return { ok: false, stage: "finance", error: step6.error, status: step6.status };
       }
       store.setContractStep6Data(step6.data);
 
@@ -283,6 +379,16 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       void setGuestContact(contactWhatsapp);
 
       return { ok: true, contractId, uuid };
+    } catch {
+      // A server action that throws (connection dropped, request body rejected
+      // by the host before reaching the app) used to escape as an unhandled
+      // rejection: the button reset silently with no message.
+      return {
+        ok: false,
+        stage: stageRef.current ?? "session",
+        error: "",
+        status: 0,
+      };
     } finally {
       setIsSyncing(false);
       setStage(null);

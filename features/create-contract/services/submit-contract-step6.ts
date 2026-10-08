@@ -24,6 +24,7 @@ export async function submitContractStep6(payload: ContractStep6Payload) {
   if (!response.ok || !response.data?.success || !response.data.data) {
     return {
       ok: false as const,
+      status: response.status,
       error:
         response.error ||
         response.data?.message ||

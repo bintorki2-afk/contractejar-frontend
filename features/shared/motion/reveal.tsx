@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
 
 type RevealProps = {
   children: ReactNode;
@@ -16,7 +17,10 @@ type RevealProps = {
  * Fades + slides its children up when they scroll into view (once).
  *
  * Ambient, low-key motion that makes the page feel alive without distracting.
- * Users with `prefers-reduced-motion` get the content immediately, unanimated.
+ * Implemented with IntersectionObserver + a CSS transition (no animation
+ * library on the critical path — the previous `motion` build added ~120 KB of
+ * JS to every marketing page). Users with `prefers-reduced-motion`, and
+ * browsers without IntersectionObserver, get the content immediately.
  */
 export default function Reveal({
   children,
@@ -24,21 +28,45 @@ export default function Reveal({
   delay = 0,
   y = 26,
 }: RevealProps) {
-  const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
 
-  if (reduced) {
-    return <div className={className}>{children}</div>;
-  }
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const reduce =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || typeof IntersectionObserver === "undefined") {
+      node.dataset.revealed = "1";
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShown(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+    <div
+      ref={ref}
+      className={cn("reveal-on-scroll", shown && "is-revealed", className)}
+      style={{
+        transitionDelay: delay ? `${delay}s` : undefined,
+        ["--reveal-y" as string]: `${y}px`,
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

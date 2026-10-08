@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
@@ -20,11 +22,11 @@ type SearchParams = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("reviewsPage");
-  return {
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/reviews" },
-  };
+    path: "/reviews",
+  });
 }
 
 /** Build a querystring, dropping empty values and resetting page on filter change. */
@@ -83,7 +85,7 @@ export default async function ReviewsPage({
         {/* Header */}
         <div className="flex flex-col gap-4 text-center">
           <nav className="mx-auto text-xs text-muted-foreground">
-            <Link href="/" className="transition hover:text-brand">
+            <Link href="/" className="inline-flex min-h-10 items-center px-1 transition hover:text-brand">
               {t("breadcrumbHome")}
             </Link>
             <span className="px-2">/</span>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import { getTranslations } from "next-intl/server";
 import { Landmark } from "lucide-react";
 
@@ -16,16 +16,16 @@ export default async function ReviewsHeroStrip() {
 
   return (
     <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-muted-foreground lg:justify-start">
-      <Link
+      <IntentLink
         href="/reviews"
-        className="group inline-flex items-center gap-2 transition hover:text-foreground"
+        className="group inline-flex min-h-10 items-center gap-2 transition hover:text-foreground"
       >
         <span className="text-base font-extrabold text-brand">
           {reviewsSummary.average.toFixed(1)}
         </span>
         <ReviewStars rating={reviewsSummary.average} size={13} />
         <span className="font-semibold">{t("trustLabel")}</span>
-      </Link>
+      </IntentLink>
 
       <span aria-hidden="true" className="text-muted-foreground/40">
         •

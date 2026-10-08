@@ -10,6 +10,7 @@ export const PROTECTED_ROUTE_PREFIXES = [
   "/requests",
   "/notifications",
   "/profile",
+  "/account",
 ] as const;
 
 export function isGuestOnlyRoute(pathname: string): boolean {

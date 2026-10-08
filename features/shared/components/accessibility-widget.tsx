@@ -89,7 +89,7 @@ export default function AccessibilityWidget() {
         aria-label={t("open")}
         aria-expanded={open}
         className={cn(
-          "fixed bottom-6 start-6 z-[65] flex size-12 items-center justify-center rounded-full border border-white/20 bg-brand text-white shadow-lg transition hover:scale-105",
+          "fixed bottom-safe-6 start-6 z-[65] flex size-12 items-center justify-center rounded-full border border-white/20 bg-brand text-white shadow-lg transition hover:scale-105",
           active && "ring-2 ring-brand-secondary ring-offset-2 ring-offset-transparent",
         )}
       >

@@ -22,7 +22,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 /** Inline script that sets the theme class before first paint (no flash). */
-export const THEME_NO_FLASH_SCRIPT = `(function(){try{var k='${THEME_STORAGE_KEY}';var t=localStorage.getItem(k);if(t!=='dark'&&t!=='light'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}var e=document.documentElement;if(t==='dark'){e.classList.add('dark');}else{e.classList.remove('dark');}}catch(e){}})();`;
+export const THEME_NO_FLASH_SCRIPT = `(function(){try{var k='${THEME_STORAGE_KEY}';var t=localStorage.getItem(k);if(t!=='dark'&&t!=='light'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}var e=document.documentElement;e.classList.add('js');if(t==='dark'){e.classList.add('dark');}else{e.classList.remove('dark');}}catch(e){}})();`;
 
 function readInitialTheme(): Theme {
   if (typeof document !== "undefined") {

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -26,10 +26,10 @@ export default function NavbarIconPopLink({
   const active = pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <Link
+    <IntentLink
       href={href}
       className={cn(
-        "group relative inline-flex items-center font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand",
+        "group relative inline-flex items-center font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
         active ? "text-brand" : "text-black dark:text-white/85",
       )}
     >
@@ -46,6 +46,6 @@ export default function NavbarIconPopLink({
         {icon}
       </span>
       <span className="leading-none">{label}</span>
-    </Link>
+    </IntentLink>
   );
 }

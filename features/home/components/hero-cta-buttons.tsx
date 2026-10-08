@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeftRight, ChevronLeft } from "lucide-react";
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 
 import HeroCtaButton from "@/features/home/components/hero-cta-button";
 import { resetCreateContractDraft } from "@/features/create-contract/utils/reset-create-contract-draft";
@@ -25,7 +25,7 @@ export default function HeroCtaButtons({
     <div className="flex flex-col gap-3">
     <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4">
       <div className="flex w-full flex-col items-center gap-2 sm:min-w-0 sm:flex-1">
-        <Link
+        <IntentLink
           href="/create-contract?id=residential"
           className="w-full"
           onClick={resetCreateContractDraft}
@@ -35,7 +35,7 @@ export default function HeroCtaButtons({
             iconSrc="/icons/housing.svg"
             featured
           />
-        </Link>
+        </IntentLink>
         <p className="flex items-center justify-center gap-1.5 text-sm font-bold text-brand">
           <span aria-hidden="true">🔥</span>
           {mostRequested}
@@ -44,7 +44,7 @@ export default function HeroCtaButtons({
       </div>
 
       <div className="w-full sm:min-w-0 sm:flex-1">
-        <Link
+        <IntentLink
           href="/create-contract?id=commercial"
           className="w-full"
           onClick={resetCreateContractDraft}
@@ -53,13 +53,13 @@ export default function HeroCtaButtons({
             label={commercialCta}
             iconSrc="/icons/commercial.svg"
           />
-        </Link>
+        </IntentLink>
       </div>
     </div>
 
       {/* Third service: «تغيير المؤجر» — a quiet secondary link under the two
           contract CTAs. */}
-      <Link
+      <IntentLink
         href="/service/lessor-change"
         className="group inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-brand/15 bg-white/70 py-2 pe-4 ps-2 text-sm font-bold text-brand transition-colors hover:border-brand/40 hover:bg-white dark:border-[#2f403b] dark:bg-white/5 dark:hover:bg-white/10"
       >
@@ -74,7 +74,7 @@ export default function HeroCtaButtons({
           className="size-4 shrink-0 transition-transform group-hover:-translate-x-0.5 rtl:rotate-0 ltr:rotate-180"
           aria-hidden="true"
         />
-      </Link>
+      </IntentLink>
     </div>
   );
 }

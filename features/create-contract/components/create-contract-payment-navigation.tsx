@@ -9,6 +9,8 @@ type CreateContractPaymentNavigationProps = {
   payingLabel?: string;
   saveLabel?: string;
   isPaying?: boolean;
+  /** Pay stays disabled until the server amount is known. */
+  payDisabled?: boolean;
   isSaving?: boolean;
   onPrevious: () => void;
   onPay: () => void;
@@ -21,6 +23,7 @@ export default function CreateContractPaymentNavigation({
   payingLabel,
   saveLabel,
   isPaying = false,
+  payDisabled = false,
   isSaving = false,
   onPrevious,
   onPay,
@@ -62,7 +65,7 @@ export default function CreateContractPaymentNavigation({
         <Button
           type="button"
           onClick={onPay}
-          disabled={busy}
+          disabled={busy || payDisabled}
           className="h-11 basis-full rounded-xl bg-linear-to-br from-brand-secondary via-brand to-brand text-base font-extrabold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1 sm:basis-auto"
         >
           {isPaying ? (

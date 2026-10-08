@@ -4,23 +4,27 @@ import { getTranslations } from "next-intl/server";
 import { FaWhatsapp } from "react-icons/fa";
 import { ArrowLeft, Clock, LifeBuoy, Phone } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
+import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
+import { breadcrumbJsonLd, buildPageMetadata } from "@/lib/seo/page-metadata";
 import FooterSocialLinks from "@/features/footer/components/footer-social-links";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
-import { resolveFooterSocialLinks } from "@/features/settings/utils/resolve-footer-contact";
+import {
+  resolveFooterPhone,
+  resolveFooterPhoneHref,
+  resolveFooterSocialLinks,
+  resolveFooterWhatsappHref,
+} from "@/features/settings/utils/resolve-footer-contact";
 
 type Topic = { title: string; desc: string; href: string };
 
-const WHATSAPP_HREF = "https://wa.me/966597500014";
-const PHONE_DISPLAY = "+966 59 750 0014";
-const PHONE_HREF = "tel:+966597500014";
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("supportPage");
-  return {
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/support" },
-  };
+    path: "/support",
+  });
 }
 
 export default async function SupportPage() {
@@ -30,14 +34,24 @@ export default async function SupportPage() {
   ]);
   const topics = t.raw("topics") as Topic[];
   const socialLinks = resolveFooterSocialLinks(settings);
+  // رقم الدعم من إعدادات الخادم (whatsapp_contact) مع القيمة الاحتياطية الموحّدة.
+  const whatsappHref = resolveFooterWhatsappHref(settings);
+  const phoneDisplay = resolveFooterPhone(settings, "+966 59 750 0014");
+  const phoneHref = resolveFooterPhoneHref(settings) ?? whatsappHref;
 
   return (
     <main className="py-14 md:py-20">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("breadcrumbHome"), path: "/" },
+          { name: t("breadcrumb"), path: "/support" },
+        ])}
+      />
       <div className="container flex flex-col gap-12">
         {/* Header */}
         <div className="flex flex-col gap-4 text-center">
           <nav className="mx-auto text-xs text-muted-foreground">
-            <Link href="/" className="transition hover:text-brand">
+            <Link href="/" className="inline-flex min-h-10 items-center px-1 transition hover:text-brand">
               {t("breadcrumbHome")}
             </Link>
             <span className="px-2">/</span>
@@ -64,10 +78,9 @@ export default async function SupportPage() {
           </h2>
           <div className="grid gap-5 md:grid-cols-3">
             {/* WhatsApp */}
-            <a
-              href={WHATSAPP_HREF}
-              target="_blank"
-              rel="noreferrer"
+            <WhatsappCtaLink
+              placement="support_page"
+              href={whatsappHref}
               className="group flex flex-col gap-3 rounded-3xl border border-border/60 bg-white p-7 shadow-sm transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.03]"
             >
               <span className="flex size-12 items-center justify-center rounded-2xl bg-green-500/10 text-green-500">
@@ -83,11 +96,11 @@ export default async function SupportPage() {
                 {t("whatsappAction")}
                 <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
               </span>
-            </a>
+            </WhatsappCtaLink>
 
             {/* Phone */}
             <a
-              href={PHONE_HREF}
+              href={phoneHref}
               className="group flex flex-col gap-3 rounded-3xl border border-border/60 bg-white p-7 shadow-sm transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.03]"
             >
               <span className="flex size-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
@@ -100,7 +113,7 @@ export default async function SupportPage() {
                 {t("phoneDesc")}
               </span>
               <span className="mt-1 text-sm font-bold text-brand" dir="ltr">
-                {PHONE_DISPLAY}
+                {phoneDisplay}
               </span>
             </a>
 

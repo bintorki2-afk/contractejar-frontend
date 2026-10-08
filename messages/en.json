@@ -1,10 +1,14 @@
 {
   "site": {
-    "metaTitle": "Electronic Rental Contract via Ejar — Documented",
+    "metaTitle": "Ejar Contract | Lease documentation platform via Ejar",
     "metaDescription": "Create a documented residential or commercial rental contract via the Ejar platform in minutes — simple steps, clear fees, and certified procedures that protect landlord and tenant rights.",
     "homeTitle": "Home",
     "aboutTitle": "About us",
-    "aboutDescription": "Learn about Rental Contract, our vision, mission, and values for documenting electronic rental contracts."
+    "aboutDescription": "Learn about Rental Contract, our vision, mission, and values for documenting electronic rental contracts.",
+    "blogTitle": "Blog",
+    "blogDescription": "Practical guides on leases in Saudi Arabia: landlord and tenant rights, Ejar documentation, termination, renewal and required documents.",
+    "faqTitle": "FAQ",
+    "faqDescription": "Clear answers about documenting a lease with Ejar Contract: fees, documents, timing, the WhatsApp draft and documentation in Ejar."
   },
   "navbar": {
     "topBar": {
@@ -19,7 +23,7 @@
     },
     "brand": {
       "name": "Rental Contract",
-      "tagline": "For a flourishing rental sector"
+      "tagline": "Lease documentation platform"
     },
     "nav": {
       "home": "Home",
@@ -296,42 +300,42 @@
     },
     "coreValues": {
       "badge": "Our values",
-      "title": "Rental Contract values",
-      "description": "Ejar aims to regulate the real estate rental sector in Saudi Arabia in a balanced way that protects the rights of all parties in the rental process.",
+      "title": "Our values at Ejar Contract",
+      "description": "We commit to values that protect every party to the lease and keep documentation clear and secure.",
       "items": [
         {
           "id": "transparency",
           "icon": "/icons/folder-star.svg",
           "eyebrow": "Transparency",
           "title": "Towards clear and responsible management",
-          "description": "Providing clear and fully open information to the public to enhance citizen understanding."
+          "description": "Published fees and clear steps from order to documentation — no surprises."
         },
         {
           "id": "trust",
           "icon": "/icons/badge.svg",
           "eyebrow": "Trust",
-          "title": "The foundation of our relationship with citizens",
-          "description": "Our platform relies on transparent and accurate information to serve you efficiently."
+          "title": "The basis of our relationship with customers",
+          "description": "Your contracts are documented through the official Ejar platform with accurate data and a human review before documentation."
         },
         {
           "id": "balance",
           "icon": "/icons/like.svg",
           "eyebrow": "Balance",
           "title": "Effective service and clear vision",
-          "description": "Providing clear and fully open information to the public to enhance citizen understanding."
+          "description": "A balanced contract that protects both landlord and tenant under Ejar regulations."
         }
       ]
     },
     "beneficiaries": {
       "badge": "Beneficiary Customers",
-      "title": "Beneficiaries of (Ejar)",
-      "description": "Based on the partnership with Ejar for housing services, all parties in the process can register and use the electronic rental services network.",
+      "title": "Who the service is for",
+      "description": "Ejar Contract serves every party to the lease in the Kingdom — individuals, businesses and real-estate offices.",
       "items": [
         {
           "id": "tenant",
           "icon": "/icons/user.svg",
           "title": "Tenant",
-          "description": "Citizens and residents benefiting from rental services."
+          "description": "Citizens and residents who want a documented contract that protects their rights."
         },
         {
           "id": "lessor",
@@ -434,6 +438,14 @@
       "metaTitle": "Privacy Policy",
       "metaDescription": "Read Rental Contract privacy policy and how we protect your data.",
       "empty": "Privacy policy is not available at the moment."
+    },
+    "updatedAt": "Last updated",
+    "contact": {
+      "title": "Questions about this policy?",
+      "privacyBody": "To access, correct or delete your data, or for any question, contact us and we will reply during working hours.",
+      "termsBody": "For any question about the terms, fees or cancellation, contact us and we will clarify everything.",
+      "support": "Support page",
+      "whatsapp": "Support WhatsApp"
     }
   },
   "faq": {
@@ -663,7 +675,8 @@
   },
   "auth": {
     "hero": {
-      "imageAlt": "Rental Contract app showing a successfully issued lease contract"
+      "imageAlt": "Rental Contract app showing a successfully issued lease contract",
+      "tagline": "Lease documentation platform"
     },
     "login": {
       "back": "Back to home",
@@ -876,7 +889,7 @@
       "steps": [
         {
           "title": "Track your request status",
-          "description": "Know each request's status in real time: under review, in progress, or completed and documented."
+          "description": "Follow every order through six steps: received, paid, review, WhatsApp draft, your review, then documentation in Ejar."
         },
         {
           "title": "All your requests in one place",
@@ -1098,7 +1111,7 @@
         "draftBadge": "Draft",
         "statusUpdatedToast": "Your request status was updated",
         "expectedDurationTitle": "Expected duration",
-        "expectedDurationBody": "The expected time to send the contract draft via WhatsApp for review is less than 30 minutes during working hours from 9:00 AM to 1:00 AM daily.",
+        "expectedDurationBody": "After payment we send the contract draft on WhatsApp during working hours (9:00 AM – 1:00 AM daily) for your review; the contract is documented in Ejar only after you review the draft.",
         "contactPrompt": "For more help, feel free to contact us",
         "whatsappCta": "Contact via WhatsApp",
         "whatsappHref": "https://wa.me/"
@@ -1121,7 +1134,10 @@
         "printLabel": "Print / Download invoice",
         "paidStatusLabel": "Paid",
         "unpaidStatusLabel": "Unpaid",
-        "loadError": "Failed to load invoice"
+        "loadError": "Failed to load invoice",
+        "subtotalLabel": "Subtotal",
+        "discountLabel": "Discount",
+        "vatLabel": "VAT"
       },
       "whatsappLabel": "Contact via WhatsApp",
       "whatsappHref": "https://wa.me/",
@@ -1470,7 +1486,7 @@
         "issues": {
           "fullName": "Owner's full name",
           "idNumber": "Owner's ID number",
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "birthDate": "Owner's date of birth",
           "phone": "Owner's mobile number",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
@@ -1480,7 +1496,7 @@
           "powerOfAttorney": "Power of attorney attachment"
         },
         "fieldErrors": {
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
           "iban": "IBAN must start with SA followed by 22 digits"
         }
@@ -1748,7 +1764,7 @@
       "errorBody": "Something went wrong while submitting your order. You can try again or contact us directly on WhatsApp.",
       "retry": "Try again",
       "back": "Back",
-      "successBodyPayLater": "Your order is saved. Pay now to start documentation right away, or later from your orders page or the link we send on WhatsApp.",
+      "successBodyPayLater": "Your order is saved. Pay now so we start the review and send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft. You can also pay later from your orders page or the link we send you.",
       "payNowCta": "Pay now",
       "trackOrderCta": "Track order",
       "syncing": {
@@ -1764,7 +1780,8 @@
       },
       "smartLinkHint": "Your direct order link (opens the app when installed):",
       "reviewIntroLoggedIn": "Review your details before submitting; we'll contact you on your account number.",
-      "incompleteSections": "Some sections are incomplete — check the red hints and try again."
+      "incompleteSections": "Some sections are incomplete — check the red hints and try again.",
+      "errorBodyUpload": "We couldn't send your order data. Check your connection; if the attachments are large, upload smaller images and try again — your data is saved."
     },
     "incompleteContinue": "Please complete all required fields before continuing",
     "fieldRequired": "This field is required",
@@ -2062,7 +2079,7 @@
         "issues": {
           "fullName": "Owner's full name",
           "idNumber": "Owner's ID number",
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "birthDate": "Owner's date of birth",
           "phone": "Owner's mobile number",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
@@ -2072,7 +2089,7 @@
           "powerOfAttorney": "Power of attorney attachment"
         },
         "fieldErrors": {
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
           "iban": "IBAN must start with SA followed by 22 digits"
         }
@@ -2654,7 +2671,7 @@
         "sectionTitle": "Your order fees",
         "ejarFees": "Contract documentation fees on Ejar",
         "contractPeriodPrice": "Contract period price:",
-        "vat": "Value Added Tax (15%)",
+        "vat": "Value Added Tax",
         "applicationFees": "Application fees:",
         "electricityMeterFee": "Electricity meter fee:",
         "waterMeterFee": "Water meter fee:",
@@ -2862,23 +2879,30 @@
       "sendCode": "Send verification code",
       "otpLengthHint": "The code is 4 to 6 digits",
       "verifyAndSubmit": "Verify and submit"
-    }
+    },
+    "uploadTooLarge": "The file is larger than 4 MB — take a lower-resolution photo or choose a smaller PDF.",
+    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF.",
+    "rentAmountWholeRiyals": "Only whole riyals are used — halalas after the decimal point are not added to the contract value."
   },
   "paymentStatus": {
     "backLabel": "Back",
     "checkingTitle": "Checking payment status",
-    "checkingDescription": "Waiting for the backend to confirm the payment and update the contract status.",
+    "checkingDescription": "Confirming the payment and updating your order — one moment.",
     "success": {
       "pageTitle": "Payment result",
       "title": "Payment successful",
-      "description": "Your payment was received successfully"
+      "description": "Your payment was received successfully",
+      "headline": "Payment received ✅",
+      "nextStep": "Next step: the contract draft reaches you on WhatsApp during working hours for review, then we document the contract in Ejar.",
+      "nextStepLessorChange": "Next step: our team reviews both deeds, transfers the contracts to the new owner in Ejar, and notifies you on WhatsApp when done.",
+      "journeyTitle": "Your order journey"
     },
     "error": {
       "pageTitle": "Payment failed",
       "title": "Payment failed",
       "description": "Your payment could not be completed"
     },
-    "contractNumberLabel": "Contract number",
+    "contractNumberLabel": "Order number",
     "contractTypeLabel": "Contract type",
     "paidAmountLabel": "Paid amount",
     "housingContractTypeLabel": "Residential",
@@ -2888,8 +2912,12 @@
     "retryPayment": "Retry payment",
     "retryPaymentLoading": "Redirecting to payment...",
     "retryPaymentError": "Failed to start payment. Please try again.",
-    "completedMessage": "Payment succeeded and the contract status was updated to completed",
-    "failedMessage": "Payment was not completed"
+    "completedMessage": "Payment succeeded and our team has started reviewing your order.",
+    "failedMessage": "Payment was not completed",
+    "lessorChangeTypeLabel": "Lessor change",
+    "trackOrder": "Track order",
+    "whatsappSupport": "Contact support on WhatsApp",
+    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the contract draft."
   },
   "startWithAqdi": {
     "dialog": {
@@ -2987,14 +3015,16 @@
       ],
       "cta": "Create a residential lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Documented within minutes after the parties approve.",
+      "responseTime": "Draft within working hours; documented after your review.",
       "fee": "From SAR 249 / year",
       "steps": [
         "Fill in the property and unit details",
         "Enter the parties' details (landlord and tenant)",
         "Financial details, rent amount and term",
         "Terms and conditions",
-        "Review, pay and document"
+        "Review, submit the order, then pay",
+        "Receive the contract draft on WhatsApp for review",
+        "Contract documented in Ejar after you review the draft"
       ],
       "requirements": [
         "Valid national ID or residency for the parties",
@@ -3012,12 +3042,12 @@
           "a": "No. Fill in your details directly with no sign-up, and we follow up on WhatsApp to finalize the documentation."
         },
         {
-          "q": "How long does it take?",
-          "a": "Just a few minutes after the details are entered and the parties approve."
+          "q": "When is the contract documented in Ejar?",
+          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
         },
         {
           "q": "What is the fee?",
-          "a": "Residential documentation fees start from SAR 249 per year."
+          "a": "Fees are shown in the “Service fee” card on this page and in the price sheet inside the wizard, and include the Ejar platform fee. Document surcharge or meter transfer fees apply only when needed."
         }
       ]
     },
@@ -3032,14 +3062,16 @@
       ],
       "cta": "Create a commercial lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Documented within minutes after the parties approve.",
+      "responseTime": "Draft within working hours; documented after your review.",
       "fee": "From SAR 349 / year",
       "steps": [
         "Fill in the commercial property and unit details",
         "Enter the parties' details (landlord and tenant)",
         "Financial details, rent amount and term",
         "Terms and conditions",
-        "Review, pay and document"
+        "Review, submit the order, then pay",
+        "Receive the contract draft on WhatsApp for review",
+        "Contract documented in Ejar after you review the draft"
       ],
       "requirements": [
         "Valid commercial registration (if applicable)",
@@ -3057,15 +3089,16 @@
           "a": "Yes — it covers shops, offices, warehouses and commercial units of all kinds."
         },
         {
-          "q": "Do I need an account?",
-          "a": "No. Fill in your details with no sign-up, and we finalize the documentation with you on WhatsApp."
+          "q": "When is the contract documented in Ejar?",
+          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
         },
         {
           "q": "What is the fee?",
-          "a": "Commercial documentation fees start from SAR 349 per year."
+          "a": "Fees are shown in the “Service fee” card on this page and in the price sheet inside the wizard, and include the Ejar platform fee. Document surcharge or meter transfer fees apply only when needed."
         }
       ]
-    }
+    },
+    "feeFrom": "From SAR {fee} / year"
   },
   "a11y": {
     "open": "Accessibility tools",
@@ -3141,8 +3174,8 @@
         "desc": "Enter the rent amount, payment method, duration, and agreed clauses."
       },
       {
-        "title": "Review, document & pay",
-        "desc": "Review the contract, document it officially via the Ejar network, and complete secure payment."
+        "title": "Review, submit, then pay",
+        "desc": "Review your details and submit the order, then pay securely via Moyasar — our team starts the review right away."
       }
     ],
     "docsTitle": "Required documents",
@@ -3169,7 +3202,9 @@
       "subtitle": "Short walkthroughs for every service. Tutorials not recorded yet are marked “Coming soon”.",
       "comingSoon": "Coming soon",
       "watch": "Watch video"
-    }
+    },
+    "journeyTitle": "Your order journey after submission",
+    "journeySubtitle": "Six clear steps from receiving your order to documenting the contract in Ejar."
   },
   "supportPage": {
     "metaTitle": "Support & Help",
@@ -3239,7 +3274,7 @@
     "homeCta": "Back to home"
   },
   "trackPage": {
-    "metaTitle": "Track your order | Contract Ejar",
+    "metaTitle": "Track your order",
     "metaDescription": "Check your rental contract order status with the order number and mobile — no sign-in needed.",
     "breadcrumbHome": "Home",
     "breadcrumb": "Track order",
@@ -3258,15 +3293,17 @@
     "typeHousing": "Residential contract",
     "typeCommercial": "Commercial contract",
     "awaitingPaymentTitle": "Awaiting payment",
-    "awaitingPaymentBody": "Your order is complete; documentation starts as soon as payment is made.",
+    "awaitingPaymentBody": "Your order is complete. After payment we send you the contract draft on WhatsApp for review, then document the contract in Ejar.",
     "payNow": "Pay now",
     "nextStep": "Next step: {step}",
     "lastUpdate": "Last update: {date}",
-    "smartLinkTitle": "Order {order} | Contract Ejar",
+    "smartLinkTitle": "Order {order}",
     "smartLinkHeading": "Your order is ready to follow",
     "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
     "typeLessorChange": "Lessor change request",
-    "lessorChangeFee": "Service fee: {fee} SAR"
+    "lessorChangeFee": "Service fee: {fee} SAR",
+    "journeyTitle": "Your order journey",
+    "awaitingPaymentBodyLessorChange": "Your request is complete. After payment we start moving the contracts linked to the old deed to the new deed and keep you updated."
   },
   "lessorChange": {
     "landing": {
@@ -3332,7 +3369,7 @@
       "idNumberLabel": "New owner ID number",
       "idNumberPlaceholder": "1XXXXXXXXX",
       "idNumberRequired": "ID number is required",
-      "idNumberLength": "ID number must be 10 digits",
+      "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
       "birthDateLabel": "New owner date of birth",
       "notesLabel": "Notes",
       "notesPlaceholder": "Anything else we should know (optional)",
@@ -3352,5 +3389,14 @@
       "homeCta": "Home",
       "trackCta": "Track order"
     }
+  },
+  "orderJourney": {
+    "badge": "Your order journey",
+    "titlePrefix": "From order to",
+    "titleAccent": "documentation in Ejar",
+    "description": "Six clear steps so you always know where your order stands.",
+    "sentence": "After payment we send you the contract draft on WhatsApp for review, and we document the contract in Ejar only after you review the draft.",
+    "cta": "Start your contract",
+    "trackCta": "Track your order"
   }
 }

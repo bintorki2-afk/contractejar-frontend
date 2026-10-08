@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, FileText, Gauge, Home, X } from "lucide-react";
+import { Building2, Home, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
@@ -14,10 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
-import { DEED_TYPES, type DeedTypeId } from "@/features/create-contract/types/deed-type";
-import { mapInstrumentTypeToDeedType } from "@/features/create-contract/utils/map-instrument-type-to-deed-type";
 import { useContractPricing } from "@/features/pricing/hooks/use-contract-pricing";
-import type { ContractPricing } from "@/features/pricing/types/contract-pricing";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import { cn } from "@/lib/utils";
 
@@ -109,23 +106,6 @@ function PriceCard({
   );
 }
 
-function resolveSurchargeDeedLabels(
-  pricing: ContractPricing,
-  deedTypeLabel: (deedType: DeedTypeId) => string,
-): string[] {
-  const seen = new Set<DeedTypeId>();
-
-  for (const instrumentType of pricing.document_surcharge.instrument_types) {
-    const deedType = mapInstrumentTypeToDeedType(instrumentType);
-    if (deedType !== "" && DEED_TYPES.includes(deedType)) {
-      seen.add(deedType);
-    }
-  }
-
-  // Keep the wizard's own ordering so the list reads the same as the dropdown.
-  return DEED_TYPES.filter((deedType) => seen.has(deedType)).map(deedTypeLabel);
-}
-
 /**
  * «عرض جميع الأسعار» — a clean price sheet driven entirely by `GET /pricing`:
  * one card per contract type, the document surcharge with the deed types it
@@ -137,12 +117,8 @@ export default function CreateContractPriceSheetDialog({
   contractType,
 }: CreateContractPriceSheetDialogProps) {
   const t = useTranslations("createContract.intro.priceDialog");
-  const tDeedTypes = useTranslations("createContract.deed.deedType.types");
   const { pricing } = useContractPricing();
 
-  const surchargeDeedLabels = resolveSurchargeDeedLabels(pricing, (deedType) =>
-    tDeedTypes(deedType),
-  );
   const yearLabels = { yearOrLess: t("yearOrLess"), extraYear: t("extraYear") };
 
   return (
@@ -174,91 +150,26 @@ export default function CreateContractPriceSheetDialog({
           </DialogClose>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <PriceCard
-            icon={<Home className="size-4" aria-hidden="true" />}
-            title={t("residentialTitle")}
-            firstYear={pricing.housing.first_year}
-            extraYear={pricing.housing.extra_year}
-            highlighted={contractType === "residential"}
-            labels={yearLabels}
-          />
-          <PriceCard
-            icon={<Building2 className="size-4" aria-hidden="true" />}
-            title={t("commercialTitle")}
-            firstYear={pricing.commercial.first_year}
-            extraYear={pricing.commercial.extra_year}
-            highlighted={contractType === "commercial"}
-            labels={yearLabels}
-          />
-        </div>
-
-        <div className="mt-3 space-y-3">
-          <div className="rounded-2xl border border-[#ececec] p-3.5 dark:border-[#2f403b]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-2">
-                <FileText
-                  className="mt-0.5 size-4 shrink-0 text-brand-secondary"
-                  aria-hidden="true"
-                />
-                <p className="text-sm font-bold leading-5 text-[#333333] dark:text-white">
-                  {t("surchargeLabel")}
-                </p>
-              </div>
-              <p className="shrink-0 text-end">
-                <Amount value={pricing.document_surcharge.fee} className="text-sm" />
-                <span className="block text-[11px] text-[#9a9a9a] dark:text-[#9eb5af]">
-                  {t("surchargeOnce")}
-                </span>
-              </p>
-            </div>
-            {surchargeDeedLabels.length > 0 ? (
-              <ul className="mt-2.5 flex flex-wrap gap-1.5 ps-6">
-                {surchargeDeedLabels.map((label) => (
-                  <li
-                    key={label}
-                    className="rounded-full bg-brand-background px-2.5 py-1 text-[11px] font-semibold text-[#555555] dark:bg-[#24302c] dark:text-[#9eb5af]"
-                  >
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-
-          <div className="rounded-2xl border border-[#ececec] p-3.5 dark:border-[#2f403b]">
-            <div className="flex items-start gap-2">
-              <Gauge
-                className="mt-0.5 size-4 shrink-0 text-brand-secondary"
-                aria-hidden="true"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold leading-5 text-[#333333] dark:text-white">
-                  {t("meterTransferLabel")}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[#555555] dark:text-[#9eb5af]">
-                  <span className="inline-flex items-center gap-1.5">
-                    {t("residentialTitle")}:
-                    <Amount
-                      value={pricing.meter_transfer_fee.housing.electricity}
-                      className="text-xs"
-                      iconSize={13}
-                    />
-                    <span className="text-[#9a9a9a]">{t("perMeter")}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    {t("commercialTitle")}:
-                    <Amount
-                      value={pricing.meter_transfer_fee.commercial.electricity}
-                      className="text-xs"
-                      iconSize={13}
-                    />
-                    <span className="text-[#9a9a9a]">{t("perMeter")}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="mt-4">
+          {contractType === "commercial" ? (
+            <PriceCard
+              icon={<Building2 className="size-4" aria-hidden="true" />}
+              title={t("commercialTitle")}
+              firstYear={pricing.commercial.first_year}
+              extraYear={pricing.commercial.extra_year}
+              highlighted
+              labels={yearLabels}
+            />
+          ) : (
+            <PriceCard
+              icon={<Home className="size-4" aria-hidden="true" />}
+              title={t("residentialTitle")}
+              firstYear={pricing.housing.first_year}
+              extraYear={pricing.housing.extra_year}
+              highlighted
+              labels={yearLabels}
+            />
+          )}
         </div>
 
         <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl bg-brand-background-green px-4 py-3 dark:bg-[#16352f]">

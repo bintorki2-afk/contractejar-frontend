@@ -15,19 +15,22 @@ import {
   Wallet,
 } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
 import ServiceTabs from "@/features/service-page/components/service-tabs";
+import { breadcrumbJsonLd, buildPageMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo/page-metadata";
 import { getLessorChangeInfo } from "@/features/lessor-change/services/get-lessor-change-info";
 import { FALLBACK_LESSOR_CHANGE_INFO } from "@/features/lessor-change/types/lessor-change";
 import { getContractPricing } from "@/features/pricing/services/get-contract-pricing";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
+import { DEFAULT_CONTACT_NUMBER } from "@/features/settings/utils/build-whatsapp-href";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("lessorChange.landing");
-  return {
+  return buildPageMetadata({
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/service/lessor-change" },
-  };
+    path: "/service/lessor-change",
+  });
 }
 
 /** Fee from `/lessor-change/info`, then `/pricing.lessor_change_fee`, then the static fallback. */
@@ -48,7 +51,7 @@ export default async function LessorChangeServicePage() {
   const [t, tService, whatsappHref, info] = await Promise.all([
     getTranslations("lessorChange.landing"),
     getTranslations("servicePage"),
-    getWhatsappHref().catch(() => "https://wa.me/"),
+    getWhatsappHref().catch(() => `https://wa.me/${DEFAULT_CONTACT_NUMBER}`),
     resolveLessorChangeInfo(),
   ]);
 
@@ -80,12 +83,28 @@ export default async function LessorChangeServicePage() {
 
   return (
     <main className="py-10 md:py-14">
+      <JsonLd
+        data={serviceJsonLd({
+          name: t("title"),
+          description: t("description"),
+          path: "/service/lessor-change",
+          price: info.fee,
+          priceLabel: feeText,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: tService("breadcrumbHome"), path: "/" },
+          { name: t("title"), path: "/service/lessor-change" },
+        ])}
+      />
+      <JsonLd data={faqJsonLd(faq)} />
       <div className="container">
         <nav
           aria-label="breadcrumb"
           className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <Link href="/" className="transition-colors hover:text-brand">
+          <Link href="/" className="inline-flex min-h-10 items-center transition-colors hover:text-brand">
             {tService("breadcrumbHome")}
           </Link>
           <ChevronLeft className="size-3.5 rtl:rotate-180" aria-hidden="true" />

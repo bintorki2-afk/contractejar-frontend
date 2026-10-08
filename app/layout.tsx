@@ -20,15 +20,27 @@ import {
   ThemeProvider,
   THEME_NO_FLASH_SCRIPT,
 } from "@/features/shared/theme/theme-provider";
+import JsonLd from "@/components/json-ld";
+import SvgSprite from "@/components/svg-sprite";
 import SiteBackground from "@/features/shared/components/site-background";
 import InstallPrompt from "@/features/shared/components/install-prompt";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo/page-metadata";
+import { getAppSettings } from "@/features/settings/services/get-app-settings";
+import { pickCoreMessages } from "@/i18n/client-messages";
+import {
+  resolveFooterPhoneHref,
+  resolveFooterSocialLinks,
+} from "@/features/settings/utils/resolve-footer-contact";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
 // Self-hosted (next/font/local) instead of next/font/google: the Google Fonts
 // fetch at build time made CI non-deterministic (build aborts if fonts.googleapis.com
-// is unreachable). Same font, same Arabic subset, weights 400/500/600/700 only
-// (medium/semibold/bold/extrabold→700). Files live in app/fonts/*.woff2.
+// is unreachable). Same font, weights 400/500/600/700 only
+// (medium/semibold/bold/extrabold→700). Files live in app/fonts/*.woff2 —
+// subset to the Arabic blocks (U+0600–06FF, 0750–077F, 0870–08FF) without
+// TrueType hinting: 178 KB → 106 KB for the four weights (#27). Regenerate
+// with `pyftsubset … --no-hinting --layout-features='*'` if the font changes.
 const ibmPlexSansArabic = localFont({
   variable: "--font-ibm-plex-sans-arabic",
   display: "swap",
@@ -47,32 +59,27 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(SITE_URL),
+    // Page titles get the short brand suffix (≤ 60 chars overall); the home
+    // page keeps the full descriptive default title.
     title: {
       default: title,
-      template: `%s | ${title}`,
+      template: `%s | ${SITE_NAME}`,
     },
     description,
     openGraph: {
       title,
       description,
-      siteName: title,
+      siteName: SITE_NAME,
       locale: "ar_SA",
       type: "website",
       url: SITE_URL,
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: [DEFAULT_OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og-image.png"],
+      images: [DEFAULT_OG_IMAGE.url],
     },
     manifest: "/manifest.webmanifest",
     appleWebApp: {
@@ -91,7 +98,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0db38b",
+  width: "device-width",
+  initialScale: 1,
+  // Draw under the notch / home indicator; fixed bars use env(safe-area-inset-*).
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0B5A3C" },
+    { media: "(prefers-color-scheme: dark)", color: "#101614" },
+  ],
 };
 
 const RTL_LOCALES = new Set(["ar", "fa", "he", "ur"]);
@@ -106,10 +120,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, websiteStatus] = await Promise.all([
+  const [locale, messages, websiteStatus, settings] = await Promise.all([
     getLocale(),
     getMessages(),
     getWebsiteStatus(),
+    getAppSettings(),
   ]);
   const direction = getDirection(locale);
 
@@ -121,22 +136,27 @@ export default async function RootLayout({
 
   // Organization + WebSite structured data (JSON-LD): يعرّف كيان «عقد إيجار»
   // (الاسم/الشعار/التواصل) لمحركات البحث ومحرّكات AI ليظهر كمصدر موثوق.
+  // رقم الدعم وحسابات التواصل من إعدادات الخادم (لا أرقام ولا حسابات ثابتة في الكود).
+  const supportTel = (resolveFooterPhoneHref(settings) ?? "tel:+966597500014").replace(/^tel:/, "");
+  const socialProfiles = resolveFooterSocialLinks(settings).map((link) => link.href);
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "عقد إيجار",
+    alternateName: "منصة توثيق عقود الإيجار",
+    legalName: "مؤسسة عقدي العقارية",
     url: SITE_URL,
     logo: `${SITE_URL}/icons/icon-512.png`,
     image: `${SITE_URL}/og-image.png`,
     identifier: "CR 4650258662",
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+966597500014",
+      telephone: supportTel,
       contactType: "customer service",
       areaServed: "SA",
       availableLanguage: ["ar"],
     },
-    sameAs: ["https://x.com/aqdi_sa", "https://www.tiktok.com/@aqdi.sa"],
+    ...(socialProfiles.length > 0 ? { sameAs: socialProfiles } : {}),
   };
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -165,14 +185,11 @@ export default async function RootLayout({
         <ClarityScript />
         <PwaRegister />
         <SentryInit />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        {/* JsonLd escapes `<`: social links come from dashboard settings and
+            must never be able to close the script tag (stored XSS). */}
+        <JsonLd data={orgJsonLd} />
+        <JsonLd data={websiteJsonLd} />
+        <SvgSprite />
         <SiteBackground />
         <ThemeProvider>
           {closedView ? (
@@ -180,7 +197,9 @@ export default async function RootLayout({
           ) : (
             <Providers>
               <DirectionProvider dir={direction} direction={direction}>
-                <NextIntlClientProvider locale={locale} messages={messages}>
+                {/* Client messages: core namespaces only — the service flows add
+                    theirs in app/(services)/layout.tsx (see i18n/client-messages.ts). */}
+                <NextIntlClientProvider locale={locale} messages={pickCoreMessages(messages)}>
                   {children}
                   <InstallPrompt />
                   <CookieNotice />

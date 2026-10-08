@@ -2,6 +2,8 @@ import { Marquee } from "@/components/ui/marquee";
 import ReviewCard from "@/features/reviews/components/review-card";
 import type { Review, ReviewContractType } from "@/features/reviews/types/review";
 
+const TICKER_SAMPLE_SIZE = 20;
+
 type ReviewsTickerProps = {
   reviews: Review[];
   /** Localized labels for contract types. */
@@ -16,16 +18,22 @@ export default function ReviewsTicker({
   reviews,
   contractTypeLabels,
 }: ReviewsTickerProps) {
-  const useTwoRows = reviews.length >= 6;
-  const mid = Math.ceil(reviews.length / 2);
-  const rowOne = useTwoRows ? reviews.slice(0, mid) : reviews;
-  const rowTwo = useTwoRows ? reviews.slice(mid) : [];
+  // #27: the strip is decorative — a varied sample of 20 cards (10 per row,
+  // duplicated twice for the seamless loop) instead of all 90 × 4 repeats,
+  // which produced ~360 cards and ~2 MB of HTML on the home page. The full
+  // review base lives on /reviews.
+  const sample = reviews.slice(0, TICKER_SAMPLE_SIZE);
+  const useTwoRows = sample.length >= 6;
+  const mid = Math.ceil(sample.length / 2);
+  const rowOne = useTwoRows ? sample.slice(0, mid) : sample;
+  const rowTwo = useTwoRows ? sample.slice(mid) : [];
 
   const renderRow = (items: Review[], reverse: boolean) => (
     <Marquee
       pauseOnHover
       reverse={reverse}
-      className="[--duration:150s] [--gap:1.25rem] py-1"
+      repeat={2}
+      className="[--duration:90s] [--gap:1.25rem] py-1"
     >
       {items.map((review) => (
         <ReviewCard

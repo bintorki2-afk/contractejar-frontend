@@ -42,6 +42,8 @@ import type { DeedTypeId } from "@/features/create-contract/types/deed-type";
 import AttachmentPreviewDialog from "@/features/shared/components/attachment-preview-dialog";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import { useWhatsappHref } from "@/features/settings/hooks/use-whatsapp-href";
+import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
+import { track } from "@/lib/analytics/track";
 import { formatSaudiMobileForForm } from "@/lib/validation/format-saudi-mobile-for-form";
 
 type CreateContractSubmitStepProps = {
@@ -78,7 +80,7 @@ function OverviewEditIcon({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="inline-flex cursor-pointer items-center justify-center rounded-lg text-brand dark:text-[#48c0b8]"
+      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-brand hover:bg-brand-background-green dark:text-[#48c0b8]"
     >
       <Pencil className="size-3.5" aria-hidden="true" />
     </button>
@@ -152,6 +154,9 @@ export default function CreateContractSubmitStep({
   // "done": the customer chose to pay later (or the server sync failed and
   // the order went through the business channel only).
   const [serverOrder, setServerOrder] = useState<{ uuid: string } | null>(null);
+  // The server rejected the data (4xx) or the request could not be sent:
+  // the customer must see why and fix it — no business-channel fallback.
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [view, setView] = useState<"form" | "payment" | "done">("form");
 
   async function handleCopyOrderNumber(orderNumber: string) {
@@ -165,7 +170,8 @@ export default function CreateContractSubmitStep({
     }
   }
 
-  const hasFailed = result != null && !result.ok && serverOrder == null;
+  const hasFailed =
+    syncError != null || (result != null && !result.ok && serverOrder == null);
   const hasIncompleteSections = summary.sections.some((section) => section.incomplete);
 
   function handleEdit(target: CreateContractReviewEditTarget) {
@@ -224,9 +230,30 @@ export default function CreateContractSubmitStep({
     //    business channel below, and the customer gets a payment link later.
     //    After the OTP the session cookie is the customer's token, so the
     //    contract is created straight under the account.
+    setSyncError(null);
     const synced = await syncContract({ contactWhatsapp: mobile });
+    // 4xx = the server refused the data (invalid file type/size, ID, …) and 0 =
+    // the request never reached the server. Before, these fell through to the
+    // business channel and the customer saw «تم استلام طلبك» (or a generic
+    // error) without the reason. Only a real outage (5xx) keeps the fallback.
+    if (!synced.ok && synced.status < 500) {
+      // Server validation messages are Arabic; anything else (English fallbacks
+      // such as "Something went wrong") is replaced by the Arabic explanation.
+      const message =
+        synced.status !== 0 && /[\u0600-\u06FF]/.test(synced.error)
+          ? synced.error
+          : t("errorBodyUpload");
+      setSyncError(message);
+      toast.error(message);
+      return;
+    }
+
     if (synced.ok) {
       setServerOrder({ uuid: synced.uuid });
+      track("order_submitted", {
+        order_number: String(synced.uuid),
+        contract_type: toPropertyContractType(contractType),
+      });
     } else if (process.env.NODE_ENV !== "production") {
       console.warn("contract sync failed", synced.stage, synced.error);
     }
@@ -359,6 +386,7 @@ export default function CreateContractSubmitStep({
               href={whatsappShareHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track("cta_whatsapp_click", { placement: "order_success" })}
             >
               <FaWhatsapp className="size-5" aria-hidden="true" />
               {t("contactWhatsappCta")}
@@ -418,7 +446,7 @@ export default function CreateContractSubmitStep({
                   className="relative flex flex-col items-start rounded-xl border border-[#dfe7e3] bg-white px-4 py-3 text-start shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-[#2f403b] dark:bg-[#1a2421] dark:shadow-none"
                 >
                   {item.editable ? (
-                    <div className="absolute inset-e-3 top-3">
+                    <div className="absolute inset-e-1 top-1">
                       <OverviewEditIcon
                         label={`${reviewLabels.edit} ${item.label}`}
                         onClick={() => handleEdit("overview")}
@@ -486,8 +514,8 @@ export default function CreateContractSubmitStep({
                 <p className="text-sm font-bold text-destructive dark:text-[#f87171]">
                   {t("errorTitle")}
                 </p>
-                <p className="text-xs leading-relaxed text-[#555555] md:text-sm dark:text-[#e8c4c4]">
-                  {t("errorBody")}
+                <p className="whitespace-pre-line text-xs leading-relaxed text-[#555555] md:text-sm dark:text-[#e8c4c4]">
+                  {syncError ?? t("errorBody")}
                 </p>
                 <Link
                   href={whatsappHref}

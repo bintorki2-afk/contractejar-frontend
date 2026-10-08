@@ -11,7 +11,10 @@ export async function getCommonQuestions(): Promise<CommonQuestion[]> {
     "/common-questions",
     {
       method: "GET",
-      cache: "no-store",
+      // Shared by every visitor: re-fetched at most every 5 minutes. With
+      // no-store each page view hit the API from the website server's IP and
+      // ~30 views/minute tripped the API limit (60/min/IP) → empty FAQ.
+      next: { revalidate: 300 },
     },
   );
 

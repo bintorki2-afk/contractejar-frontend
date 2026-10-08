@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import BlogLatestSection from "@/features/blog/components/blog-latest-section";
 import BlogListingSection from "@/features/blog/components/blog-listing-section";
@@ -7,17 +8,33 @@ import { getContentPageSeo } from "@/features/content-pages/services/get-content
 import { resolveContentPageMetadata } from "@/features/content-pages/utils/resolve-content-page-metadata";
 import FaqSectionBoundary from "@/features/faq/components/faq-section-boundary";
 import SupportSection from "@/features/support/components/support-section";
+import JsonLd from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageSeo = await getContentPageSeo("blogs");
+  const [pageSeo, t] = await Promise.all([
+    getContentPageSeo("blogs"),
+    getTranslations("site"),
+  ]);
 
-  // Empty API fields inherit root layout defaults. Blog [slug] does not use this.
-  return resolveContentPageMetadata(pageSeo, { canonical: "/blog" });
+  return resolveContentPageMetadata(pageSeo, {
+    title: t("blogTitle"),
+    description: t("blogDescription"),
+    canonical: "/blog",
+  });
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const t = await getTranslations("site");
+
   return (
     <main className="overflow-x-hidden">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("homeTitle"), path: "/" },
+          { name: t("blogTitle"), path: "/blog" },
+        ])}
+      />
       <BlogLatestSection />
       <Reveal>
         <BlogListingSection />

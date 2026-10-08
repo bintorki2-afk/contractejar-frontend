@@ -30,12 +30,6 @@ export default function RequestCardActions({
   labels,
   isIncompleteDraft = false,
 }: RequestCardActionsProps) {
-  const contractTypeLabel =
-  
-    card.contractType === "commercial"
-      ? labels.contractTypes.commercial
-      : labels.contractTypes.housing;
-
   return (
     <div className={cn("flex flex-wrap items-center justify-end gap-2 border-[#f0f0f0] pt-4 dark:border-[#262d2c]", isIncompleteDraft ? "" : " border-t")}>
       {/* RTL visual (right → left): WhatsApp, View, Invoice?, When, Pay? */}
@@ -72,8 +66,6 @@ export default function RequestCardActions({
         <RequestInvoiceButton
           label={labels.downloadInvoice}
           contractId={card.contractId}
-          uuid={card.uuid}
-          contractTypeLabel={contractTypeLabel}
           invoiceLabels={labels.invoiceDialog}
         />
       ) : null}

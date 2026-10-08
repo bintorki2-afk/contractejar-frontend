@@ -116,7 +116,7 @@ export default function CreateContractFinancePermissionsSection({
 
                   <button
                     type="button"
-                    className="flex min-w-0 flex-1 items-center gap-2 text-start"
+                    className="-my-3.5 flex min-w-0 flex-1 items-center gap-2 py-3.5 text-start"
                     onClick={() => {
                       if (checked && role.pop) {
                         setOpenRole(role);

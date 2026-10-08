@@ -29,7 +29,7 @@ export default function CreateContractPaymentSummary({
       null,
   );
   const financeData = useCreateContractDraftStore((state) => state.financeData);
-  const { data, isLoading } = useContractFinanceSummary(contractUuid);
+  const { data, isLoading, refetch } = useContractFinanceSummary(contractUuid);
   const contractPeriodsQuery = useContractPeriods(
     toPropertyContractType(contractType),
   );
@@ -57,6 +57,7 @@ export default function CreateContractPaymentSummary({
 
   return (
     <CreateContractFinancialBreakdown
+      onRetry={() => void refetch()}
       labels={labels}
       contractType={contractType}
       data={data}

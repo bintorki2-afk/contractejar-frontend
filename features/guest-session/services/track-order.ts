@@ -22,6 +22,10 @@ export type TrackedOrder = {
   status_color: string | null;
   status_client_explanation: string | null;
   timeline: Array<{ status_label: string; at: string | null }>;
+  /** ف2: the 6-step journey (contracts only). */
+  journey?: unknown;
+  journey_sentence?: string | null;
+  smart_link?: string | null;
   created_at: string | null;
   updated_at: string | null;
 };

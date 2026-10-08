@@ -26,22 +26,49 @@ function formatContractDate(isoDate: string) {
 }
 
 function formatLastUpdated(isoDate: string) {
+  // A date-only value («2026-10-08») has no time: showing one invented a
+  // misleading «03:00 ص» on every card.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+    return isoDate.replaceAll("-", "/");
+  }
+
   const date = new Date(isoDate);
 
   if (Number.isNaN(date.getTime())) {
     return isoDate;
   }
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  // Riyadh time regardless of the server's time zone (this runs on the server).
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Riyadh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+      .formatToParts(date)
+      .map((part) => [part.type, part.value]),
+  );
+  let hours = Number(parts.hour) % 24;
   const period = hours >= 12 ? "م" : "ص";
   hours = hours % 12 || 12;
-  const hoursLabel = String(hours).padStart(2, "0");
 
-  return `${year}/${month}/${day} · ${hoursLabel}:${minutes} ${period}`;
+  return `${parts.year}/${parts.month}/${parts.day} · ${String(hours).padStart(2, "0")}:${parts.minute} ${period}`;
+}
+
+/** Latest real update: the newest status-timeline entry, else the creation date. */
+function resolveLastUpdatedSource(contract: ContractListItem): string {
+  const timeline = (contract as { status_timeline?: Array<{ created_at?: string | null }> })
+    .status_timeline;
+  const latest = (timeline ?? [])
+    .map((entry) => entry?.created_at)
+    .filter((value): value is string => typeof value === "string" && value.length > 10)
+    .sort()
+    .pop();
+  return latest ?? contract.created_at;
 }
 
 function resolveStatus(contract: ContractListItem): RequestStatus {
@@ -128,7 +155,7 @@ export function mapContractToRequestCard(
       contract.name_real_estate?.trim() ||
       (contractType === "commercial" ? labels.commercial : labels.housing),
     date: formatContractDate(contract.created_at),
-    lastUpdated: formatLastUpdated(contract.created_at),
+    lastUpdated: formatLastUpdated(resolveLastUpdatedSource(contract)),
     requestNumber,
     step: contract.step,
     status,

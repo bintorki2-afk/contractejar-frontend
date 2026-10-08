@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { isSameOriginRequest } from "@/lib/security/request-guards";
+
 // Order intake → multi-channel delivery. Public route (middleware excludes /api).
 // No auth, no payment, no OTP. Defense-in-depth so an order is never lost:
 //   1. Telegram notification (with one retry)   — env: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
@@ -217,6 +219,16 @@ async function emailBackup(order: OrderPayload, text: string): Promise<boolean> 
 }
 
 export async function POST(request: NextRequest) {
+  // 0) Same-origin JSON only: a cross-site page could otherwise make visitors'
+  //    browsers post fake orders (text/plain bodies parse as JSON) — each from
+  //    a different IP, bypassing the per-IP limit below.
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+  }
+  if (!(request.headers.get("content-type") ?? "").toLowerCase().includes("application/json")) {
+    return NextResponse.json({ ok: false, error: "unsupported_media_type" }, { status: 415 });
+  }
+
   // 1) Rate limit (best-effort, per instance).
   if (isRateLimited(clientIp(request))) {
     return NextResponse.json(

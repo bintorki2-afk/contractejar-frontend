@@ -35,9 +35,13 @@ export function fieldChromeSurfaceClass(
   );
 }
 
-/** Nested Input inside a chrome wrapper — keep a11y invalid, kill extra border/ring. */
+/**
+ * Nested Input inside a chrome wrapper — keep a11y invalid, kill extra border/ring.
+ * `self-stretch` makes the (borderless) input fill the wrapper's full height so
+ * the whole visible box is the tap target (the input alone was ~31px tall).
+ */
 export const fieldChromeNestedInputClass =
-  "border-0 bg-transparent shadow-none text-black dark:text-white placeholder:text-[#bdbdbd] dark:placeholder:text-[#6b7d78] focus-visible:border-0 focus-visible:ring-0 aria-invalid:border-0 aria-invalid:ring-0 dark:aria-invalid:border-0 dark:aria-invalid:ring-0";
+  "self-stretch border-0 bg-transparent shadow-none text-black dark:text-white placeholder:text-[#bdbdbd] dark:placeholder:text-[#6b7d78] focus-visible:border-0 focus-visible:ring-0 aria-invalid:border-0 aria-invalid:ring-0 dark:aria-invalid:border-0 dark:aria-invalid:ring-0";
 
 /** Input/textarea that is itself the chrome surface — one border only. */
 export const fieldChromeControlClass =

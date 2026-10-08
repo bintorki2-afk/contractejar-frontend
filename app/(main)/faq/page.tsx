@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getTranslations } from "next-intl/server";
+
+import JsonLd from "@/components/json-ld";
+import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo/page-metadata";
 
 import { getContentPageSeo } from "@/features/content-pages/services/get-content-pages";
 import { resolveContentPageMetadata } from "@/features/content-pages/utils/resolve-content-page-metadata";
@@ -11,14 +15,21 @@ import type { CommonQuestion } from "@/features/faq/types/common-question";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pageSeo = await getContentPageSeo("faq");
+  const [pageSeo, t] = await Promise.all([
+    getContentPageSeo("faq"),
+    getTranslations("site"),
+  ]);
 
-  // Empty API fields inherit root layout defaults (previous FAQ behavior).
-  return resolveContentPageMetadata(pageSeo, { canonical: "/faq" });
+  return resolveContentPageMetadata(pageSeo, {
+    title: t("faqTitle"),
+    description: t("faqDescription"),
+    canonical: "/faq",
+  });
 }
 
 export default async function FaqPage() {
   const queryClient = getQueryClient();
+  const t = await getTranslations("site");
 
   await queryClient.prefetchQuery({
     queryKey: faqKeys.list(),
@@ -29,27 +40,16 @@ export default async function FaqPage() {
   // الأسئلة والأجوبة مباشرة في النتائج والردود.
   const questions =
     queryClient.getQueryData<CommonQuestion[]>(faqKeys.list()) ?? [];
-  const faqJsonLd =
-    questions.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: questions.map((q) => ({
-            "@type": "Question",
-            name: q.question,
-            acceptedAnswer: { "@type": "Answer", text: q.answer },
-          })),
-        }
-      : null;
 
   return (
     <>
-      {faqJsonLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-        />
-      ) : null}
+      <JsonLd data={faqJsonLd(questions.map((q) => ({ q: q.question, a: q.answer })))} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("homeTitle"), path: "/" },
+          { name: t("faqTitle"), path: "/faq" },
+        ])}
+      />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <FaqPageSection />
       </HydrationBoundary>

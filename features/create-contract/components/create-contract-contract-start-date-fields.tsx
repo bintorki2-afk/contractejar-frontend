@@ -92,7 +92,7 @@ export default function CreateContractContractStartDateFields({
               type="button"
               onClick={() => updateField("calendarType", calendarType)}
               className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
+                "min-h-9 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
                 value.calendarType === calendarType
                   ? "bg-brand text-white shadow-sm"
                   : "text-[#7f7f7f] hover:text-[#555555]",

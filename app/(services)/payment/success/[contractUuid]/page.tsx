@@ -34,6 +34,7 @@ export default async function PaymentSuccessPage({ params }: PaymentSuccessPageP
         paidAmountLabel: t("paidAmountLabel"),
         housingContractTypeLabel: t("housingContractTypeLabel"),
         commercialContractTypeLabel: t("commercialContractTypeLabel"),
+        lessorChangeTypeLabel: t("lessorChangeTypeLabel"),
         backToRequestsLabel: t("backToRequests"),
         backToHomeLabel: t("backToHome"),
         retryPaymentLabel: t("retryPayment"),
@@ -43,6 +44,13 @@ export default async function PaymentSuccessPage({ params }: PaymentSuccessPageP
         checkingDescription: t("checkingDescription"),
         completedMessage: t("completedMessage"),
         failedMessage: t("failedMessage"),
+        successHeadline: t("success.headline"),
+        successNextStep: t("success.nextStep"),
+        successNextStepLessorChange: t("success.nextStepLessorChange"),
+        journeyTitle: t("success.journeyTitle"),
+        trackOrderLabel: t("trackOrder"),
+        whatsappSupportLabel: t("whatsappSupport"),
+        whatsappSupportMessage: t("whatsappSupportMessage", { order: contractUuid }),
       }}
     />
   );

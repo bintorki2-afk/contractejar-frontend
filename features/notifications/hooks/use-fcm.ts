@@ -2,6 +2,8 @@
 
 import { useCallback, useState, useSyncExternalStore } from "react";
 
+import { PUSH_ENABLED_EVENT } from "@/features/notifications/constants/push-enabled-event";
+
 type PermissionState = NotificationPermission | "unsupported" | null;
 
 function subscribeToNothing() {
@@ -44,12 +46,14 @@ export function useFcm() {
       setRequestedPermission(Notification.permission);
       setToken(deviceToken);
 
-      // Hand the token to the backend so status pushes can reach this browser.
+      // Hand the token to the backend so status pushes can reach this browser,
+      // and start the foreground listener (deferred until this opt-in).
       if (deviceToken) {
         const { registerFcmToken } = await import(
           "@/features/notifications/services/register-fcm-token"
         );
         void registerFcmToken(deviceToken);
+        window.dispatchEvent(new Event(PUSH_ENABLED_EVENT));
       }
     } catch (error) {
       console.error("Failed to request notification permission:", error);

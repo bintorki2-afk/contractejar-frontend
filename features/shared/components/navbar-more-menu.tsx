@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -101,7 +101,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "inline-flex items-center gap-1 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand",
+          "inline-flex items-center gap-1 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
           open || anyActive ? "text-brand" : "text-black dark:text-white/85",
         )}
       >
@@ -138,7 +138,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
               pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
-              <Link
+              <IntentLink
                 key={item.href}
                 href={item.href}
                 role="menuitem"
@@ -153,7 +153,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
                   {item.icon}
                 </span>
                 <span className="leading-none">{item.label}</span>
-              </Link>
+              </IntentLink>
             );
           })}
         </div>

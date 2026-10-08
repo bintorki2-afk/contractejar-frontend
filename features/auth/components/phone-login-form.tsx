@@ -20,6 +20,7 @@ import {
 } from "@/features/auth/schemas/verify-otp-schema";
 import { requestPhoneOtp } from "@/features/auth/services/request-phone-otp";
 import { verifyPhoneOtp } from "@/features/auth/services/verify-phone-otp";
+import { track } from "@/lib/analytics/track";
 import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import { formatPhoneDisplay } from "@/features/auth/utils/format-phone-display";
 import { getSaudiNationalMobile } from "@/features/auth/utils/normalize-saudi-phone";
@@ -70,6 +71,7 @@ export default function PhoneLoginForm() {
       );
       return false;
     }
+    track("otp_requested", { context: "login" });
     return true;
   }
 
@@ -95,6 +97,7 @@ export default function PhoneLoginForm() {
     }
 
     setUser(response.user);
+    track("otp_verified", { context: "login" });
     toast.success(t("verifySuccess"));
     router.push(getSafeCallbackUrl(searchParams.get("callbackUrl")));
     router.refresh();

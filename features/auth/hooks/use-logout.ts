@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { logoutUser } from "@/features/auth/services/logout-user";
 import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 
 export function useLogout() {
-  const router = useRouter();
   const clearUser = useAuthStore((state) => state.clearUser);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,12 +26,17 @@ export function useLogout() {
           "aqdi-create-property-draft",
           "aqdi-create-unit-draft",
           "aqdi-auth-user",
+          "aqdi-notifications-inbox",
+          "aqdi-lessor-change-draft",
         ].forEach((key) => localStorage.removeItem(key));
       } catch {
         // localStorage may be unavailable (private mode) — ignore.
       }
 
-      router.push("/login");
+      // Full reload, not router.push: the drafts above also live in memory
+      // (zustand); a client-side navigation kept the previous customer's
+      // wizard (IDs, phones, deed) on screen and persisted it again.
+      window.location.assign("/login");
 
       return {
         ok: true as const,

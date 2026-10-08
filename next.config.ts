@@ -11,6 +11,14 @@ const MAX_UPLOAD_BODY_SIZE = 50 * 1024 * 1024; // 50 MB
 //   - object-src 'none': no plugins/embeds.
 // 'unsafe-inline'/'unsafe-eval' remain for now because GTM and the Next.js runtime
 // rely on inline scripts; removing them requires per-request nonces (follow-up).
+// Local development only: when the API runs on plain http (e.g.
+// http://localhost:8010) the browser must be allowed to call it. Production
+// uses https, so this adds nothing there.
+const apiBase = process.env.NEXT_PUBLIC_BASE_URL || "";
+const localApiOrigin = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(apiBase)
+  ? new URL(apiBase).origin
+  : "";
+
 const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -19,8 +27,9 @@ const CSP = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com",
-  "connect-src 'self' https: wss:",
+  // clarity.ms: Microsoft Clarity session recordings (features/analytics/clarity-script.tsx).
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms",
+  `connect-src 'self' https: wss:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
   "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
@@ -42,10 +51,22 @@ const SECURITY_HEADERS = [
   { key: "Content-Security-Policy", value: CSP },
 ];
 
+// Long-lived caching for the static assets under /public that are referenced
+// by hashed or stable names. `/_next/static` is already immutable (Next.js).
+const STATIC_CACHE_HEADERS = [
+  { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  compress: true,
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      { source: "/images/:path*", headers: STATIC_CACHE_HEADERS },
+      { source: "/icons/:path*", headers: STATIC_CACHE_HEADERS },
+      { source: "/og-image.png", headers: STATIC_CACHE_HEADERS },
+    ];
   },
   experimental: {
     serverActions: {

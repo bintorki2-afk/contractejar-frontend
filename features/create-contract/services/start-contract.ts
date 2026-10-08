@@ -30,11 +30,20 @@ type StartContractApiResponse = {
   };
 };
 
-export async function startContract(payload: StartContractPayload) {
+export async function startContract(
+  payload: StartContractPayload,
+  /** Local draft id: a retry after a lost response returns the same contract (24 h). */
+  idempotencyKey?: string,
+) {
   const response = await apiRequest<StartContractApiResponse>("/contract/start", {
     method: "POST",
     cache: "no-store",
-    body: JSON.stringify({ ...payload, app_or_web: "web" }),
+    headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : undefined,
+    body: JSON.stringify({
+      ...payload,
+      app_or_web: "web",
+      ...(idempotencyKey ? { client_reference: idempotencyKey } : {}),
+    }),
   });
 
   if (!response.ok || !response.data?.success || !response.data.data) {

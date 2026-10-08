@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils";
 type RequestInvoiceButtonProps = {
   label: string;
   contractId: number;
-  uuid: string;
-  contractTypeLabel: string;
   invoiceLabels: RequestInvoiceDialogLabels;
   className?: string;
 };
@@ -19,8 +17,6 @@ type RequestInvoiceButtonProps = {
 export default function RequestInvoiceButton({
   label,
   contractId,
-  uuid,
-  contractTypeLabel,
   invoiceLabels,
   className,
 }: RequestInvoiceButtonProps) {
@@ -44,8 +40,6 @@ export default function RequestInvoiceButton({
         open={open}
         onOpenChange={setOpen}
         contractId={contractId}
-        uuid={uuid}
-        contractTypeLabel={contractTypeLabel}
         labels={invoiceLabels}
       />
     </>

@@ -1,10 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { Bell, BellOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useFcm } from "@/features/notifications/hooks/use-fcm";
+import {
+  markAccountNotificationsRead,
+  type AccountNotification,
+} from "@/features/notifications/services/account-notifications";
 import type { NotificationsPageLabels } from "@/features/notifications/types/notifications-page-labels";
 import {
   useNotificationsInboxStore,
@@ -14,10 +19,26 @@ import { cn } from "@/lib/utils";
 
 type NotificationsPageContentProps = {
   labels: NotificationsPageLabels;
+  accountItems?: AccountNotification[];
+  accountLoadFailed?: boolean;
 };
+
+function formatDate(value: string | number | null) {
+  if (value == null) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ar-SA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    // Fixed zone: the list is rendered on the server and in the browser.
+    timeZone: "Asia/Riyadh",
+  }).format(date);
+}
 
 export default function NotificationsPageContent({
   labels,
+  accountItems = [],
+  accountLoadFailed = false,
 }: NotificationsPageContentProps) {
   const isHydrated = usePersistStoreHydrated(
     useNotificationsInboxStore.persist,
@@ -34,6 +55,14 @@ export default function NotificationsPageContent({
 
     markAllRead();
   }, [isHydrated, markAllRead]);
+
+  // Opening the page = the account's unread notifications have been seen.
+  const hasUnreadAccountItems = accountItems.some((item) => !item.isRead);
+  useEffect(() => {
+    if (hasUnreadAccountItems) {
+      void markAccountNotificationsRead().catch(() => undefined);
+    }
+  }, [hasUnreadAccountItems]);
 
   const visibleItems = isHydrated ? items : [];
   const showEnablePrompt =
@@ -96,7 +125,55 @@ export default function NotificationsPageContent({
         </div>
       ) : null}
 
-      {visibleItems.length === 0 ? (
+      {accountLoadFailed ? (
+        <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-900">
+          تعذّر تحميل إشعارات حسابك الآن — حدّث الصفحة بعد قليل.
+        </p>
+      ) : null}
+
+      {accountItems.length > 0 ? (
+        <ul className="mb-3 space-y-3">
+          {accountItems.map((item) => {
+            const content = (
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-brand">
+                  <Bell className="size-4" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1 space-y-1 text-start">
+                  <p className="text-sm font-bold text-brand">{item.title}</p>
+                  {item.body ? (
+                    <p className="text-xs leading-6 text-muted-foreground">{item.body}</p>
+                  ) : null}
+                  {/* Client-only: Node and the browser ship different ICU data for ar-SA dates (hydration mismatch). */}
+                  <p className="text-[11px] text-muted-foreground/80">
+                    {isHydrated ? formatDate(item.createdAt) : ""}
+                  </p>
+                </div>
+              </div>
+            );
+
+            return (
+              <li
+                key={`account-${item.id}`}
+                className={cn(
+                  "rounded-2xl border bg-white px-4 py-4 shadow-sm dark:bg-[#1a2421]",
+                  item.isRead ? "border-border/60" : "border-brand/30",
+                )}
+              >
+                {item.href ? (
+                  <Link href={item.href} className="block">
+                    {content}
+                  </Link>
+                ) : (
+                  content
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      {visibleItems.length === 0 && accountItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-6 py-16 text-center shadow-sm">
           <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-brand-background-green text-brand">
             <Bell className="size-6" aria-hidden="true" />
@@ -106,7 +183,7 @@ export default function NotificationsPageContent({
             {labels.emptyDescription}
           </p>
         </div>
-      ) : (
+      ) : visibleItems.length === 0 ? null : (
         <ul className="space-y-3">
           {visibleItems.map((item) => (
             <li
@@ -128,10 +205,7 @@ export default function NotificationsPageContent({
                     </p>
                   ) : null}
                   <p className="text-[11px] text-muted-foreground/80">
-                    {new Intl.DateTimeFormat("ar-SA", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    }).format(item.createdAt)}
+                    {formatDate(item.createdAt)}
                   </p>
                 </div>
               </div>

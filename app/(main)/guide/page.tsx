@@ -10,17 +10,21 @@ import {
   Lightbulb,
 } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
 import GuideTutorialsSection from "@/features/guide/components/guide-tutorials-section";
+import { breadcrumbJsonLd, buildPageMetadata } from "@/lib/seo/page-metadata";
+import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import { buildNeutralJourney } from "@/features/requests/data/order-journey";
 
 type Step = { title: string; desc: string };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("guidePage");
-  return {
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/guide" },
-  };
+    path: "/guide",
+  });
 }
 
 export default async function GuidePage() {
@@ -31,11 +35,17 @@ export default async function GuidePage() {
 
   return (
     <main className="py-14 md:py-20">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("breadcrumbHome"), path: "/" },
+          { name: t("breadcrumb"), path: "/guide" },
+        ])}
+      />
       <div className="container flex flex-col gap-12">
         {/* Header */}
         <div className="flex flex-col gap-4 text-center">
           <nav className="mx-auto text-xs text-muted-foreground">
-            <Link href="/" className="transition hover:text-brand">
+            <Link href="/" className="inline-flex min-h-10 items-center px-1 transition hover:text-brand">
               {t("breadcrumbHome")}
             </Link>
             <span className="px-2">/</span>
@@ -80,6 +90,18 @@ export default async function GuidePage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* رحلة الطلب بعد الإرسال (ف2) — نفس الخطوات الست التي يراها العميل في التتبّع */}
+        <section className="flex flex-col gap-6 rounded-3xl border border-border/60 bg-white p-7 shadow-sm dark:bg-white/[0.03]">
+          <div className="flex flex-col gap-2">
+            <h2 className="inline-flex items-center gap-2 text-2xl font-bold text-foreground">
+              <CheckCircle2 className="size-6 text-brand" aria-hidden="true" />
+              {t("journeyTitle")}
+            </h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">{t("journeySubtitle")}</p>
+          </div>
+          <OrderJourneySteps steps={buildNeutralJourney()} showSentence neutral />
         </section>
 
         {/* Docs + Tips */}

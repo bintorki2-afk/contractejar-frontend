@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 
 import type { ContentPageSeo } from "@/features/content-pages/types/content-page-seo";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 type ContentPageMetadataDefaults = {
   /** Hardcoded fallback title (i18n). Used when API `meta_title` is empty. */
-  title?: Metadata["title"];
+  title: string;
   /** Hardcoded fallback description (i18n). Used when API `meta_description` is empty. */
-  description?: string;
+  description: string;
   /** Self-referencing canonical path (e.g. "/blog"). Resolved absolute via metadataBase. */
-  canonical?: string;
+  canonical: string;
+  /** Home page: the default title is used verbatim (no brand suffix). */
+  absoluteTitle?: boolean;
 };
 
 function normalizeMetaField(value: string | null | undefined): string {
@@ -20,49 +23,21 @@ function normalizeMetaField(value: string | null | undefined): string {
 }
 
 /**
- * Merge CMS SEO over page defaults.
- * Non-empty `meta_title` / `meta_description` win and also set Open Graph.
- * Empty / missing API fields keep the provided hardcoded defaults unchanged.
+ * Merge CMS SEO over page defaults: non-empty `meta_title` / `meta_description`
+ * win (title used verbatim so the root template doesn't double-suffix it).
+ * Open Graph / Twitter / canonical / image are always filled.
  */
 export function resolveContentPageMetadata(
   page: ContentPageSeo | null | undefined,
-  defaults: ContentPageMetadataDefaults = {},
+  defaults: ContentPageMetadataDefaults,
 ): Metadata {
   const apiTitle = normalizeMetaField(page?.meta_title);
   const apiDescription = normalizeMetaField(page?.meta_description);
 
-  const metadata: Metadata = {};
-
-  if (defaults.canonical) {
-    metadata.alternates = { canonical: defaults.canonical };
-  }
-
-  if (defaults.title !== undefined) {
-    metadata.title = defaults.title;
-  }
-
-  if (defaults.description !== undefined) {
-    metadata.description = defaults.description;
-  }
-
-  if (!apiTitle && !apiDescription) {
-    return metadata;
-  }
-
-  const openGraph: NonNullable<Metadata["openGraph"]> = {};
-
-  if (apiTitle) {
-    // Absolute so CMS titles are not double-suffixed by the root `%s | …` template.
-    metadata.title = { absolute: apiTitle };
-    openGraph.title = apiTitle;
-  }
-
-  if (apiDescription) {
-    metadata.description = apiDescription;
-    openGraph.description = apiDescription;
-  }
-
-  metadata.openGraph = openGraph;
-
-  return metadata;
+  return buildPageMetadata({
+    title: apiTitle || defaults.title,
+    description: apiDescription || defaults.description,
+    path: defaults.canonical,
+    absoluteTitle: apiTitle ? true : Boolean(defaults.absoluteTitle),
+  });
 }

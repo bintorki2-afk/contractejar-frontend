@@ -44,14 +44,33 @@ export async function initFirebaseAnalytics() {
     return null;
   }
 
-  const { getAnalytics, isSupported } = await import("firebase/analytics");
-  const supported = await isSupported();
-  if (!supported) {
+  try {
+    const { getAnalytics, getGoogleAnalyticsClientId, isSupported } =
+      await import("firebase/analytics");
+    const supported = await isSupported();
+    if (!supported) {
+      return null;
+    }
+
+    analytics = getAnalytics(firebaseApp);
+
+    // `getAnalytics` starts an internal, non-awaited initialisation (dynamic
+    // config + installations fetches to *.googleapis.com). When those hosts
+    // are blocked (ad blockers, offline, strict proxies) that promise rejects
+    // with nobody listening → "Uncaught (in promise) TypeError: Failed to
+    // fetch" and a noise event in Sentry. The SDK exposes no handle on that
+    // promise, but `getGoogleAnalyticsClientId` awaits it synchronously, so
+    // attaching a catch here observes the rejection and keeps analytics
+    // best-effort. (If gtag never loads the derived promise simply stays
+    // pending; it is never awaited.)
+    void getGoogleAnalyticsClientId(analytics).catch(() => {});
+
+    return analytics;
+  } catch {
+    // Offline / blocked (ad blockers, proxies): analytics is best-effort and
+    // must never surface as an unhandled rejection.
     return null;
   }
-
-  analytics = getAnalytics(firebaseApp);
-  return analytics;
 }
 
 export async function getFirebaseMessagingAsync(): Promise<Messaging | null> {

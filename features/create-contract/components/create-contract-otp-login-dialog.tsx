@@ -26,6 +26,7 @@ import VerifyOtpSlot from "@/features/auth/components/verify-otp-slot";
 import { useOtpTimer } from "@/features/auth/hooks/use-otp-timer";
 import { requestPhoneOtp } from "@/features/auth/services/request-phone-otp";
 import { verifyPhoneOtp } from "@/features/auth/services/verify-phone-otp";
+import { track } from "@/lib/analytics/track";
 import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import type { AuthUser } from "@/features/auth/types/auth-user";
 import { formatPhoneDisplay } from "@/features/auth/utils/format-phone-display";
@@ -120,6 +121,7 @@ function OtpLoginFlow({
       return false;
     }
 
+    track("otp_requested", { context: "checkout" });
     return true;
   }
 
@@ -187,6 +189,7 @@ function OtpLoginFlow({
       }
 
       setUser(response.user);
+      track("otp_verified", { context: "checkout" });
       toast.success(tLogin("verifySuccess"));
       onVerified({ user: response.user, mobile });
     } finally {
