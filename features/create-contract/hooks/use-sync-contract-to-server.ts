@@ -65,6 +65,58 @@ function allFiles(files: File[], persisted: PersistedFile[]): File[] {
 }
 
 /**
+ * The same draft open in two tabs: tab A sends it (server contract #1 is saved
+ * in localStorage), then tab B — whose in-memory draft never saw that id —
+ * sent it again and created a second order (tested: 445150 + 684391). Before
+ * creating a contract, adopt the server identity another tab stored for the
+ * same draft (same contract type, owner and tenant ID numbers).
+ */
+const DRAFT_STORAGE_KEY = "aqdi-create-contract-draft";
+
+function adoptServerIdentityFromOtherTab(rawValue?: string | null) {
+  const store = useCreateContractDraftStore.getState();
+  if (store.contractSession?.serverContractId || typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const raw = rawValue ?? window.localStorage.getItem(DRAFT_STORAGE_KEY);
+    const persisted = raw ? JSON.parse(raw)?.state : null;
+    const session = persisted?.contractSession;
+    if (!session?.serverContractId || !session?.serverUuid) {
+      return;
+    }
+
+    const sameDraft =
+      session.contractType === store.contractSession?.contractType &&
+      persisted?.owner?.ownerData?.idNumber === store.owner.ownerData.idNumber &&
+      persisted?.tenant?.tenantData?.individual?.idNumber ===
+        store.tenant.tenantData.individual.idNumber &&
+      persisted?.tenant?.tenantData?.organization?.unifiedRecordNumber ===
+        store.tenant.tenantData.organization.unifiedRecordNumber;
+
+    if (sameDraft) {
+      store.setServerContractIdentity({
+        contractId: Number(session.serverContractId),
+        uuid: String(session.serverUuid),
+      });
+    }
+  } catch {
+    // Unreadable storage: fall back to creating the contract as before.
+  }
+}
+
+// Tab B overwrites localStorage with its own copy on its next edit (e.g. the
+// OTP dialog storing the mobile), so catch tab A's write the moment it happens.
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === DRAFT_STORAGE_KEY && event.newValue) {
+      adoptServerIdentityFromOtherTab(event.newValue);
+    }
+  });
+}
+
+/**
  * Draft-first stays: the whole wizard is filled offline in the browser. This
  * hook replays the finished draft onto the backend in one go (start →
  * step1…6) so a real contract exists for payment, tracking and the dashboard.
@@ -102,12 +154,14 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
 
       // 1) Contract id — reuse the server one when the draft already has it.
       setStage("start");
-      let contractId = store.contractSession?.serverContractId ?? null;
-      let uuid = store.contractSession?.serverUuid ?? null;
+      adoptServerIdentityFromOtherTab();
+      const current = useCreateContractDraftStore.getState();
+      let contractId = current.contractSession?.serverContractId ?? null;
+      let uuid = current.contractSession?.serverUuid ?? null;
 
       if (!contractId || !uuid) {
-        const existing = store.existingPropertyContext;
-        const currentSession = store.contractSession;
+        const existing = current.existingPropertyContext;
+        const currentSession = current.contractSession;
         const started =
           existing && currentSession?.isReal
             ? await startContract({
