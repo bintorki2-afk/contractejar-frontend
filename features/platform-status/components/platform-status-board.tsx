@@ -59,18 +59,30 @@ function formatTime(value: string | null) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  // en-GB + fixed zone: identical on the server and in the browser (the
+  // ar-SA ICU data differs between Node and browsers → hydration mismatch).
+  return new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Riyadh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   }).format(date);
 }
 
-export default function PlatformStatusBoard({ initial }: { initial: PlatformStatus }) {
+export default function PlatformStatusBoard({
+  initial,
+  renderedAt,
+}: {
+  initial: PlatformStatus;
+  /** Server render time (ISO) — «آخر فحص» when the API sends no timestamp. */
+  renderedAt: string;
+}) {
   const [status, setStatus] = useState<PlatformStatus>(initial);
   const [refreshing, setRefreshing] = useState(false);
-  // Client clock for «آخر تحديث» (server-rendered time would mismatch on hydration).
-  const [fetchedAt, setFetchedAt] = useState<string | null>(null);
+  const [fetchedAt, setFetchedAt] = useState<string>(renderedAt);
   const inFlight = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -89,7 +101,6 @@ export default function PlatformStatusBoard({ initial }: { initial: PlatformStat
   }, []);
 
   useEffect(() => {
-    setFetchedAt(new Date().toISOString());
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") void refresh();
     }, REFRESH_MS);

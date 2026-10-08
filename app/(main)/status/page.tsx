@@ -50,7 +50,7 @@ export default async function StatusPage() {
           </p>
         </div>
 
-        <PlatformStatusBoard initial={initial} />
+        <PlatformStatusBoard initial={initial} renderedAt={new Date().toISOString()} />
       </div>
     </main>
   );
