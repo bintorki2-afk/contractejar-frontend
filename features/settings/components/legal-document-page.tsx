@@ -1,34 +1,72 @@
+import Link from "next/link";
+import { FaWhatsapp } from "react-icons/fa";
+
+import type { LegalDocument } from "@/content/legal/types";
+import LegalDocumentBody from "@/features/settings/components/legal-document-body";
+
 type LegalDocumentPageProps = {
-  title: string;
-  html: string;
-  emptyLabel: string;
+  document: LegalDocument;
+  updatedAtLabel: string;
+  contactTitle: string;
+  contactBody: string;
+  supportLabel: string;
+  whatsappLabel: string;
+  whatsappHref: string;
 };
 
+/**
+ * Static legal page (privacy / terms). Content lives in `content/legal/*`
+ * (the dashboard text is no longer used on the website — see the note in
+ * `content/legal/types.ts`).
+ */
 export default function LegalDocumentPage({
-  title,
-  html,
-  emptyLabel,
+  document,
+  updatedAtLabel,
+  contactTitle,
+  contactBody,
+  supportLabel,
+  whatsappLabel,
+  whatsappHref,
 }: LegalDocumentPageProps) {
-  const hasContent = html.trim().length > 0;
-
   return (
     <main className="bg-brand-background py-10 md:py-14">
       <div className="container">
         <article className="mx-auto max-w-3xl rounded-[28px] bg-white dark:bg-[#151c1b] p-6 shadow-[0_2px_24px_rgba(0,0,0,0.04)] md:p-10">
           <h1 className="text-3xl font-extrabold text-brand md:text-4xl">
-            {title}
+            {document.title}
           </h1>
 
-          {hasContent ? (
-            <div
-              className="mt-8 space-y-4 text-sm leading-8 text-[#4d4d4d] dark:text-white/70 md:text-base [&_a]:font-bold [&_a]:text-brand [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:text-[#222222] dark:[&_h2]:text-white/90 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-bold [&_li]:ms-5 [&_li]:list-disc [&_ol]:ms-5 [&_ol]:list-decimal [&_p]:mb-3 [&_p:last-child]:mb-0 [&_strong]:font-bold [&_ul]:ms-5 [&_ul]:list-disc"
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
-          ) : (
-            <p className="mt-8 text-sm leading-7 text-[#7a7a7a] dark:text-white/50 md:text-base">
-              {emptyLabel}
+          <LegalDocumentBody
+            document={document}
+            updatedAtLabel={updatedAtLabel}
+            className="mt-4"
+          />
+
+          <aside className="mt-10 rounded-2xl border border-brand/15 bg-brand-background-green p-5 dark:border-[#2f403b]">
+            <p className="text-base font-extrabold text-brand dark:text-[#48c0b8]">
+              {contactTitle}
             </p>
-          )}
+            <p className="mt-1 text-sm leading-7 text-[#4d5f5a] dark:text-white/70">
+              {contactBody}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href="/support"
+                className="inline-flex h-11 items-center rounded-full border border-brand/25 bg-white px-5 text-sm font-bold text-brand transition hover:bg-brand-background dark:bg-[#1a2421] dark:text-[#48c0b8]"
+              >
+                {supportLabel}
+              </Link>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center gap-2 rounded-full bg-[#25d366] px-5 text-sm font-bold text-white transition hover:bg-[#1ebe5a]"
+              >
+                <FaWhatsapp className="size-4" aria-hidden="true" />
+                {whatsappLabel}
+              </a>
+            </div>
+          </aside>
         </article>
       </div>
     </main>

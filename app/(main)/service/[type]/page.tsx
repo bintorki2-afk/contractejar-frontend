@@ -13,6 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { getContractPricingSafe } from "@/features/pricing/services/get-contract-pricing-safe";
 import ServiceTabs from "@/features/service-page/components/service-tabs";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 
@@ -51,10 +52,15 @@ export default async function ServicePage({
   const key = resolveType(type);
   if (!key) notFound();
 
-  const [t, whatsappHref] = await Promise.all([
+  const [t, whatsappHref, pricing] = await Promise.all([
     getTranslations("servicePage"),
     getWhatsappHref(),
+    getContractPricingSafe(),
   ]);
+  // رسوم السنة الأولى من GET /pricing (قاعدة 13: لا أسعار ثابتة في الواجهة).
+  const firstYearFee =
+    key === "commercial" ? pricing.commercial.first_year : pricing.housing.first_year;
+  const feeText = t("feeFrom", { fee: firstYearFee.toLocaleString("en-US") });
 
   const features = t.raw(`${key}.features`) as string[];
   const steps = t.raw(`${key}.steps`) as string[];
@@ -76,7 +82,7 @@ export default async function ServicePage({
     {
       icon: <Wallet className="size-4" aria-hidden="true" />,
       title: t("sidebar.feeTitle"),
-      value: t(`${key}.fee`),
+      value: feeText,
     },
   ];
 

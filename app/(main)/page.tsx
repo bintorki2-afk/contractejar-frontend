@@ -15,6 +15,7 @@ import { trustedEntitiesConfig } from "@/features/home/data/trusted-entities";
 import { getHomeContent } from "@/features/home/services/get-home-content";
 import { resolveHomeContent } from "@/features/home/utils/resolve-home-content";
 import PricingSection from "@/features/pricing/components/pricing-section";
+import { getContractPricingSafe } from "@/features/pricing/services/get-contract-pricing-safe";
 import ReviewsSection from "@/features/reviews/components/reviews-section";
 import ServicesSection from "@/features/services/components/services-section";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
@@ -34,10 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [apiSections, settings, tHero, tTrusted, tAdvantages, tPricing, tSupport, tApp] =
+  const [apiSections, settings, pricing, tHero, tTrusted, tAdvantages, tPricing, tSupport, tApp] =
     await Promise.all([
       getHomeContent(),
       getAppSettings(),
+      getContractPricingSafe(),
       getTranslations("hero"),
       getTranslations("trustedEntities"),
       getTranslations("advantages"),
@@ -93,7 +95,8 @@ export default async function Home() {
       titleAccent: tPricing("titleAccent"),
       description: tPricing("description"),
       benefitsTitle: tPricing("benefitsTitle"),
-      plans: tPricing.raw("plans") as Array<{
+      // الأسعار من GET /pricing (المصدر الوحيد)، والنص الثابت يحمل الشكل فقط.
+      plans: (tPricing.raw("plans") as Array<{
         id: string;
         icon: string;
         title: string;
@@ -102,7 +105,15 @@ export default async function Home() {
         period: string;
         features: string[];
         cta: string;
-      }>,
+      }>).map((plan) => ({
+        ...plan,
+        price:
+          plan.id === "commercial"
+            ? String(pricing.commercial.first_year)
+            : plan.id === "residential"
+              ? String(pricing.housing.first_year)
+              : plan.price,
+      })),
     },
     contact: {
       eyebrow: tSupport("eyebrow"),

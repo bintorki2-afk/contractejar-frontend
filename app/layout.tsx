@@ -22,6 +22,11 @@ import {
 } from "@/features/shared/theme/theme-provider";
 import SiteBackground from "@/features/shared/components/site-background";
 import InstallPrompt from "@/features/shared/components/install-prompt";
+import { getAppSettings } from "@/features/settings/services/get-app-settings";
+import {
+  resolveFooterPhoneHref,
+  resolveFooterSocialLinks,
+} from "@/features/settings/utils/resolve-footer-contact";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
@@ -106,10 +111,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, websiteStatus] = await Promise.all([
+  const [locale, messages, websiteStatus, settings] = await Promise.all([
     getLocale(),
     getMessages(),
     getWebsiteStatus(),
+    getAppSettings(),
   ]);
   const direction = getDirection(locale);
 
@@ -121,22 +127,27 @@ export default async function RootLayout({
 
   // Organization + WebSite structured data (JSON-LD): يعرّف كيان «عقد إيجار»
   // (الاسم/الشعار/التواصل) لمحركات البحث ومحرّكات AI ليظهر كمصدر موثوق.
+  // رقم الدعم وحسابات التواصل من إعدادات الخادم (لا أرقام ولا حسابات ثابتة في الكود).
+  const supportTel = (resolveFooterPhoneHref(settings) ?? "tel:+966597500014").replace(/^tel:/, "");
+  const socialProfiles = resolveFooterSocialLinks(settings).map((link) => link.href);
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "عقد إيجار",
+    alternateName: "منصة توثيق عقود الإيجار",
+    legalName: "مؤسسة عقدي العقارية",
     url: SITE_URL,
     logo: `${SITE_URL}/icons/icon-512.png`,
     image: `${SITE_URL}/og-image.png`,
     identifier: "CR 4650258662",
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+966597500014",
+      telephone: supportTel,
       contactType: "customer service",
       areaServed: "SA",
       availableLanguage: ["ar"],
     },
-    sameAs: ["https://x.com/aqdi_sa", "https://www.tiktok.com/@aqdi.sa"],
+    ...(socialProfiles.length > 0 ? { sameAs: socialProfiles } : {}),
   };
   const websiteJsonLd = {
     "@context": "https://schema.org",

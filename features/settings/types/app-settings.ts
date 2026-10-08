@@ -11,6 +11,11 @@ export type AppSettings = {
   tiktok: string;
   linkedIn: string;
   whatsapp_contact: string;
+  /** Digits-only international support number (e.g. 966597500014). */
+  support_phone?: string | null;
+  /** Local form (e.g. 0597500014). */
+  support_phone_local?: string | null;
+  support_whatsapp_url?: string | null;
   version: string;
   time_to_documentation_contract: number;
   open_payment: number;

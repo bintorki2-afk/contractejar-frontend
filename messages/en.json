@@ -296,42 +296,42 @@
     },
     "coreValues": {
       "badge": "Our values",
-      "title": "Rental Contract values",
-      "description": "Ejar aims to regulate the real estate rental sector in Saudi Arabia in a balanced way that protects the rights of all parties in the rental process.",
+      "title": "Our values at Ejar Contract",
+      "description": "We commit to values that protect every party to the lease and keep documentation clear and secure.",
       "items": [
         {
           "id": "transparency",
           "icon": "/icons/folder-star.svg",
           "eyebrow": "Transparency",
           "title": "Towards clear and responsible management",
-          "description": "Providing clear and fully open information to the public to enhance citizen understanding."
+          "description": "Published fees and clear steps from order to documentation — no surprises."
         },
         {
           "id": "trust",
           "icon": "/icons/badge.svg",
           "eyebrow": "Trust",
-          "title": "The foundation of our relationship with citizens",
-          "description": "Our platform relies on transparent and accurate information to serve you efficiently."
+          "title": "The basis of our relationship with customers",
+          "description": "Your contracts are documented through the official Ejar platform with accurate data and a human review before documentation."
         },
         {
           "id": "balance",
           "icon": "/icons/like.svg",
           "eyebrow": "Balance",
           "title": "Effective service and clear vision",
-          "description": "Providing clear and fully open information to the public to enhance citizen understanding."
+          "description": "A balanced contract that protects both landlord and tenant under Ejar regulations."
         }
       ]
     },
     "beneficiaries": {
       "badge": "Beneficiary Customers",
-      "title": "Beneficiaries of (Ejar)",
-      "description": "Based on the partnership with Ejar for housing services, all parties in the process can register and use the electronic rental services network.",
+      "title": "Who the service is for",
+      "description": "Ejar Contract serves every party to the lease in the Kingdom — individuals, businesses and real-estate offices.",
       "items": [
         {
           "id": "tenant",
           "icon": "/icons/user.svg",
           "title": "Tenant",
-          "description": "Citizens and residents benefiting from rental services."
+          "description": "Citizens and residents who want a documented contract that protects their rights."
         },
         {
           "id": "lessor",
@@ -434,6 +434,14 @@
       "metaTitle": "Privacy Policy",
       "metaDescription": "Read Rental Contract privacy policy and how we protect your data.",
       "empty": "Privacy policy is not available at the moment."
+    },
+    "updatedAt": "Last updated",
+    "contact": {
+      "title": "Questions about this policy?",
+      "privacyBody": "To access, correct or delete your data, or for any question, contact us and we will reply during working hours.",
+      "termsBody": "For any question about the terms, fees or cancellation, contact us and we will clarify everything.",
+      "support": "Support page",
+      "whatsapp": "Support WhatsApp"
     }
   },
   "faq": {
@@ -3031,7 +3039,7 @@
         },
         {
           "q": "What is the fee?",
-          "a": "Residential documentation fees start from SAR 249 per year."
+          "a": "Fees are shown in the “Service fee” card on this page and in the price sheet inside the wizard, and include the Ejar platform fee. Document surcharge or meter transfer fees apply only when needed."
         }
       ]
     },
@@ -3078,10 +3086,11 @@
         },
         {
           "q": "What is the fee?",
-          "a": "Commercial documentation fees start from SAR 349 per year."
+          "a": "Fees are shown in the “Service fee” card on this page and in the price sheet inside the wizard, and include the Ejar platform fee. Document surcharge or meter transfer fees apply only when needed."
         }
       ]
-    }
+    },
+    "feeFrom": "From SAR {fee} / year"
   },
   "a11y": {
     "open": "Accessibility tools",
