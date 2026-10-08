@@ -19,8 +19,8 @@ export type ContractListItem = {
   contract_status_name: string | null;
   contract_status_color: string | null;
   status?: string | null;
-  /** Batch D: `new`, `paid`, `under_review`, …, `refunded`. */
-  status_case?: string | null;
+  /** Batch D: stable status key (`new`, `paid`, `under_review`, …, `refunded`). */
+  status_key?: string | null;
   status_label?: string | null;
   status_type?: ContractStatusType | string | null;
   status_id?: number | null;

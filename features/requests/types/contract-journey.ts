@@ -31,7 +31,7 @@ export type ContractStatusSnapshot = {
 
 export type ContractDetail = ContractStatusSnapshot & {
   uuid?: string;
-  /** Batch D refunds (`status_case = refunded` / partial refund amount). */
+  /** Batch D refunds (`status`/`status_key` = refunded, or a partial refund amount). */
   refund?: RefundInfo;
   is_completed?: boolean;
   is_draft?: boolean;

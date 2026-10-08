@@ -90,7 +90,7 @@ function resolveStatus(contract: ContractListItem): RequestStatus {
   const statusText =
     contract.status_label || contract.contract_status_name || "";
 
-  // Older API without `status_case`: the refund row's Arabic name.
+  // Older API without `status_key`: the refund row's Arabic name.
   if (statusText.includes("مرتجع") || statusText.includes("مسترجع")) {
     return "returned";
   }

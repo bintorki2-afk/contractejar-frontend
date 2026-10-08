@@ -77,10 +77,15 @@ describe("notification kinds (item 54)", () => {
 });
 
 describe("refund state (B2/B8: by case, never by id)", () => {
-  it("status_case refunded = full refund with amount", () => {
-    const info = resolveRefundInfo({ status_case: "refunded", refund: { status: "full", amount: 349 } });
+  it("status refunded = full refund with amount", () => {
+    const info = resolveRefundInfo({ status: "refunded", refund: { status: "full", amount: 349 } });
     expect(info).toMatchObject({ refunded: true, partial: false, amount: 349 });
     expect(formatRefundLabel(info)).toBe("تم الاسترجاع · 349 ريال");
+  });
+
+  it("status_key / status_case object (key=return) also mean refunded", () => {
+    expect(resolveRefundInfo({ status_key: "refunded" }).refunded).toBe(true);
+    expect(resolveRefundInfo({ status_case: { key: "return", fields: [] } }).refunded).toBe(true);
   });
 
   it("«قيد المراجعة» (under_review, old id 2) is NOT a refund", () => {
@@ -126,7 +131,6 @@ describe("refund state (B2/B8: by case, never by id)", () => {
       contract_status_name: "مسترجع",
       contract_status_color: "#8b5cf6",
       status: "refunded",
-      status_case: "refunded",
       refund: { status: "full", amount: 349 },
       created_at: "2026-10-09",
       time_to_documentation_contract: null,
@@ -159,7 +163,7 @@ describe("refund state (B2/B8: by case, never by id)", () => {
 describe("rate-the-service after notarization (W5)", () => {
   it("shows after ejar_authenticated / completed", () => {
     expect(isNotarized({ status: "ejar_authenticated" })).toBe(true);
-    expect(isNotarized({ status: "x", status_case: "completed" })).toBe(true);
+    expect(isNotarized({ status: "x", status_key: "completed" })).toBe(true);
     expect(isNotarized({ status: "whatsapp_draft", journey: [{ key: "ejar_authenticated", done: true }] })).toBe(true);
     expect(isNotarized({ status: "under_review", journey: [{ key: "ejar_authenticated", done: false }] })).toBe(false);
   });

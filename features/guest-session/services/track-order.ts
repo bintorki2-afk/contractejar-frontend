@@ -18,8 +18,8 @@ export type TrackedOrder = {
   awaiting_payment: boolean;
   payment_url: string | null;
   status: string;
-  /** Batch D: status resolved by case (`under_review`, `refunded`…), not by id. */
-  status_case?: string | null;
+  /** Batch D: stable status key (`under_review`, `refunded`…) — never resolve by id. */
+  status_key?: string | null;
   status_label: string;
   status_color: string | null;
   status_client_explanation: string | null;

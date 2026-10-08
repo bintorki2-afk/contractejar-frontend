@@ -1,6 +1,6 @@
 /** Notarization done (or completed): the journey reached its last step. */
-export function isNotarized(input: { status?: string | null; status_case?: string | null; journey?: unknown }) {
-  const keys = [input.status_case, input.status].map((v) => (v ?? "").toLowerCase());
+export function isNotarized(input: { status?: string | null; status_key?: string | null; journey?: unknown }) {
+  const keys = [input.status_key, input.status].map((v) => (typeof v === "string" ? v : "").toLowerCase());
   if (keys.some((key) => key === "ejar_authenticated" || key === "completed")) {
     return true;
   }

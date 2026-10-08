@@ -1,8 +1,9 @@
 /**
  * حالة الاسترجاع للعميل (دفعة د، B2/B8) — «تم الاسترجاع» مع المبلغ.
  *
- * الحالة تُحدَّد بالـ case وليس بالرقم: `status_case`/`status` = `refunded`
- * (لم يعد «قيد المراجعة» حالة استرجاع). المبلغ من `refund.amount` /
+ * الحالة تُحدَّد بالمفتاح وليس بالرقم: `status` / `status_key` = `refunded`
+ * (لم يعد «قيد المراجعة» حالة استرجاع). ملاحظة الخادم: `status_case` على صف
+ * الحالة كائن نموذج `{key, fields}` (للمسترجع key = `return`) وليس مفتاح الحالة. المبلغ من `refund.amount` /
  * `refunded_amount` / مجموع `refunds[]`، وإلا من الفاتورة إن وُجدت.
  * استرجاع جزئي (`refund.status = partial`) لا يغيّر حالة الطلب لكنه يُعرض.
  */
@@ -16,7 +17,7 @@ export type RefundInfo = {
   at: string | null;
 };
 
-const REFUNDED_CASES = new Set(["refunded", "refund", "returned"]);
+const REFUNDED_CASES = new Set(["refunded", "refund", "returned", "return"]);
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -42,7 +43,14 @@ export function resolveRefundInfo(raw: unknown): RefundInfo {
   const refund = asRecord(row.refund);
   const refunds = Array.isArray(row.refunds) ? row.refunds.map(asRecord).filter(Boolean) : [];
 
-  const cases = [row.status_case, row.status, row.journey_status, row.payment_status]
+  const statusCase = asRecord(row.status_case);
+  const cases = [
+    row.status_key,
+    typeof row.status_case === "string" ? row.status_case : statusCase?.key,
+    row.status,
+    row.journey_status,
+    row.payment_status,
+  ]
     .map(asText)
     .filter((value): value is string => value !== null);
   const refundState = asText(refund?.status) ?? asText(row.refund_status);
