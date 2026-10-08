@@ -484,11 +484,6 @@ export function mapCompletedContractToDetails(
   );
   pushRow(
     financeRows,
-    labels.fields.servicesTotal,
-    formatAmount(financial?.services_total, labels.currency),
-  );
-  pushRow(
-    financeRows,
     labels.fields.meterFeesTotal,
     formatAmount(financial?.meter_fees_total, labels.currency),
   );
@@ -503,14 +498,9 @@ export function mapCompletedContractToDetails(
     formatAmount(financial?.total_price, labels.currency),
   );
 
-  const serviceRows: RequestContractDetailsRow[] = [];
-  for (const service of financial?.services ?? []) {
-    pushRow(
-      serviceRows,
-      service.name || service.service_name || service.name_ar,
-      formatAmount(service.price ?? service.service_price, labels.currency),
-    );
-  }
+  // Legacy «services» rows (`services_pricings`) are not part of the order's
+  // price and showed e.g. «إجمالي الخدمات 325» on a 249 order (CROSS-W3): the
+  // charged lines live only in the invoice (`GET /invoices/{id}` items[]).
 
   const sections = [
     buildSection(labels.overviewSection, overviewRows),
@@ -518,7 +508,6 @@ export function mapCompletedContractToDetails(
     buildSection(labels.tenantSection, tenantRows),
     ...unitSections,
     buildSection(labels.financeSection, financeRows),
-    buildSection(labels.servicesSection, serviceRows),
   ].filter(
     (section): section is RequestContractDetailsSection => section !== null,
   );
