@@ -335,7 +335,10 @@ function resolvePricing(
               card.subtitle,
               fallback?.description ?? "",
             ),
-            price: textOrFallback(card.price, fallback?.price ?? ""),
+            // Price always from GET /pricing (carried by the static plan): a
+            // price typed in the content editor froze the home cards at 249/349
+            // after any pricing change in the settings (CROSS-W2).
+            price: fallback?.price || textOrFallback(card.price, ""),
             period: textOrFallback(
               card.duration_label,
               fallback?.period ?? "",
