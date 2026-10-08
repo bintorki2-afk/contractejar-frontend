@@ -1,3 +1,4 @@
+import { isValidPersonId } from "@/lib/validation/national-id";
 import {
   EMPTY_BIRTH_DATE,
   type BirthDateValue,
@@ -74,8 +75,7 @@ function isBirthDateComplete(birthDate: BirthDateValue) {
 }
 
 function isIdNumberComplete(idNumber: string) {
-  const digits = idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
-  return digits.length === 10;
+  return isValidPersonId(idNumber);
 }
 
 function isUnifiedRecordNumberComplete(unifiedRecordNumber: string) {

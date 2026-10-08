@@ -1,6 +1,7 @@
 import { isSaudiMobilePrefixOnly } from "@/lib/validation/format-saudi-mobile-for-form";
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { digitsOnly } from "@/lib/utils/digits";
+import { isValidOwnerId, isValidPersonId } from "@/lib/validation/national-id";
 
 export type OwnerBirthDateLike = {
   calendarType?: "hijri" | "gregorian";
@@ -56,14 +57,13 @@ export function isPhoneComplete(phone: string) {
   return /^05\d{8}$/.test(digits);
 }
 
-function isIdNumberComplete(idNumber: string) {
-  const digits = digitsOnly(idNumber);
-  return digits.length === 10;
+function isIdNumberComplete(idNumber: string, allowEstablishment = false) {
+  return allowEstablishment ? isValidOwnerId(idNumber) : isValidPersonId(idNumber);
 }
 
 export function isOwnerDataComplete(ownerData: OwnerDataLike) {
   return (
-    isIdNumberComplete(ownerData.idNumber) &&
+    isIdNumberComplete(ownerData.idNumber, true) &&
     isBirthDateComplete(ownerData.birthDate) &&
     isPhoneComplete(ownerData.phone) &&
     ownerData.hasAgent !== ""
@@ -87,7 +87,7 @@ export function getOwnerDataValidationIssues(
   const idDigits = digitsOnly(ownerData.idNumber);
   if (idDigits.length === 0) {
     issues.push("idNumber");
-  } else if (idDigits.length !== 10) {
+  } else if (!isValidOwnerId(idDigits)) {
     issues.push("idNumberLength");
   }
 
@@ -116,7 +116,7 @@ export function getAgentDataValidationIssues(
   const idDigits = digitsOnly(agentData.idNumber);
   if (idDigits.length === 0) {
     issues.push("idNumber");
-  } else if (idDigits.length !== 10) {
+  } else if (!isValidPersonId(idDigits)) {
     issues.push("idNumberLength");
   }
 
@@ -140,13 +140,13 @@ export function getAgentDataValidationIssues(
 export function getIdNumberFieldError(
   idNumber: string,
   messages: { required: string; length: string },
-  options?: { showEmpty?: boolean },
+  options?: { showEmpty?: boolean; allowEstablishment?: boolean },
 ) {
   const digits = digitsOnly(idNumber);
   if (digits.length === 0) {
     return options?.showEmpty ? messages.required : undefined;
   }
-  if (digits.length !== 10) {
+  if (!(options?.allowEstablishment ? isValidOwnerId(digits) : isValidPersonId(digits))) {
     return messages.length;
   }
   return undefined;

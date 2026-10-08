@@ -1486,7 +1486,7 @@
         "issues": {
           "fullName": "Owner's full name",
           "idNumber": "Owner's ID number",
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "birthDate": "Owner's date of birth",
           "phone": "Owner's mobile number",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
@@ -1496,7 +1496,7 @@
           "powerOfAttorney": "Power of attorney attachment"
         },
         "fieldErrors": {
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
           "iban": "IBAN must start with SA followed by 22 digits"
         }
@@ -2079,7 +2079,7 @@
         "issues": {
           "fullName": "Owner's full name",
           "idNumber": "Owner's ID number",
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "birthDate": "Owner's date of birth",
           "phone": "Owner's mobile number",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
@@ -2089,7 +2089,7 @@
           "powerOfAttorney": "Power of attorney attachment"
         },
         "fieldErrors": {
-          "idNumberLength": "ID number must be 10 digits",
+          "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
           "phoneLength": "Mobile number must start with 05 and be 10 digits",
           "iban": "IBAN must start with SA followed by 22 digits"
         }
@@ -3369,7 +3369,7 @@
       "idNumberLabel": "New owner ID number",
       "idNumberPlaceholder": "1XXXXXXXXX",
       "idNumberRequired": "ID number is required",
-      "idNumberLength": "ID number must be 10 digits",
+      "idNumberLength": "Invalid ID — 10 digits starting with 1 (citizen) or 2 (resident), or 7 for an owner establishment",
       "birthDateLabel": "New owner date of birth",
       "notesLabel": "Notes",
       "notesPlaceholder": "Anything else we should know (optional)",

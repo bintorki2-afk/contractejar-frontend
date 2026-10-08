@@ -46,6 +46,7 @@ import type {
 } from "@/features/lessor-change/types/lessor-change";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import { getIdNumberFieldError } from "@/lib/validation/owner-step-validation";
+import { isValidOwnerId } from "@/lib/validation/national-id";
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { formatSaudiMobileForForm } from "@/lib/validation/format-saudi-mobile-for-form";
 import { cn } from "@/lib/utils";
@@ -199,9 +200,9 @@ export default function LessorChangeFlow({
   const idError = getIdNumberFieldError(
     draft.newOwnerIdNumber,
     { required: t("idNumberRequired"), length: t("idNumberLength") },
-    { showEmpty: showErrors },
+    { showEmpty: showErrors, allowEstablishment: true },
   );
-  const idComplete = digitsOnly(draft.newOwnerIdNumber).length === 10;
+  const idComplete = isValidOwnerId(draft.newOwnerIdNumber);
   const dobComplete = isAdultBirthDateComplete(draft.newOwnerBirthDate);
   const ownerComplete = idComplete && dobComplete && draft.acknowledged;
 

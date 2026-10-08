@@ -60,7 +60,7 @@ export default function CreateContractOwnerDataPhase({
       required: t("fieldRequired"),
       length: validationLabels.idNumberLength,
     },
-    { showEmpty: showFieldErrors },
+    { showEmpty: showFieldErrors, allowEstablishment: true },
   );
   const phoneError = getPhoneFieldError(
     value.phone,

@@ -51,7 +51,7 @@ export default function CreatePropertyOwnerDataPhase({
   const idNumberError = getIdNumberFieldError(value.idNumber, {
     required: validationLabels.idNumberLength,
     length: validationLabels.idNumberLength,
-  });
+  }, { allowEstablishment: true });
   const phoneError = getPhoneFieldError(value.phone, {
     required: validationLabels.phoneLength,
     length: validationLabels.phoneLength,
