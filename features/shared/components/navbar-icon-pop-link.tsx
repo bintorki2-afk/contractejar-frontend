@@ -29,7 +29,7 @@ export default function NavbarIconPopLink({
     <IntentLink
       href={href}
       className={cn(
-        "group relative inline-flex items-center font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand",
+        "group relative inline-flex items-center font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
         active ? "text-brand" : "text-black dark:text-white/85",
       )}
     >

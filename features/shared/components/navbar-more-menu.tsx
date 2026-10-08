@@ -101,7 +101,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "inline-flex items-center gap-1 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand",
+          "inline-flex items-center gap-1 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
           open || anyActive ? "text-brand" : "text-black dark:text-white/85",
         )}
       >
