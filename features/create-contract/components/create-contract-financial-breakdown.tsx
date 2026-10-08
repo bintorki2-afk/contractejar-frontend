@@ -8,7 +8,6 @@ import type { AppliedContractCoupon } from "@/features/create-contract/types/con
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import {
-  PAYMENT_BREAKDOWN,
   formatPaymentAmount,
 } from "@/features/create-contract/types/payment-step";
 import CustomIcon from "@/features/shared/components/custom-icon";
@@ -24,6 +23,8 @@ type CreateContractFinancialBreakdownProps = {
   appliedCoupon?: AppliedContractCoupon | null;
   sectionTitle?: string;
   feeSubtitle?: string;
+  /** Re-fetch the server summary after a failure (no amount is guessed). */
+  onRetry?: () => void;
 };
 
 type PaymentAmountProps = {
@@ -206,14 +207,13 @@ function TotalRow({
 
 export default function CreateContractFinancialBreakdown({
   labels,
-  contractType,
   data,
   isLoading,
   appliedCoupon = null,
   sectionTitle,
   feeSubtitle,
+  onRetry,
 }: CreateContractFinancialBreakdownProps) {
-  const breakdown = PAYMENT_BREAKDOWN[contractType];
 
   if (isLoading) {
     return (
@@ -319,27 +319,24 @@ export default function CreateContractFinancialBreakdown({
     );
   }
 
-  const fallbackTax =
-    Number.isFinite(breakdown.vat) && breakdown.vat > 0 ? breakdown.vat : 0;
-
+  // The summary could not be loaded: never show a guessed amount (the old
+  // fixed 249/349 table disagreed with the server for surcharges/meters/2y).
   return (
     <BreakdownShell sectionTitle={sectionTitle}>
-      <SummaryRow
-        label={labels.ejarFees}
-        amount={Math.max(0, breakdown.total - fallbackTax)}
-        subtitle={feeSubtitle}
-        primary
-      />
-
-      <div className="border-t border-dashed border-[#d4d4d4] dark:border-[#2f403b]" />
-
-      <SummaryRow
-        label={labels.vat}
-        amount={fallbackTax}
-        freeLabel={labels.free}
-      />
-
-      <TotalRow label={labels.total} amount={breakdown.total} />
+      <div className="space-y-3 py-2 text-center">
+        <p className="text-sm font-semibold text-[#b42318] dark:text-[#f87171]">
+          تعذّر جلب الرسوم من الخادم. الدفع متوقف حتى تظهر الرسوم الصحيحة.
+        </p>
+        {onRetry ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-brand/30 px-5 text-sm font-bold text-brand hover:bg-brand-background-green dark:text-[#48c0b8]"
+          >
+            إعادة المحاولة
+          </button>
+        ) : null}
+      </div>
     </BreakdownShell>
   );
 }

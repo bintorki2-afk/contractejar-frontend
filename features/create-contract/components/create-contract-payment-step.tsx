@@ -188,9 +188,15 @@ export default function CreateContractPaymentStep({
 
   const selectedMethod = paymentFlow.selectedPaymentMethod;
   // CR1: direct payment — always show the pay-with-amount label (no draft step).
-  const payLabel = withTemplate(labels.navigation.payWithAmount, {
-    amount: formatPaymentAmount(payableTotal),
-  });
+  // The amount on the button comes only from the server summary: while it is
+  // loading (or failed) the button shows no number and stays disabled — before,
+  // it showed the fixed 249/349 while the gateway would charge e.g. 724.
+  const summaryReady = financeSummaryTotal != null && !financeSummaryIsPending;
+  const payLabel = summaryReady
+    ? withTemplate(labels.navigation.payWithAmount, {
+        amount: formatPaymentAmount(payableTotal),
+      })
+    : labels.navigation.pay;
 
   function handleSwitchChange(checked: boolean) {
     if (savePropertyBusyRef.current || isSaving) {
@@ -398,6 +404,7 @@ export default function CreateContractPaymentStep({
             payingLabel={labels.navigation.paying}
             saveLabel={labels.navigation.save}
             isPaying={paymentFlow.isSubmitting}
+            payDisabled={!summaryReady}
             isSaving={isSavingDraft}
             onPrevious={onBack}
             onPay={() => void paymentFlow.handlePrimaryAction()}
