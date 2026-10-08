@@ -18,16 +18,50 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Only open pages of this site from a notification (smart links point at the
+// public domain, e.g. https://contractejar.com/r/123456 → /r/123456).
+function toSitePath(url) {
+  try {
+    const parsed = new URL(url, self.location.origin);
+    return parsed.pathname + parsed.search;
+  } catch (error) {
+    return "/notifications";
+  }
+}
+
 messaging.onBackgroundMessage((payload) => {
   const notificationTitle =
-    payload.data?.title || payload.notification?.title || "New Message";
+    payload.data?.title || payload.notification?.title || "عقد إيجار";
   const notificationOptions = {
     body:
       payload.data?.body ||
       payload.notification?.body ||
-      "Check your notifications.",
-    icon: payload.data?.icon || "/firebase-logo.png",
+      "لديك تحديث جديد على طلبك.",
+    icon: "/icons/icon-192.png",
+    dir: "rtl",
+    lang: "ar",
+    data: { url: toSitePath(payload.data?.url || "/notifications") },
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// Tap on a notification → open (or focus) the order page it is about.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const path = toSitePath(event.notification?.data?.url || "/notifications");
+  const target = new URL(path, self.location.origin).href;
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windows) => {
+        for (const client of windows) {
+          if (client.url.startsWith(self.location.origin) && "focus" in client) {
+            return client.navigate(target).then((c) => (c || client).focus());
+          }
+        }
+        return self.clients.openWindow(target);
+      }),
+  );
 });

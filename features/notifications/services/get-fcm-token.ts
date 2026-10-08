@@ -5,7 +5,10 @@ import {
 import { getFirebaseMessagingAsync } from "@/features/notifications/services/firebase-client";
 
 const SERVICE_WORKER_URL = "/firebase-messaging-sw.js";
-const SERVICE_WORKER_SCOPE = "/";
+// Own scope (Firebase's default): the PWA worker `/sw.js` owns "/", and two
+// workers cannot share a scope — `getRegistration("/")` returned the PWA worker
+// (no push handler), so web push was subscribed on the wrong worker.
+const SERVICE_WORKER_SCOPE = "/firebase-cloud-messaging-push-scope";
 
 async function ensureServiceWorkerRegistration() {
   if (!("serviceWorker" in navigator)) {
@@ -16,7 +19,8 @@ async function ensureServiceWorkerRegistration() {
     let registration =
       await navigator.serviceWorker.getRegistration(SERVICE_WORKER_SCOPE);
 
-    if (!registration) {
+    // getRegistration() also matches a broader scope ("/" = the PWA worker).
+    if (!registration || !registration.scope.endsWith(SERVICE_WORKER_SCOPE)) {
       registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL, {
         scope: SERVICE_WORKER_SCOPE,
       });
