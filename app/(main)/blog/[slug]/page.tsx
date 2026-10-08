@@ -12,6 +12,7 @@ import {
 import type { BlogDetailCommentsLabels } from "@/features/blog/types/blog-detail-comments";
 import type { BlogDetailLabels, BlogDetailPost } from "@/features/blog/types/blog-detail";
 import { formatArticleDate } from "@/features/blog/utils/format-article-date";
+import { buildPageMetadata, SITE_URL } from "@/lib/seo/page-metadata";
 
 type BlogDetailPageProps = {
   params: Promise<{
@@ -24,8 +25,6 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
-
 export async function generateMetadata({
   params,
 }: BlogDetailPageProps): Promise<Metadata> {
@@ -36,29 +35,14 @@ export async function generateMetadata({
     return {};
   }
 
-  const url = `${SITE_URL}/blog/${slug}`;
-
-  return {
+  return buildPageMetadata({
     title: article.title,
     description: article.excerpt,
-    alternates: {
-      canonical: `/blog/${slug}`,
-    },
-    openGraph: {
-      type: "article",
-      title: article.title,
-      description: article.excerpt,
-      url,
-      publishedTime: article.date,
-      images: [{ url: article.coverImage, alt: article.imageAlt }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.title,
-      description: article.excerpt,
-      images: [article.coverImage],
-    },
-  };
+    path: `/blog/${slug}`,
+    type: "article",
+    image: { url: article.coverImage, alt: article.imageAlt },
+    article: { publishedTime: article.date },
+  });
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {

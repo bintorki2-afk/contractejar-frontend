@@ -29,8 +29,10 @@ export async function generateMetadata(): Promise<Metadata> {
   ]);
 
   return resolveContentPageMetadata(pageSeo, {
+    title: t("metaTitle"),
     description: t("metaDescription"),
     canonical: "/",
+    absoluteTitle: true,
   });
 }
 

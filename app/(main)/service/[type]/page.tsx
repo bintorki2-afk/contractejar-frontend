@@ -13,7 +13,14 @@ import {
   Wallet,
 } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
 import { getContractPricingSafe } from "@/features/pricing/services/get-contract-pricing-safe";
+import {
+  breadcrumbJsonLd,
+  buildPageMetadata,
+  faqJsonLd,
+  serviceJsonLd,
+} from "@/lib/seo/page-metadata";
 import ServiceTabs from "@/features/service-page/components/service-tabs";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
 
@@ -36,11 +43,11 @@ export async function generateMetadata({
   const key = resolveType(type);
   if (!key) return {};
   const t = await getTranslations("servicePage");
-  return {
+  return buildPageMetadata({
     title: t(`${key}.title`),
     description: t(`${key}.description`),
-    alternates: { canonical: `/service/${key}` },
-  };
+    path: `/service/${key}`,
+  });
 }
 
 export default async function ServicePage({
@@ -88,6 +95,22 @@ export default async function ServicePage({
 
   return (
     <main className="py-10 md:py-14">
+      <JsonLd
+        data={serviceJsonLd({
+          name: t(`${key}.title`),
+          description: t(`${key}.description`),
+          path: `/service/${key}`,
+          price: firstYearFee,
+          priceLabel: feeText,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("breadcrumbHome"), path: "/" },
+          { name: t(`${key}.title`), path: `/service/${key}` },
+        ])}
+      />
+      <JsonLd data={faqJsonLd(faq)} />
       <div className="container">
         {/* Breadcrumb */}
         <nav

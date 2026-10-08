@@ -22,6 +22,7 @@ import {
 } from "@/features/shared/theme/theme-provider";
 import SiteBackground from "@/features/shared/components/site-background";
 import InstallPrompt from "@/features/shared/components/install-prompt";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo/page-metadata";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
 import {
   resolveFooterPhoneHref,
@@ -52,32 +53,27 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(SITE_URL),
+    // Page titles get the short brand suffix (≤ 60 chars overall); the home
+    // page keeps the full descriptive default title.
     title: {
       default: title,
-      template: `%s | ${title}`,
+      template: `%s | ${SITE_NAME}`,
     },
     description,
     openGraph: {
       title,
       description,
-      siteName: title,
+      siteName: SITE_NAME,
       locale: "ar_SA",
       type: "website",
       url: SITE_URL,
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: [DEFAULT_OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og-image.png"],
+      images: [DEFAULT_OG_IMAGE.url],
     },
     manifest: "/manifest.webmanifest",
     appleWebApp: {

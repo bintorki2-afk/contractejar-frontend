@@ -4,7 +4,9 @@ import { getTranslations } from "next-intl/server";
 import { FaWhatsapp } from "react-icons/fa";
 import { ArrowLeft, Clock, LifeBuoy, Phone } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
 import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
+import { breadcrumbJsonLd, buildPageMetadata } from "@/lib/seo/page-metadata";
 import FooterSocialLinks from "@/features/footer/components/footer-social-links";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
 import {
@@ -18,11 +20,11 @@ type Topic = { title: string; desc: string; href: string };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("supportPage");
-  return {
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/support" },
-  };
+    path: "/support",
+  });
 }
 
 export default async function SupportPage() {
@@ -39,6 +41,12 @@ export default async function SupportPage() {
 
   return (
     <main className="py-14 md:py-20">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: t("breadcrumbHome"), path: "/" },
+          { name: t("breadcrumb"), path: "/support" },
+        ])}
+      />
       <div className="container flex flex-col gap-12">
         {/* Header */}
         <div className="flex flex-col gap-4 text-center">

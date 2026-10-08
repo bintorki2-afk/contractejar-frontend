@@ -1,10 +1,14 @@
 {
   "site": {
-    "metaTitle": "Electronic Rental Contract via Ejar — Documented",
+    "metaTitle": "Ejar Contract | Lease documentation platform via Ejar",
     "metaDescription": "Create a documented residential or commercial rental contract via the Ejar platform in minutes — simple steps, clear fees, and certified procedures that protect landlord and tenant rights.",
     "homeTitle": "Home",
     "aboutTitle": "About us",
-    "aboutDescription": "Learn about Rental Contract, our vision, mission, and values for documenting electronic rental contracts."
+    "aboutDescription": "Learn about Rental Contract, our vision, mission, and values for documenting electronic rental contracts.",
+    "blogTitle": "Blog",
+    "blogDescription": "Practical guides on leases in Saudi Arabia: landlord and tenant rights, Ejar documentation, termination, renewal and required documents.",
+    "faqTitle": "FAQ",
+    "faqDescription": "Clear answers about documenting a lease with Ejar Contract: fees, documents, timing, the WhatsApp draft and documentation in Ejar."
   },
   "navbar": {
     "topBar": {
@@ -3266,7 +3270,7 @@
     "homeCta": "Back to home"
   },
   "trackPage": {
-    "metaTitle": "Track your order | Contract Ejar",
+    "metaTitle": "Track your order",
     "metaDescription": "Check your rental contract order status with the order number and mobile — no sign-in needed.",
     "breadcrumbHome": "Home",
     "breadcrumb": "Track order",
@@ -3289,7 +3293,7 @@
     "payNow": "Pay now",
     "nextStep": "Next step: {step}",
     "lastUpdate": "Last update: {date}",
-    "smartLinkTitle": "Order {order} | Contract Ejar",
+    "smartLinkTitle": "Order {order}",
     "smartLinkHeading": "Your order is ready to follow",
     "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
     "typeLessorChange": "Lessor change request",

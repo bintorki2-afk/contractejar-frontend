@@ -10,6 +10,13 @@ import ServicesSideBackNav from "@/features/services/components/services-side-ba
 import NavbarShell from "@/features/shared/components/navbar-shell";
 import { getTranslations } from "next-intl/server";
 
+import type { Metadata } from "next";
+
+// Transactional / account pages: never indexed (robots.txt also disallows them).
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default async function ServicesLayout({
   children,
 }: Readonly<{

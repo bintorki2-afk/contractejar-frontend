@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getTranslations } from "next-intl/server";
 
@@ -28,6 +29,15 @@ import {
 type CreateContractPageProps = {
   searchParams: Promise<{ id?: string }>;
 };
+
+export async function generateMetadata({
+  searchParams,
+}: CreateContractPageProps): Promise<Metadata> {
+  const [{ id }, t] = await Promise.all([searchParams, getTranslations("createContract")]);
+  return {
+    title: id === "commercial" ? t("pageTitleCommercial") : t("pageTitleResidential"),
+  };
+}
 
 export default async function CreateContractPage({
   searchParams,

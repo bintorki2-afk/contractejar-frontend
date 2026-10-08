@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
+
 import { PRIVACY_POLICY } from "@/content/legal/privacy";
 import LegalDocumentPage from "@/features/settings/components/legal-document-page";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
@@ -9,12 +11,11 @@ import { resolveFooterWhatsappHref } from "@/features/settings/utils/resolve-foo
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("legal.privacy");
 
-  return {
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/privacy" },
-    openGraph: { title: t("metaTitle"), description: t("metaDescription"), url: "/privacy" },
-  };
+    path: "/privacy",
+  });
 }
 
 export default async function PrivacyPage() {

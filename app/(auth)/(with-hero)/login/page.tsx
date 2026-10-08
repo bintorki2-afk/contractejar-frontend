@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 
@@ -9,6 +10,11 @@ import PhoneLoginForm from "@/features/auth/components/phone-login-form";
  * Sign-in is mobile + OTP only (same as the app). The email/password and
  * social components are kept in `features/auth` but no longer mounted.
  */
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("navbar");
+  return { title: t("login") };
+}
+
 export default async function LoginPage() {
   const t = await getTranslations("auth.phoneLogin");
 

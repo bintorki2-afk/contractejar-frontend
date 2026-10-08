@@ -4,14 +4,17 @@ import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
 import TrackOrderForm from "@/features/track-order/components/track-order-form";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("trackPage");
-  return {
+  // Transactional page: reachable, but kept out of the index.
+  return buildPageMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/track" },
-  };
+    path: "/track",
+    noindex: true,
+  });
 }
 
 /**

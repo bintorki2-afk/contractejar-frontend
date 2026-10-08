@@ -15,7 +15,9 @@ import {
   Wallet,
 } from "lucide-react";
 
+import JsonLd from "@/components/json-ld";
 import ServiceTabs from "@/features/service-page/components/service-tabs";
+import { breadcrumbJsonLd, buildPageMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo/page-metadata";
 import { getLessorChangeInfo } from "@/features/lessor-change/services/get-lessor-change-info";
 import { FALLBACK_LESSOR_CHANGE_INFO } from "@/features/lessor-change/types/lessor-change";
 import { getContractPricing } from "@/features/pricing/services/get-contract-pricing";
@@ -23,11 +25,11 @@ import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("lessorChange.landing");
-  return {
+  return buildPageMetadata({
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: "/service/lessor-change" },
-  };
+    path: "/service/lessor-change",
+  });
 }
 
 /** Fee from `/lessor-change/info`, then `/pricing.lessor_change_fee`, then the static fallback. */
@@ -80,6 +82,22 @@ export default async function LessorChangeServicePage() {
 
   return (
     <main className="py-10 md:py-14">
+      <JsonLd
+        data={serviceJsonLd({
+          name: t("title"),
+          description: t("description"),
+          path: "/service/lessor-change",
+          price: info.fee,
+          priceLabel: feeText,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: tService("breadcrumbHome"), path: "/" },
+          { name: t("title"), path: "/service/lessor-change" },
+        ])}
+      />
+      <JsonLd data={faqJsonLd(faq)} />
       <div className="container">
         <nav
           aria-label="breadcrumb"
