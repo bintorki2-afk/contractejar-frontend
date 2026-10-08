@@ -25,6 +25,8 @@ import OrderNotificationsList from "@/features/notifications/components/order-no
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
 import RefundBanner from "@/features/requests/components/refund-banner";
 import { resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
+import RateServiceCard from "@/features/track-order/components/rate-service-card";
+import { isNotarized } from "@/features/track-order/utils/is-notarized";
 import {
   buildTemplateJourney,
   normalizeOrderJourney,
@@ -64,6 +66,7 @@ export default function TrackOrderForm({
   const isLessorChange =
     result?.kind === "lessor_change" || result?.contract_type === "lessor_change";
   const refund = resolveRefundInfo(result);
+  const notarized = Boolean(result) && !isLessorChange && !refund.refunded && isNotarized(result ?? {});
   // رحلة الطلب (ف2): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
   // طلب مسترجع بالكامل انتهى: يُعرض سجل الحالات بدل الرحلة.
   const journey =
@@ -228,6 +231,8 @@ export default function TrackOrderForm({
           ) : null}
 
           <RefundBanner info={refund} />
+
+          {notarized ? <RateServiceCard orderNumber={result.order_number} /> : null}
 
           {result.awaiting_payment && result.payment_url && !refund.refunded ? (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
