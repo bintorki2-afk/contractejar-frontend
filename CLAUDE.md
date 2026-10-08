@@ -4,6 +4,8 @@
 
 @AGENTS.md
 
+> دليل البدء للمطوّر الجديد: `كيف-تبدأ.md` · الأداء: `docs/performance.md` · أحداث التحويل: `docs/analytics-events.md`
+
 ## نبذة تقنية
 موقع «عقد إيجار» العام — **Next.js 16.3 + React 19** (App Router)، عربي RTL، PWA + Sentry.
 
