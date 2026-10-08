@@ -228,7 +228,7 @@ export default function TrackOrderForm({
                 {t("awaitingPaymentTitle")}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-                {t("awaitingPaymentBody")}
+                {isLessorChange ? t("awaitingPaymentBodyLessorChange") : t("awaitingPaymentBody")}
               </p>
               {isLessorChange ? (
                 <Button

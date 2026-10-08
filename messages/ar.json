@@ -3342,7 +3342,8 @@
     "smartLinkSubtitle": "هذا رابط الطلب رقم {order}. أدخل رقم جوالك للتحقق وعرض الحالة.",
     "typeLessorChange": "طلب تغيير المؤجر",
     "lessorChangeFee": "رسوم الخدمة: {fee} ريال",
-    "journeyTitle": "رحلة طلبك"
+    "journeyTitle": "رحلة طلبك",
+    "awaitingPaymentBodyLessorChange": "طلبك مكتمل البيانات. بعد الدفع نبدأ نقل العقود المرتبطة بالصك القديم إلى الصك الجديد ونبلغك بكل تحديث."
   },
   "lessorChange": {
     "landing": {

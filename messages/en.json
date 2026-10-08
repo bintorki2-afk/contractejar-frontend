@@ -3302,7 +3302,8 @@
     "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
     "typeLessorChange": "Lessor change request",
     "lessorChangeFee": "Service fee: {fee} SAR",
-    "journeyTitle": "Your order journey"
+    "journeyTitle": "Your order journey",
+    "awaitingPaymentBodyLessorChange": "Your request is complete. After payment we start moving the contracts linked to the old deed to the new deed and keep you updated."
   },
   "lessorChange": {
     "landing": {
