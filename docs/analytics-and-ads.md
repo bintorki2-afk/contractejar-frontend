@@ -58,6 +58,8 @@
 
 ## 3) حدث التحويل الذي يرسله الموقع
 
+> **تحديث 2026-10-08:** صار للموقع مجموعة أحداث تحويل كاملة (`wizard_start`، `wizard_step`، `order_submitted`، `payment_started`، **`purchase`**، `lessor_change_submitted`، `cta_whatsapp_click`، `otp_requested`، `otp_verified`) موثّقة في **`docs/analytics-events.md`**. استخدم `purchase` لتحويل الشراء، ويبقى `generate_lead` أدناه للتوافق مع الوسوم القديمة.
+
 عند إرسال أي طلب بنجاح، يدفع الموقع الحدث التالي إلى `dataLayer`:
 
 | الحقل            | المعنى                                   | مثال              |

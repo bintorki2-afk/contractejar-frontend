@@ -12,6 +12,7 @@ import {
   type PaymentStatusUiState,
 } from "@/features/payment/utils/resolve-payment-status-ui";
 import type { PaymentContentItem } from "@/features/payment/types/payment-content";
+import { trackPurchaseOnce } from "@/lib/analytics/track";
 import { BASE_URL } from "@/lib/api/constants";
 
 type PaymentStatusVerifierLabels = {
@@ -130,6 +131,19 @@ export default function PaymentStatusVerifier({
         });
 
         if (outcome.isPaid) {
+          // GTM `purchase` — once per order per session (docs/analytics-events.md).
+          trackPurchaseOnce({
+            transaction_id: String(contractUuid),
+            value: outcome.statusData?.paidAmount ?? undefined,
+            currency: "SAR",
+            contract_type:
+              outcome.statusData?.kind === "lessor_change"
+                ? "lessor_change"
+                : (outcome.statusData?.contractType?.toLowerCase() === "commercial"
+                    ? "commercial"
+                    : "housing"),
+          });
+
           // The paid order now lives on the server: clear the local draft so
           // the next "create contract" starts clean (only when this draft is
           // the one that was just paid).

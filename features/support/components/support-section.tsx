@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
 import SupportVisual from "@/features/support/components/support-visual";
 import type { HomeContactResolved } from "@/features/home/types/home-content";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
@@ -47,10 +47,9 @@ export default async function SupportSection({ content }: SupportSectionProps) {
             </p>
 
             <div className="pt-1">
-              <Link
+              <WhatsappCtaLink
+                placement="support_section"
                 href={resolved.whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-full bg-white px-2 py-2  text-sm font-bold text-brand dark:!text-[#005848] transition hover:bg-white/95"
               >
                 <span>{resolved.cta}</span>
@@ -60,7 +59,7 @@ export default async function SupportSection({ content }: SupportSectionProps) {
                     aria-hidden="true"
                   />
                 </span>
-              </Link>
+              </WhatsappCtaLink>
             </div>
           </div>
 

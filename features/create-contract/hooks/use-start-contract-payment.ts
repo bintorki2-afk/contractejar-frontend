@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { getContractPaymentUrl } from "@/features/create-contract/services/get-contract-payment-url";
 import type { ContractPaymentStatusSource } from "@/features/create-contract/services/get-contract-payment-status";
+import { track } from "@/lib/analytics/track";
 
 /**
  * The Moyasar gateway/invoice page renders in the language passed via the URL.
@@ -63,6 +64,12 @@ export function useStartContractPayment() {
         setIsPaying(false);
         return false;
       }
+
+      // GTM: payment_started (value = cart amount from the server when known).
+      track("payment_started", {
+        order_number: String(result.data.contractUuid || contractUuid),
+        value: result.data.cartAmount ?? undefined,
+      });
 
       // Leaving the app for the gateway: keep the button disabled during the
       // redirect so a second click cannot start a duplicate payment.

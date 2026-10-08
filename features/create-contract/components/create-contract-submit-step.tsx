@@ -42,6 +42,8 @@ import type { DeedTypeId } from "@/features/create-contract/types/deed-type";
 import AttachmentPreviewDialog from "@/features/shared/components/attachment-preview-dialog";
 import CustomIcon from "@/features/shared/components/custom-icon";
 import { useWhatsappHref } from "@/features/settings/hooks/use-whatsapp-href";
+import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
+import { track } from "@/lib/analytics/track";
 import { formatSaudiMobileForForm } from "@/lib/validation/format-saudi-mobile-for-form";
 
 type CreateContractSubmitStepProps = {
@@ -227,6 +229,10 @@ export default function CreateContractSubmitStep({
     const synced = await syncContract({ contactWhatsapp: mobile });
     if (synced.ok) {
       setServerOrder({ uuid: synced.uuid });
+      track("order_submitted", {
+        order_number: String(synced.uuid),
+        contract_type: toPropertyContractType(contractType),
+      });
     } else if (process.env.NODE_ENV !== "production") {
       console.warn("contract sync failed", synced.stage, synced.error);
     }
@@ -359,6 +365,7 @@ export default function CreateContractSubmitStep({
               href={whatsappShareHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track("cta_whatsapp_click", { placement: "order_success" })}
             >
               <FaWhatsapp className="size-5" aria-hidden="true" />
               {t("contactWhatsappCta")}

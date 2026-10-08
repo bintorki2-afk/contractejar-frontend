@@ -12,6 +12,10 @@ import CreateContractTenantStep from "@/features/create-contract/components/crea
 import CreateContractStepper from "@/features/create-contract/components/create-contract-stepper";
 import { useCreateContractSteps } from "@/features/create-contract/hooks/use-create-contract-steps";
 import { useStartFreshContract } from "@/features/create-contract/hooks/use-start-fresh-contract";
+import {
+  trackWizardStart,
+  useWizardAnalytics,
+} from "@/features/create-contract/hooks/use-wizard-analytics";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
@@ -37,7 +41,13 @@ export default function CreateContractWizard({
   onToggleDarkMode,
 }: CreateContractWizardProps) {
   const { currentStep, goNext, goBack, goToStep } = useCreateContractSteps();
-  const { handleStart, isStarting } = useStartFreshContract(contractType);
+  const { handleStart: startFreshContract, isStarting } = useStartFreshContract(contractType);
+  // GTM: wizard_start / wizard_step (docs/analytics-events.md).
+  useWizardAnalytics(contractType);
+  function handleStart() {
+    trackWizardStart(contractType);
+    startFreshContract();
+  }
   const isDraftHydrated = usePersistStoreHydrated(
     useCreateContractDraftStore.persist,
   );

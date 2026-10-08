@@ -14,6 +14,7 @@ import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/analytics/track";
 import type { ContractPaymentStatusSource } from "@/features/create-contract/services/get-contract-payment-status";
 import type { ContractPaymentStatusData } from "@/features/create-contract/types/contract-payment";
 import { formatPaymentAmount } from "@/features/create-contract/types/payment-step";
@@ -298,7 +299,12 @@ export default function PaymentStatusContent({
                     asChild
                     className="h-12 w-full rounded-xl bg-[#25d366] text-sm font-bold text-white hover:bg-[#1ebe5a]"
                   >
-                    <Link href={whatsappSupportHref} target="_blank" rel="noopener noreferrer">
+                    <Link
+                      href={whatsappSupportHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track("cta_whatsapp_click", { placement: "payment_success" })}
+                    >
                       <FaWhatsapp className="size-5" aria-hidden="true" />
                       {whatsappSupportLabel}
                     </Link>
@@ -353,7 +359,12 @@ export default function PaymentStatusContent({
                     variant="outline"
                     className="h-12 w-full rounded-xl border-[#25d366]/40 bg-white text-sm font-bold text-[#1ebe5a] hover:bg-[#f0fdf4] dark:bg-[#1a2421]"
                   >
-                    <Link href={whatsappSupportHref} target="_blank" rel="noopener noreferrer">
+                    <Link
+                      href={whatsappSupportHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track("cta_whatsapp_click", { placement: "payment_error" })}
+                    >
                       <FaWhatsapp className="size-5" aria-hidden="true" />
                       {whatsappSupportLabel}
                     </Link>

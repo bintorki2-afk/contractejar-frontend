@@ -1,8 +1,9 @@
 "use client";
 
 import { Clock3, X } from "lucide-react";
-import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa";
+
+import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
 
 import {
   Dialog,
@@ -185,15 +186,14 @@ export default function RequestReceiveContractDialog({
             />
           ) : null}
 
-          <Link
+          <WhatsappCtaLink
+            placement="order_detail"
             href={labels.whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 text-sm font-bold text-white transition-opacity hover:opacity-90"
           >
             <FaWhatsapp className="size-5 shrink-0" aria-hidden="true" />
             {labels.whatsappCta}
-          </Link>
+          </WhatsappCtaLink>
         </div>
       </DialogContent>
     </Dialog>

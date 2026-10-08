@@ -39,6 +39,7 @@ import { setGuestContact } from "@/features/guest-session/services/set-guest-con
 import { useLessorChangeInfo } from "@/features/lessor-change/hooks/use-lessor-change-info";
 import { getLessorChangePaymentUrl } from "@/features/lessor-change/services/get-lessor-change-payment-url";
 import { submitLessorChange } from "@/features/lessor-change/services/submit-lessor-change";
+import { track } from "@/lib/analytics/track";
 import type {
   LessorChangeDraft,
   LessorChangeOrder,
@@ -295,6 +296,10 @@ export default function LessorChangeFlow({
       }
 
       setOrder(result.order);
+      track("lessor_change_submitted", {
+        order_number: String(result.order.order_number ?? result.order.uuid ?? ""),
+        value: typeof result.order.fee === "number" ? result.order.fee : undefined,
+      });
       toast.success(t("submitted"));
 
       void notifyLessorChangeOrder(result.order, draft, mobile, {

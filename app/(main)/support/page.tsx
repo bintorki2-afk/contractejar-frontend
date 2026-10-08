@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { FaWhatsapp } from "react-icons/fa";
 import { ArrowLeft, Clock, LifeBuoy, Phone } from "lucide-react";
 
+import WhatsappCtaLink from "@/features/analytics/components/whatsapp-cta-link";
 import FooterSocialLinks from "@/features/footer/components/footer-social-links";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
 import {
@@ -69,10 +70,9 @@ export default async function SupportPage() {
           </h2>
           <div className="grid gap-5 md:grid-cols-3">
             {/* WhatsApp */}
-            <a
+            <WhatsappCtaLink
+              placement="support_page"
               href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
               className="group flex flex-col gap-3 rounded-3xl border border-border/60 bg-white p-7 shadow-sm transition hover:border-brand/40 hover:shadow-md dark:bg-white/[0.03]"
             >
               <span className="flex size-12 items-center justify-center rounded-2xl bg-green-500/10 text-green-500">
@@ -88,7 +88,7 @@ export default async function SupportPage() {
                 {t("whatsappAction")}
                 <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
               </span>
-            </a>
+            </WhatsappCtaLink>
 
             {/* Phone */}
             <a
