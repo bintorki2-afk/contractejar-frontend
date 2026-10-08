@@ -15,6 +15,7 @@ const LOCAL_KEYS = [
   "aqdi-create-unit-draft",
   "aqdi-auth-user",
   "aqdi-notifications-inbox",
+  "aqdi-lessor-change-draft",
 ];
 
 export default function AccountDeleteContent() {

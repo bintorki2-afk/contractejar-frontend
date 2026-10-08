@@ -27,6 +27,7 @@ export function useLogout() {
           "aqdi-create-unit-draft",
           "aqdi-auth-user",
           "aqdi-notifications-inbox",
+          "aqdi-lessor-change-draft",
         ].forEach((key) => localStorage.removeItem(key));
       } catch {
         // localStorage may be unavailable (private mode) — ignore.

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,25 @@ import type {
 import CustomIcon from "@/features/shared/components/custom-icon";
 import { getIdNumberFieldError } from "@/lib/validation/owner-step-validation";
 import { isValidOwnerId } from "@/lib/validation/national-id";
+import {
+  filesToPersisted,
+  persistedToFiles,
+  type PersistedFile,
+} from "@/lib/storage/persisted-files";
+
+// Survives a page refresh (fields + deed images ≤ 512 KB each); cleared once
+// the request is sent and on logout.
+export const LESSOR_CHANGE_DRAFT_KEY = "aqdi-lessor-change-draft";
+
+type StoredLessorChangeDraft = {
+  step: "documents" | "owner";
+  newOwnerIdNumber: string;
+  newOwnerBirthDate: LessorChangeDraft["newOwnerBirthDate"];
+  notes: string;
+  acknowledged: boolean;
+  oldDeed: PersistedFile[];
+  newDeed: PersistedFile[];
+};
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { formatSaudiMobileForForm } from "@/lib/validation/format-saudi-mobile-for-form";
 import { cn } from "@/lib/utils";
@@ -189,6 +208,60 @@ export default function LessorChangeFlow({
   const [otpOpen, setOtpOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [order, setOrder] = useState<LessorChangeOrder | null>(null);
+  const restored = useRef(false);
+
+  // Restore the saved draft once (client only).
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    try {
+      const raw = localStorage.getItem(LESSOR_CHANGE_DRAFT_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as StoredLessorChangeDraft;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDraft({
+        oldDeedFiles: persistedToFiles(saved.oldDeed ?? []),
+        newDeedFiles: persistedToFiles(saved.newDeed ?? []),
+        newOwnerIdNumber: saved.newOwnerIdNumber ?? "",
+        newOwnerBirthDate: saved.newOwnerBirthDate ?? { ...EMPTY_BIRTH_DATE },
+        notes: saved.notes ?? "",
+        acknowledged: Boolean(saved.acknowledged),
+      });
+      if (saved.step === "owner") setStep("owner");
+    } catch {
+      // Corrupt/unavailable storage: start empty.
+    }
+  }, []);
+
+  // Save on every change (until the request has been sent).
+  useEffect(() => {
+    if (!restored.current || order) return;
+    let cancelled = false;
+    void (async () => {
+      const [oldDeed, newDeed] = await Promise.all([
+        filesToPersisted(draft.oldDeedFiles),
+        filesToPersisted(draft.newDeedFiles),
+      ]);
+      if (cancelled) return;
+      try {
+        const value: StoredLessorChangeDraft = {
+          step,
+          newOwnerIdNumber: draft.newOwnerIdNumber,
+          newOwnerBirthDate: draft.newOwnerBirthDate,
+          notes: draft.notes,
+          acknowledged: draft.acknowledged,
+          oldDeed,
+          newDeed,
+        };
+        localStorage.setItem(LESSOR_CHANGE_DRAFT_KEY, JSON.stringify(value));
+      } catch {
+        // Quota/private mode: keep working without persistence.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [draft, step, order]);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isOpeningPayment, setIsOpeningPayment] = useState(false);
 
@@ -297,6 +370,11 @@ export default function LessorChangeFlow({
       }
 
       setOrder(result.order);
+      try {
+        localStorage.removeItem(LESSOR_CHANGE_DRAFT_KEY);
+      } catch {
+        // ignore
+      }
       track("lessor_change_submitted", {
         order_number: String(result.order.order_number ?? result.order.uuid ?? ""),
         value: typeof result.order.fee === "number" ? result.order.fee : undefined,
