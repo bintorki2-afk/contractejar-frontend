@@ -72,7 +72,9 @@ export async function getLessorChangePaymentUrl(uuid: string): Promise<
     return {
       ok: false,
       error:
-        payload && typeof payload === "object" && "gateway_error" in payload
+        // Gateway outage: the API now answers 503 with its own Arabic message —
+        // shown as-is; older responses (400 «غير مسموح» + gateway_error) get ours.
+        payload && typeof payload === "object" && "gateway_error" in payload && response.status < 500
           ? GATEWAY_ERROR_MESSAGE
           : getResponseErrorMessage(response.status, payload),
     };
