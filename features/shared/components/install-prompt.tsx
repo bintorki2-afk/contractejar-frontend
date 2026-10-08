@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Download, Plus, Share, X } from "lucide-react";
@@ -7,6 +8,16 @@ import { Download, Plus, Share, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DISMISS_KEY = "cj-install-dismissed";
+
+const FLOW_PATH_PREFIXES = [
+  "/create-contract",
+  "/lessor-change",
+  "/payment",
+  "/login",
+  "/track",
+  "/r",
+  "/properties",
+];
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -24,6 +35,7 @@ type BeforeInstallPromptEvent = Event & {
  */
 export default function InstallPrompt() {
   const t = useTranslations("installPrompt");
+  const pathname = usePathname() ?? "";
   const [platform, setPlatform] = useState<"none" | "android" | "ios">("none");
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
@@ -89,7 +101,13 @@ export default function InstallPrompt() {
     dismiss();
   }
 
-  if (platform === "none") return null;
+  // Never over the transactional flows: on phones the fixed card sat on top of
+  // the wizard's «لنبدأ / متابعة / إرسال الطلب» and payment buttons.
+  const onTransactionalFlow = FLOW_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
+  if (platform === "none" || onTransactionalFlow) return null;
 
   return (
     <div
