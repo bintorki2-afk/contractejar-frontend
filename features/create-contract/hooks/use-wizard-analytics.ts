@@ -52,6 +52,16 @@ export function useWizardAnalytics(contractType: ContractTypeId) {
     if (lastFired.current === key) {
       return;
     }
+
+    // The national address is now filled on the deed screen itself (no
+    // separate phase), so step 2 never fired and the funnel jumped 1 → 3.
+    // Reaching the owner step means the address was completed: emit 2 first.
+    if (analyticsStep === 3 && lastFired.current === `${contractType}:1`) {
+      track("wizard_step", {
+        contract_type: toPropertyContractType(contractType),
+        step: 2,
+      });
+    }
     lastFired.current = key;
 
     track("wizard_step", {
