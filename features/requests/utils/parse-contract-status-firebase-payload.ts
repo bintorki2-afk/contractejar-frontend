@@ -8,6 +8,17 @@ const CONTRACT_EVENT_TYPES = new Set([
   "contract_received",
 ]);
 
+// Batch D notification kinds that carry the order's new status (refund →
+// «مسترجع», assignment → «مستلم من الموظف»…).
+const CONTRACT_EVENT_KINDS = new Set([
+  "status_changed",
+  "refund",
+  "assigned",
+  "payment_success",
+  "draft_sent",
+  "notarized",
+]);
+
 function asRecord(value: unknown): Record<string, string> | null {
   if (!value || typeof value !== "object") {
     return null;
@@ -29,7 +40,10 @@ export function isContractStatusNotification(
     return false;
   }
 
-  return CONTRACT_EVENT_TYPES.has(data.type);
+  return (
+    CONTRACT_EVENT_TYPES.has(data.type) ||
+    (CONTRACT_EVENT_KINDS.has(data.kind) && Boolean(data.status || data.status_label))
+  );
 }
 
 export function parseContractStatusFirebasePayload(

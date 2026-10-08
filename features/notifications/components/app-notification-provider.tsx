@@ -1,13 +1,22 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 import AppNotificationToaster from "@/features/notifications/components/app-notification-toaster";
+import {
+  ORDER_UPDATED_EVENT,
+  type OrderUpdatedDetail,
+} from "@/features/notifications/constants/order-updated-event";
 import { PUSH_ENABLED_EVENT } from "@/features/notifications/constants/push-enabled-event";
 import { useNotificationsInboxStore } from "@/features/notifications/stores/use-notifications-inbox-store";
 import { useContractsLiveStore } from "@/features/requests/stores/use-contracts-live-store";
 import { runWhenIdle } from "@/lib/perf/run-when-idle";
+import {
+  ORDER_AFFECTING_KINDS,
+  resolveNotificationKind,
+} from "@/features/notifications/utils/notification-kinds";
 
 type ForegroundPayload = {
   notification?: {
@@ -19,8 +28,39 @@ type ForegroundPayload = {
     title?: string;
     body?: string;
     icon?: string;
+    kind?: string;
+    type?: string;
+    contract_id?: string;
+    order_number?: string;
+    contract_uuid?: string;
   };
 };
+
+/**
+ * A push that changes an order (refund, discount, status…): tell open order
+ * views to re-fetch, and refresh the server-rendered lists.
+ */
+function notifyOrderUpdated(payload: ForegroundPayload, refresh: () => void) {
+  const data = payload.data ?? {};
+  const kind = data.kind || data.type || "";
+  const meta = resolveNotificationKind(kind);
+  const isContractEvent = kind === "contract_status_changed" || kind === "contract_received";
+  if (!ORDER_AFFECTING_KINDS.has(meta.key) && !isContractEvent) {
+    return;
+  }
+
+  const contractId = Number(data.contract_id);
+  const detail: OrderUpdatedDetail = {
+    kind,
+    contractId: Number.isFinite(contractId) && contractId > 0 ? contractId : undefined,
+    orderNumber: data.order_number || data.contract_uuid || undefined,
+  };
+  window.dispatchEvent(new CustomEvent(ORDER_UPDATED_EVENT, { detail }));
+
+  if (/^\/(requests|notifications|track|r\/)/.test(window.location.pathname)) {
+    refresh();
+  }
+}
 
 function parseForegroundMessage(payload: ForegroundPayload) {
   return {
@@ -40,6 +80,7 @@ function parseForegroundMessage(payload: ForegroundPayload) {
  *    visitors, and it never prompts by itself.
  */
 export function AppNotificationProvider() {
+  const router = useRouter();
   const applyFirebasePatch = useContractsLiveStore(
     (state) => state.applyFirebasePatch,
   );
@@ -99,6 +140,7 @@ export function AppNotificationProvider() {
         unsubscribe = onForegroundMessage((payload) => {
           const message = parseForegroundMessage(payload);
           addNotification(message);
+          notifyOrderUpdated(payload, () => router.refresh());
 
           const contractPatch = parseContractStatusFirebasePayload(payload);
 
@@ -146,7 +188,7 @@ export function AppNotificationProvider() {
       window.removeEventListener(PUSH_ENABLED_EVENT, onPushEnabled);
       unsubscribe();
     };
-  }, [addNotification, applyFirebasePatch]);
+  }, [addNotification, applyFirebasePatch, router]);
 
   return <AppNotificationToaster />;
 }

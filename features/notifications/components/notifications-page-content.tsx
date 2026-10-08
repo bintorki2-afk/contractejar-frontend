@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
 import { Bell, BellOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import NotificationItemCard from "@/features/notifications/components/notification-item-card";
 import { useFcm } from "@/features/notifications/hooks/use-fcm";
 import {
   markAccountNotificationsRead,
@@ -133,43 +133,14 @@ export default function NotificationsPageContent({
 
       {accountItems.length > 0 ? (
         <ul className="mb-3 space-y-3">
-          {accountItems.map((item) => {
-            const content = (
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-brand">
-                  <Bell className="size-4" aria-hidden="true" />
-                </span>
-                <div className="min-w-0 flex-1 space-y-1 text-start">
-                  <p className="text-sm font-bold text-brand">{item.title}</p>
-                  {item.body ? (
-                    <p className="text-xs leading-6 text-muted-foreground">{item.body}</p>
-                  ) : null}
-                  {/* Client-only: Node and the browser ship different ICU data for ar-SA dates (hydration mismatch). */}
-                  <p className="text-[11px] text-muted-foreground/80">
-                    {isHydrated ? formatDate(item.createdAt) : ""}
-                  </p>
-                </div>
-              </div>
-            );
-
-            return (
-              <li
-                key={`account-${item.id}`}
-                className={cn(
-                  "rounded-2xl border bg-white px-4 py-4 shadow-sm dark:bg-[#1a2421]",
-                  item.isRead ? "border-border/60" : "border-brand/30",
-                )}
-              >
-                {item.href ? (
-                  <Link href={item.href} className="block">
-                    {content}
-                  </Link>
-                ) : (
-                  content
-                )}
-              </li>
-            );
-          })}
+          {accountItems.map((item) => (
+            <NotificationItemCard
+              key={`account-${item.id}`}
+              item={item}
+              // Client-only: Node and the browser ship different ICU data for ar-SA dates (hydration mismatch).
+              dateLabel={isHydrated ? formatDate(item.createdAt) : ""}
+            />
+          ))}
         </ul>
       ) : null}
 

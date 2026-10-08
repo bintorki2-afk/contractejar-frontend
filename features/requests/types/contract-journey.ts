@@ -1,3 +1,5 @@
+import type { RefundInfo } from "@/features/requests/utils/resolve-refund";
+
 export type ContractJourneyStepState = "completed" | "current" | "pending";
 
 export type ContractStatusType = "contract" | "draft";
@@ -29,6 +31,8 @@ export type ContractStatusSnapshot = {
 
 export type ContractDetail = ContractStatusSnapshot & {
   uuid?: string;
+  /** Batch D refunds (`status_case = refunded` / partial refund amount). */
+  refund?: RefundInfo;
   is_completed?: boolean;
   is_draft?: boolean;
   step?: number;

@@ -19,6 +19,8 @@ export type ContractListItem = {
   contract_status_name: string | null;
   contract_status_color: string | null;
   status?: string | null;
+  /** Batch D: `new`, `paid`, `under_review`, …, `refunded`. */
+  status_case?: string | null;
   status_label?: string | null;
   status_type?: ContractStatusType | string | null;
   status_id?: number | null;
@@ -33,6 +35,9 @@ export type ContractListItem = {
   doc_fee?: number | null;
   amount?: number | null;
   payable_amount?: number | null;
+  refund?: { status?: string | null; amount?: number | string | null; refunded_at?: string | null } | null;
+  refunded_amount?: number | string | null;
+  is_refunded?: boolean;
 };
 
 export type ContractsPagination = {

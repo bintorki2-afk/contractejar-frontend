@@ -21,7 +21,10 @@ import {
   type TrackedOrder,
 } from "@/features/guest-session/services/track-order";
 import { getLessorChangePaymentUrl } from "@/features/lessor-change/services/get-lessor-change-payment-url";
+import OrderNotificationsList from "@/features/notifications/components/order-notifications-list";
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import RefundBanner from "@/features/requests/components/refund-banner";
+import { resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 import {
   buildTemplateJourney,
   normalizeOrderJourney,
@@ -60,9 +63,11 @@ export default function TrackOrderForm({
 
   const isLessorChange =
     result?.kind === "lessor_change" || result?.contract_type === "lessor_change";
+  const refund = resolveRefundInfo(result);
   // رحلة الطلب (ف2): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
+  // طلب مسترجع بالكامل انتهى: يُعرض سجل الحالات بدل الرحلة.
   const journey =
-    result && !isLessorChange
+    result && !isLessorChange && !refund.refunded
       ? (normalizeOrderJourney(result.journey) ??
         buildTemplateJourney(result.is_paid ? 2 : 1))
       : null;
@@ -222,7 +227,9 @@ export default function TrackOrderForm({
             </p>
           ) : null}
 
-          {result.awaiting_payment && result.payment_url ? (
+          <RefundBanner info={refund} />
+
+          {result.awaiting_payment && result.payment_url && !refund.refunded ? (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
               <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
                 {t("awaitingPaymentTitle")}
@@ -298,6 +305,8 @@ export default function TrackOrderForm({
               })}
             </ol>
           ) : null}
+
+          <OrderNotificationsList orderNumber={result.order_number} />
 
           <p className="text-xs text-muted-foreground">
             {t("lastUpdate", { date: result.updated_at ?? "—" })}
