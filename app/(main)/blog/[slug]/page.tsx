@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import JsonLd from "@/components/json-ld";
 import BlogDetailPageContent from "@/features/blog/components/blog-detail-page-content";
 import { ARTICLE_CATEGORY_LABEL_KEY } from "@/features/blog/data/blog-post-config";
 import {
@@ -145,14 +146,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbLd} />
       <BlogDetailPageContent
         post={post}
         labels={labels}

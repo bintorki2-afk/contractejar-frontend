@@ -20,6 +20,7 @@ import {
   ThemeProvider,
   THEME_NO_FLASH_SCRIPT,
 } from "@/features/shared/theme/theme-provider";
+import JsonLd from "@/components/json-ld";
 import SvgSprite from "@/components/svg-sprite";
 import SiteBackground from "@/features/shared/components/site-background";
 import InstallPrompt from "@/features/shared/components/install-prompt";
@@ -184,14 +185,10 @@ export default async function RootLayout({
         <ClarityScript />
         <PwaRegister />
         <SentryInit />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        {/* JsonLd escapes `<`: social links come from dashboard settings and
+            must never be able to close the script tag (stored XSS). */}
+        <JsonLd data={orgJsonLd} />
+        <JsonLd data={websiteJsonLd} />
         <SvgSprite />
         <SiteBackground />
         <ThemeProvider>
