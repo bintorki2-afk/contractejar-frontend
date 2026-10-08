@@ -168,6 +168,10 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       if (!contractId || !uuid) {
         const existing = current.existingPropertyContext;
         const currentSession = current.contractSession;
+        // Stable for this draft until the server id replaces it (WEBSITE-3).
+        const idempotencyKey = currentSession
+          ? `web-${currentSession.contractId}-${currentSession.orderReference ?? ""}`
+          : undefined;
         const started =
           existing && currentSession?.isReal
             ? await startContract({
@@ -175,11 +179,11 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
                 is_real: true,
                 real_id: currentSession.realId,
                 unit_ids: currentSession.unitIds,
-              })
+              }, idempotencyKey)
             : await startContract({
                 contract_type: toPropertyContractType(contractType),
                 is_real: false,
-              });
+              }, idempotencyKey);
 
         if (!started.ok) {
           return { ok: false, stage: "start", error: started.error, status: started.status };
