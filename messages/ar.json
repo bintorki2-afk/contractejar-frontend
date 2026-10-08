@@ -2921,7 +2921,8 @@
       "verifyAndSubmit": "تأكيد وإرسال الطلب"
     },
     "uploadTooLarge": "حجم الملف أكبر من 10 ميجابايت — اختر صورة أو ملفاً أصغر.",
-    "uploadInvalidType": "نوع الملف غير مدعوم — الصيغ المقبولة: JPG أو PNG أو WEBP أو PDF."
+    "uploadInvalidType": "نوع الملف غير مدعوم — الصيغ المقبولة: JPG أو PNG أو WEBP أو PDF.",
+    "rentAmountWholeRiyals": "يُحتسب المبلغ بالريال فقط — الهللات بعد الفاصلة لا تُضاف إلى قيمة العقد."
   },
   "paymentStatus": {
     "backLabel": "رجوع",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
@@ -13,7 +13,7 @@ import {
   resolveFieldChromeState,
 } from "@/lib/ui/field-chrome";
 import { cn } from "@/lib/utils";
-import { digitsOnly } from "@/lib/utils/digits";
+import { digitsOnly, toAsciiDigits } from "@/lib/utils/digits";
 
 type CreateContractRentAmountFieldProps = {
   label: string;
@@ -50,6 +50,10 @@ export default function CreateContractRentAmountField({
   const locale = useLocale();
   const inputId = useId();
   const chrome = resolveFieldChromeState({ invalid, valid });
+  // Halalas typed after a decimal point («36000.75») are shown while typing but
+  // never merged into the riyal amount — before, the point was dropped and the
+  // rent silently became 3,600,075.
+  const [fraction, setFraction] = useState<string | null>(null);
   const numericValue = Number(digitsOnly(value));
   // Spell the amount in Arabic words only in Arabic; in English show the
   // formatted numeral so the helper line reads naturally in each language.
@@ -82,11 +86,13 @@ export default function CreateContractRentAmountField({
           type="text"
           inputMode="numeric"
           dir="ltr"
-          value={formatRentAmount(value)}
+          value={`${formatRentAmount(value)}${fraction !== null && value ? `.${fraction}` : ""}`}
           onChange={(event) => {
+            const [integerPart, fractionPart] = toAsciiDigits(event.target.value).split(/[.٫]/);
+            setFraction(fractionPart === undefined ? null : digitsOnly(fractionPart).slice(0, 2));
             // Cap at 12 digits: beyond ~15 digits `Number()` loses precision and
             // the displayed amount / words no longer match what was typed.
-            onChange(digitsOnly(event.target.value).slice(0, 12));
+            onChange(digitsOnly(integerPart ?? "").slice(0, 12));
           }}
           placeholder={placeholder}
           aria-invalid={invalid}
@@ -101,6 +107,10 @@ export default function CreateContractRentAmountField({
 
       {amountInWords ? (
         <p className="mt-2 text-xs leading-5 text-[#9a9a9a]">{amountInWords}</p>
+      ) : null}
+
+      {fraction ? (
+        <p className="mt-1 text-xs leading-5 text-[#b26a00]">{t("rentAmountWholeRiyals")}</p>
       ) : null}
     </div>
   );

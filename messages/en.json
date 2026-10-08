@@ -2881,7 +2881,8 @@
       "verifyAndSubmit": "Verify and submit"
     },
     "uploadTooLarge": "The file is larger than 10 MB — choose a smaller image or file.",
-    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF."
+    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF.",
+    "rentAmountWholeRiyals": "Only whole riyals are used — halalas after the decimal point are not added to the contract value."
   },
   "paymentStatus": {
     "backLabel": "Back",
