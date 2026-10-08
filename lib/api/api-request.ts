@@ -12,7 +12,10 @@ import {
   WEBSITE_CLOSED_PATH,
 } from "@/lib/api/constants";
 import { compressFormDataImages } from "@/lib/api/image-utils";
-import { getErrorMessage } from "@/lib/api/get-error-message";
+import {
+  getResponseErrorMessage,
+  NETWORK_ERROR_MESSAGE,
+} from "@/lib/api/get-error-message";
 import type { ApiResponse } from "@/lib/api/types";
 import { isWebsiteClosedResponse } from "@/lib/api/is-website-closed-response";
 
@@ -70,7 +73,7 @@ export async function apiRequest<T>(
     return {
       ok: false,
       status: 500,
-      error: "Network error",
+      error: NETWORK_ERROR_MESSAGE,
     };
   }
 
@@ -89,7 +92,7 @@ export async function apiRequest<T>(
     return {
       ok: false,
       status: response.status,
-      error: getErrorMessage(data),
+      error: getResponseErrorMessage(response.status, data),
     };
   }
 
@@ -124,7 +127,7 @@ export async function apiFormDataRequest<T>(
     return {
       ok: false,
       status: 500,
-      error: "Network error",
+      error: NETWORK_ERROR_MESSAGE,
     };
   }
 
@@ -140,7 +143,7 @@ export async function apiFormDataRequest<T>(
     return {
       ok: false,
       status: response.status,
-      error: getErrorMessage(data),
+      error: getResponseErrorMessage(response.status, data),
     };
   }
 

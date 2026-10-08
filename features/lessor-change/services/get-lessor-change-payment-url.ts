@@ -5,7 +5,15 @@ import {
   WEBSITE_CLIENT_HEADER,
   WEBSITE_CLIENT_ID,
 } from "@/lib/api/constants";
-import { getErrorMessage } from "@/lib/api/get-error-message";
+import {
+  getResponseErrorMessage,
+  NETWORK_ERROR_MESSAGE,
+} from "@/lib/api/get-error-message";
+
+// The API answers a gateway outage with a generic «غير مسموح» plus raw
+// `gateway_error` (cURL/host details): show a clear Arabic message instead.
+const GATEWAY_ERROR_MESSAGE =
+  "تعذّر الاتصال ببوابة الدفع حالياً. طلبك محفوظ — حاول بعد قليل أو تواصل معنا عبر واتساب.";
 
 type LessorChangePaymentApiResponse = {
   message?: string;
@@ -48,7 +56,7 @@ export async function getLessorChangePaymentUrl(uuid: string): Promise<
       | LessorChangePaymentApiResponse
       | null;
   } catch {
-    return { ok: false, error: "Network error" };
+    return { ok: false, error: NETWORK_ERROR_MESSAGE };
   }
 
   if (payload?.already_paid === true || payload?.data?.already_paid === true) {
@@ -61,9 +69,9 @@ export async function getLessorChangePaymentUrl(uuid: string): Promise<
     return {
       ok: false,
       error:
-        getErrorMessage(payload) ||
-        payload?.message ||
-        "Failed to initiate the lessor change payment",
+        payload && typeof payload === "object" && "gateway_error" in payload
+          ? GATEWAY_ERROR_MESSAGE
+          : getResponseErrorMessage(response.status, payload),
     };
   }
 
