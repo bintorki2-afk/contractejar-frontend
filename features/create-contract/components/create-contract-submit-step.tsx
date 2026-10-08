@@ -154,6 +154,9 @@ export default function CreateContractSubmitStep({
   // "done": the customer chose to pay later (or the server sync failed and
   // the order went through the business channel only).
   const [serverOrder, setServerOrder] = useState<{ uuid: string } | null>(null);
+  // The server rejected the data (4xx) or the request could not be sent:
+  // the customer must see why and fix it — no business-channel fallback.
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [view, setView] = useState<"form" | "payment" | "done">("form");
 
   async function handleCopyOrderNumber(orderNumber: string) {
@@ -167,7 +170,8 @@ export default function CreateContractSubmitStep({
     }
   }
 
-  const hasFailed = result != null && !result.ok && serverOrder == null;
+  const hasFailed =
+    syncError != null || (result != null && !result.ok && serverOrder == null);
   const hasIncompleteSections = summary.sections.some((section) => section.incomplete);
 
   function handleEdit(target: CreateContractReviewEditTarget) {
@@ -226,7 +230,24 @@ export default function CreateContractSubmitStep({
     //    business channel below, and the customer gets a payment link later.
     //    After the OTP the session cookie is the customer's token, so the
     //    contract is created straight under the account.
+    setSyncError(null);
     const synced = await syncContract({ contactWhatsapp: mobile });
+    // 4xx = the server refused the data (invalid file type/size, ID, …) and 0 =
+    // the request never reached the server. Before, these fell through to the
+    // business channel and the customer saw «تم استلام طلبك» (or a generic
+    // error) without the reason. Only a real outage (5xx) keeps the fallback.
+    if (!synced.ok && synced.status < 500) {
+      // Server validation messages are Arabic; anything else (English fallbacks
+      // such as "Something went wrong") is replaced by the Arabic explanation.
+      const message =
+        synced.status !== 0 && /[\u0600-\u06FF]/.test(synced.error)
+          ? synced.error
+          : t("errorBodyUpload");
+      setSyncError(message);
+      toast.error(message);
+      return;
+    }
+
     if (synced.ok) {
       setServerOrder({ uuid: synced.uuid });
       track("order_submitted", {
@@ -493,8 +514,8 @@ export default function CreateContractSubmitStep({
                 <p className="text-sm font-bold text-destructive dark:text-[#f87171]">
                   {t("errorTitle")}
                 </p>
-                <p className="text-xs leading-relaxed text-[#555555] md:text-sm dark:text-[#e8c4c4]">
-                  {t("errorBody")}
+                <p className="whitespace-pre-line text-xs leading-relaxed text-[#555555] md:text-sm dark:text-[#e8c4c4]">
+                  {syncError ?? t("errorBody")}
                 </p>
                 <Link
                   href={whatsappHref}

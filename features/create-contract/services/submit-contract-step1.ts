@@ -105,6 +105,7 @@ export async function submitContractStep1(payload: SubmitContractStep1Payload) {
   if (!response.ok || !response.data?.success || !response.data.data) {
     return {
       ok: false as const,
+      status: response.status,
       error: response.error || response.data?.message || "Failed to submit deed data",
     };
   }

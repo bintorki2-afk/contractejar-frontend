@@ -1780,7 +1780,8 @@
       },
       "smartLinkHint": "Your direct order link (opens the app when installed):",
       "reviewIntroLoggedIn": "Review your details before submitting; we'll contact you on your account number.",
-      "incompleteSections": "Some sections are incomplete — check the red hints and try again."
+      "incompleteSections": "Some sections are incomplete — check the red hints and try again.",
+      "errorBodyUpload": "We couldn't send your order data. Check your connection; if the attachments are large, upload smaller images and try again — your data is saved."
     },
     "incompleteContinue": "Please complete all required fields before continuing",
     "fieldRequired": "This field is required",

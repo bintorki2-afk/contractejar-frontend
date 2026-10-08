@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { ensureGuestSession } from "@/features/guest-session/services/ensure-guest-session";
 import { setGuestContact } from "@/features/guest-session/services/set-guest-contact";
@@ -41,7 +41,12 @@ export type SyncContractStage =
 
 export type SyncContractResult =
   | { ok: true; contractId: number; uuid: string }
-  | { ok: false; stage: SyncContractStage; error: string };
+  /**
+   * `status`: HTTP status of the failing call (0 = the request itself threw,
+   * e.g. offline or the upload was rejected before reaching the server).
+   * 4xx means the server rejected the data — the customer must fix it.
+   */
+  | { ok: false; stage: SyncContractStage; error: string; status: number };
 
 function firstFile(files: File[], persisted: PersistedFile[]): File | undefined {
   if (files.length > 0 && files[0] instanceof File) {
@@ -70,7 +75,12 @@ function allFiles(files: File[], persisted: PersistedFile[]): File[] {
  */
 export function useSyncContractToServer(contractType: ContractTypeId) {
   const [isSyncing, setIsSyncing] = useState(false);
-  const [stage, setStage] = useState<SyncContractStage | null>(null);
+  const [stage, setStageState] = useState<SyncContractStage | null>(null);
+  const stageRef = useRef<SyncContractStage | null>(null);
+  function setStage(next: SyncContractStage | null) {
+    stageRef.current = next;
+    setStageState(next);
+  }
 
   async function syncContract({
     contactWhatsapp,
@@ -87,7 +97,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       setStage("session");
       const session = await ensureGuestSession();
       if (!session.ok) {
-        return { ok: false, stage: "session", error: session.error };
+        return { ok: false, stage: "session", error: session.error, status: 503 };
       }
 
       // 1) Contract id — reuse the server one when the draft already has it.
@@ -112,7 +122,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
               });
 
         if (!started.ok) {
-          return { ok: false, stage: "start", error: started.error };
+          return { ok: false, stage: "start", error: started.error, status: started.status };
         }
 
         contractId = started.contractId;
@@ -122,7 +132,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
 
       const deedType = deed.selectedDeedType;
       if (deedType === "") {
-        return { ok: false, stage: "deed", error: "missing deed type" };
+        return { ok: false, stage: "deed", error: "missing deed type", status: 400 };
       }
 
       const skipState = { selectedDeedType: deedType };
@@ -166,7 +176,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         manualDeedEntry: useManual ? deed.manualDeedEntry : undefined,
       });
       if (!step1.ok) {
-        return { ok: false, stage: "deed", error: step1.error };
+        return { ok: false, stage: "deed", error: step1.error, status: step1.status };
       }
       store.setContractStep1Data(step1.data);
 
@@ -192,7 +202,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           manualAddress: deed.nationalAddressManual,
         });
         if (!step2.ok) {
-          return { ok: false, stage: "address", error: step2.error };
+          return { ok: false, stage: "address", error: step2.error, status: step2.status };
         }
         store.setContractStep2Data(step2.data);
       }
@@ -216,7 +226,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           representativeMode,
         });
         if (!step3.ok) {
-          return { ok: false, stage: "owner", error: step3.error };
+          return { ok: false, stage: "owner", error: step3.error, status: step3.status };
         }
         store.setContractStep3Data(step3.data);
       }
@@ -244,7 +254,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
             : undefined,
       });
       if (!step4.ok) {
-        return { ok: false, stage: "tenant", error: step4.error };
+        return { ok: false, stage: "tenant", error: step4.error, status: step4.status };
       }
       store.setContractStep4Data(step4.data);
 
@@ -259,7 +269,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           rentedUnits: tenant.rentedUnits,
         });
         if (!step5.ok) {
-          return { ok: false, stage: "units", error: step5.error };
+          return { ok: false, stage: "units", error: step5.error, status: step5.status };
         }
         store.setContractStep5Data(step5.data);
       }
@@ -274,7 +284,7 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       }
       const step6 = await submitContractStep6({ contractId, financeData, roles });
       if (!step6.ok) {
-        return { ok: false, stage: "finance", error: step6.error };
+        return { ok: false, stage: "finance", error: step6.error, status: step6.status };
       }
       store.setContractStep6Data(step6.data);
 
@@ -283,6 +293,16 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
       void setGuestContact(contactWhatsapp);
 
       return { ok: true, contractId, uuid };
+    } catch {
+      // A server action that throws (connection dropped, request body rejected
+      // by the host before reaching the app) used to escape as an unhandled
+      // rejection: the button reset silently with no message.
+      return {
+        ok: false,
+        stage: stageRef.current ?? "session",
+        error: "",
+        status: 0,
+      };
     } finally {
       setIsSyncing(false);
       setStage(null);
