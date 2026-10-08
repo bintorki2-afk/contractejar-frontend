@@ -22,6 +22,7 @@ import { getLessorChangeInfo } from "@/features/lessor-change/services/get-lesso
 import { FALLBACK_LESSOR_CHANGE_INFO } from "@/features/lessor-change/types/lessor-change";
 import { getContractPricing } from "@/features/pricing/services/get-contract-pricing";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
+import { DEFAULT_CONTACT_NUMBER } from "@/features/settings/utils/build-whatsapp-href";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("lessorChange.landing");
@@ -50,7 +51,7 @@ export default async function LessorChangeServicePage() {
   const [t, tService, whatsappHref, info] = await Promise.all([
     getTranslations("lessorChange.landing"),
     getTranslations("servicePage"),
-    getWhatsappHref().catch(() => "https://wa.me/"),
+    getWhatsappHref().catch(() => `https://wa.me/${DEFAULT_CONTACT_NUMBER}`),
     resolveLessorChangeInfo(),
   ]);
 

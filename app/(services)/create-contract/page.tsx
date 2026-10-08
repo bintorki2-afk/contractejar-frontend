@@ -20,6 +20,7 @@ import { DEED_TYPES } from "@/features/create-contract/types/deed-type";
 import { settingContractsKeys } from "@/features/shared/query-keys";
 import { getSettingContracts } from "@/features/shared/services/get-setting-contracts";
 import { getWhatsappHref } from "@/features/settings/services/get-whatsapp-href";
+import { DEFAULT_CONTACT_NUMBER } from "@/features/settings/utils/build-whatsapp-href";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 import {
   DELEGATION_TYPE_OPTIONS,
@@ -54,7 +55,7 @@ export default async function CreateContractPage({
   // and falls back to its default. The client read hooks refetch as needed.
   const [t, whatsappHref] = await Promise.all([
     getTranslations("createContract"),
-    getWhatsappHref().catch(() => "https://wa.me/"),
+    getWhatsappHref().catch(() => `https://wa.me/${DEFAULT_CONTACT_NUMBER}`),
     queryClient
       .prefetchQuery({
         queryKey: contractPaperworkKeys.list(propertyContractType),
