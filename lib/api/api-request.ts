@@ -2,6 +2,7 @@
 // be an open proxy that attaches the user's bearer token to any endpoint.
 import "server-only";
 
+import { headers as requestHeaders } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { clearAuthToken, getToken } from "@/actions/auth";
@@ -38,6 +39,32 @@ function buildAuthHeaders(token: string | null, isFormData: boolean): HeadersIni
   return headers;
 }
 
+/**
+ * The API rate-limits by client IP, but every call from here leaves from the
+ * website server: without the visitor's IP all customers share one budget
+ * (e.g. 10 guest sessions or order lookups per minute for the whole site).
+ * Forward it for per-visitor requests (never on cached fetches — headers are
+ * part of the cache key).
+ */
+async function clientIpHeaders(): Promise<Record<string, string>> {
+  try {
+    const incoming = await requestHeaders();
+    const ip =
+      incoming.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      incoming.get("x-real-ip")?.trim() ||
+      "";
+    return ip ? { "X-Forwarded-For": ip } : {};
+  } catch {
+    // Outside a request (build time / static generation).
+    return {};
+  }
+}
+
+function isCachedFetch(options?: RequestInit): boolean {
+  const next = (options as RequestInit & { next?: { revalidate?: number | false } })?.next;
+  return options?.cache === "force-cache" || typeof next?.revalidate === "number";
+}
+
 export async function apiRequest<T>(
   endpoint: string,
   options?: RequestInit,
@@ -62,6 +89,7 @@ export async function apiRequest<T>(
       ...requestOptions,
       headers: {
         ...buildAuthHeaders(token, isFormData),
+        ...(isCachedFetch(requestOptions) ? {} : await clientIpHeaders()),
         ...(requestOptions?.headers || {}),
       },
       // Bound every read so a slow/unresponsive backend cannot hang the request forever.
@@ -105,6 +133,8 @@ export async function apiRequest<T>(
   };
 }
 
+export { clientIpHeaders };
+
 export async function apiFormDataRequest<T>(
   endpoint: string,
   formData: FormData,
@@ -120,7 +150,7 @@ export async function apiFormDataRequest<T>(
     response = await fetch(`${BASE_URL}${endpoint}`, {
       method,
       body: compressedFormData,
-      headers: buildAuthHeaders(token, true),
+      headers: { ...buildAuthHeaders(token, true), ...(await clientIpHeaders()) },
       signal: AbortSignal.timeout(60000),
     });
 

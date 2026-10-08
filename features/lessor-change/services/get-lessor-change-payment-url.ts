@@ -5,6 +5,7 @@ import {
   WEBSITE_CLIENT_HEADER,
   WEBSITE_CLIENT_ID,
 } from "@/lib/api/constants";
+import { clientIpHeaders } from "@/lib/api/api-request";
 import {
   getResponseErrorMessage,
   NETWORK_ERROR_MESSAGE,
@@ -49,6 +50,8 @@ export async function getLessorChangePaymentUrl(uuid: string): Promise<
         headers: {
           Accept: "application/json",
           [WEBSITE_CLIENT_HEADER]: WEBSITE_CLIENT_ID,
+          // Per-visitor rate limit on the API (not one budget for the whole site).
+          ...(await clientIpHeaders()),
         },
       },
     );

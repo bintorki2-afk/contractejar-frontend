@@ -35,7 +35,9 @@ const fetchWebsiteStatus = cache(async function fetchWebsiteStatus(): Promise<We
         Accept: "application/json",
         [WEBSITE_CLIENT_HEADER]: WEBSITE_CLIENT_ID,
       },
-      cache: "no-store",
+      // Called by the root layout on every page: cached 30 s (closing the site
+      // from the dashboard shows within 30 s) instead of one API call per view.
+      next: { revalidate: 30 },
     });
 
     const body = (await response
