@@ -2879,7 +2879,9 @@
       "sendCode": "Send verification code",
       "otpLengthHint": "The code is 4 to 6 digits",
       "verifyAndSubmit": "Verify and submit"
-    }
+    },
+    "uploadTooLarge": "The file is larger than 10 MB — choose a smaller image or file.",
+    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF."
   },
   "paymentStatus": {
     "backLabel": "Back",

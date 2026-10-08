@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -57,6 +58,17 @@ function isPdfFile(file: File) {
 
 function isImageFile(file: File) {
   return file.type.startsWith("image/");
+}
+
+// Same limits as the server (`mimes:jpg,jpeg,png,webp,pdf|max:10240`): reject
+// on selection instead of failing at «إرسال الطلب» after the whole wizard.
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "pdf"]);
+const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
+
+function isAllowedUpload(file: File) {
+  const extension = getFileParts(file).extension;
+  return ALLOWED_MIME_TYPES.has(file.type) || ALLOWED_EXTENSIONS.has(extension);
 }
 
 type DeedFileRowProps = {
@@ -240,9 +252,20 @@ export default function CreateContractDeedImageUpload({
   }, [previewUrl]);
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []).filter((file) =>
-      pdfOnly ? isPdfFile(file) : true,
+    const picked = Array.from(event.target.files ?? []);
+    const files = picked.filter(
+      (file) =>
+        (pdfOnly ? isPdfFile(file) : isAllowedUpload(file)) &&
+        file.size <= MAX_UPLOAD_BYTES,
     );
+
+    if (files.length < picked.length) {
+      toast.error(
+        picked.some((file) => file.size > MAX_UPLOAD_BYTES)
+          ? t("uploadTooLarge")
+          : t("uploadInvalidType"),
+      );
+    }
 
     if (files.length > 0) {
       onChange(single ? [files[0]] : [...value, ...files]);
