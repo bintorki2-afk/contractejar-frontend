@@ -62,6 +62,26 @@ const STATIC_CACHE_HEADERS = [
   { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
 ];
 
+// Hosts allowed for next/image remote sources: the API's public storage.
+const PRODUCTION_API_HOST = "aqdi-new-backend-main-production.up.railway.app";
+const apiImageHost = (() => {
+  try {
+    const url = new URL(apiBase);
+    return url.protocol === "https:" ? url.hostname : "";
+  } catch {
+    return "";
+  }
+})();
+const IMAGE_REMOTE_PATTERNS = Array.from(
+  new Set([PRODUCTION_API_HOST, apiImageHost].filter(Boolean)),
+).flatMap((hostname) =>
+  ["/storage/**", "/uploads/**", "/images/**"].map((pathname) => ({
+    protocol: "https" as const,
+    hostname,
+    pathname,
+  })),
+);
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
@@ -94,23 +114,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/storage/**",
-      },
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/images/**",
-      },
-    ],
+    // Backend storage only (صقر ١ on Railway + whatever host NEXT_PUBLIC_BASE_URL
+    // points at). The legacy third-party image host was removed (batch D, W3).
+    remotePatterns: IMAGE_REMOTE_PATTERNS,
   },
 };
 

@@ -41,8 +41,10 @@ notifications will target the wrong Firebase project.
 ### 1b. Backend must allow the site origin
 
 The Laravel API's CORS / allowed origins must include the deployed site's domain,
-and image hosts must match `next.config.ts → images.remotePatterns` (currently
-`aqid.subcodeco.com`). Add your production image host there if it differs.
+and image hosts must match `next.config.ts → images.remotePatterns`. They are
+derived automatically: the production API host on Railway
+(`aqdi-new-backend-main-production.up.railway.app`) plus the host of
+`NEXT_PUBLIC_BASE_URL` (when https). Add any other image host there.
 
 ---
 
