@@ -22,8 +22,10 @@ export async function getContracts({
   );
 
   if (!response.ok || !response.data?.success || !response.data.data) {
-    throw new Error(
-      response.error || response.data?.message || "Failed to fetch contracts",
+    // `status` lets the page tell an expired session (401) from an outage.
+    throw Object.assign(
+      new Error(response.error || response.data?.message || "Failed to fetch contracts"),
+      { status: response.status },
     );
   }
 

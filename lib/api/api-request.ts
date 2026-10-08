@@ -86,7 +86,9 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     if (response.status === 401) {
-      await clearAuthToken();
+      // Only possible in a Server Action / Route Handler; while rendering a
+      // Server Component the cookie cannot be changed (the page handles 401).
+      await clearAuthToken().catch(() => undefined);
     }
 
     return {
@@ -137,7 +139,9 @@ export async function apiFormDataRequest<T>(
 
   if (!response.ok) {
     if (response.status === 401) {
-      await clearAuthToken();
+      // Only possible in a Server Action / Route Handler; while rendering a
+      // Server Component the cookie cannot be changed (the page handles 401).
+      await clearAuthToken().catch(() => undefined);
     }
 
     return {
