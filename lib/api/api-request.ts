@@ -53,7 +53,15 @@ async function clientIpHeaders(): Promise<Record<string, string>> {
       incoming.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       incoming.get("x-real-ip")?.trim() ||
       "";
-    return ip ? { "X-Forwarded-For": ip } : {};
+    if (!ip) return {};
+    // The API only trusts X-Forwarded-For together with this shared secret
+    // (server-only env, same value as TRUSTED_FORWARDER_SECRET on Railway).
+    // Unset → header omitted (limits then count on the website server's IP).
+    const secret = process.env.API_FORWARDER_SECRET?.trim();
+    return {
+      "X-Forwarded-For": ip,
+      ...(secret ? { "X-Forwarded-Client-Secret": secret } : {}),
+    };
   } catch {
     // Outside a request (build time / static generation).
     return {};
