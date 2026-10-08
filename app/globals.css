@@ -1022,21 +1022,29 @@ html.dark textarea::placeholder {
 }
 
 /* Live header height (the navbar script overwrites this with the exact value);
-   responsive default lets the hero sit behind the transparent header before JS. */
+   responsive defaults match the measured header (100 / 112 / 144px) so the
+   header spacer and the hero reserve the right space before JS → no CLS. */
 :root {
   --header-h: 100px;
 }
+@media (min-width: 768px) {
+  :root {
+    --header-h: 112px;
+  }
+}
 @media (min-width: 1024px) {
   :root {
-    --header-h: 148px;
+    --header-h: 144px;
   }
 }
 
+/* Soft orbs: the gradient itself carries the falloff — no `filter: blur()`
+   (a 90px blur over ~700px orbs cost hundreds of ms of paint on phones, #27). */
 .site-bg-glow {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
   opacity: 0.28;
+  will-change: transform;
 }
 .dark .site-bg-glow {
   opacity: 0.5;
@@ -1046,21 +1054,21 @@ html.dark textarea::placeholder {
   height: 40rem;
   top: -10rem;
   inset-inline-start: -8rem;
-  background: radial-gradient(circle, rgba(13, 179, 139, 0.6), transparent 70%);
+  background: radial-gradient(circle, rgba(13, 179, 139, 0.55) 0%, rgba(13, 179, 139, 0.2) 40%, transparent 68%);
 }
 .site-bg-glow-2 {
   width: 46rem;
   height: 46rem;
   top: 38%;
   inset-inline-end: -12rem;
-  background: radial-gradient(circle, rgba(23, 116, 98, 0.7), transparent 70%);
+  background: radial-gradient(circle, rgba(23, 116, 98, 0.6) 0%, rgba(23, 116, 98, 0.22) 40%, transparent 68%);
 }
 .site-bg-glow-3 {
   width: 36rem;
   height: 36rem;
   bottom: -10rem;
   inset-inline-start: 22%;
-  background: radial-gradient(circle, rgba(13, 179, 139, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(13, 179, 139, 0.45) 0%, rgba(13, 179, 139, 0.16) 40%, transparent 68%);
 }
 
 /* Faint dot grid — precise, technical feel; fades out toward the edges. */
@@ -1162,4 +1170,40 @@ html.a11y-motion .animate-marquee-vertical { animation: none !important; }
 }
 .bottom-safe-4 {
   bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Reveal on scroll (features/shared/motion/reveal.tsx) ─────────────────
+   Pure CSS transition driven by IntersectionObserver; `[data-revealed]` and
+   prefers-reduced-motion show the content immediately (see the a11y block). */
+/* Below-the-fold sections skip layout/paint until they approach the viewport
+   (`content-visibility: auto`): the home page's first paint no longer pays for
+   the whole document (#27). `contain-intrinsic-size` reserves a placeholder
+   height so the scrollbar stays stable; `auto` keeps the real size once seen. */
+.reveal-on-scroll,
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 640px;
+}
+
+/* `html.js` is set by the no-flash script, so without JavaScript nothing stays hidden. */
+html.js .reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 26px));
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+html.js .reveal-on-scroll.is-revealed,
+html.js .reveal-on-scroll[data-revealed] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

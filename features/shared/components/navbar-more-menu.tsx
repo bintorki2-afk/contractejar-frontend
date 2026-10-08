@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -138,7 +138,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
               pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
-              <Link
+              <IntentLink
                 key={item.href}
                 href={item.href}
                 role="menuitem"
@@ -153,7 +153,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
                   {item.icon}
                 </span>
                 <span className="leading-none">{item.label}</span>
-              </Link>
+              </IntentLink>
             );
           })}
         </div>

@@ -59,7 +59,7 @@ export default function BlogPostGridCard({
 
         <Link
           href={`/blog/${post.slug}`}
-          className="mt-auto inline-flex items-center gap-2  font-bold text-brand-secondary transition-colors hover:text-brand"
+          className="mt-auto inline-flex min-h-10 items-center gap-2 font-bold text-brand-secondary transition-colors hover:text-brand"
         >
           {readMoreLabel}
           <ArrowUpLeft className="size-4" aria-hidden="true" />

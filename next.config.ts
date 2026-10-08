@@ -27,7 +27,8 @@ const CSP = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com",
+  // clarity.ms: Microsoft Clarity session recordings (features/analytics/clarity-script.tsx).
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms",
   `connect-src 'self' https: wss:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
   "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
   "worker-src 'self' blob:",
@@ -50,10 +51,22 @@ const SECURITY_HEADERS = [
   { key: "Content-Security-Policy", value: CSP },
 ];
 
+// Long-lived caching for the static assets under /public that are referenced
+// by hashed or stable names. `/_next/static` is already immutable (Next.js).
+const STATIC_CACHE_HEADERS = [
+  { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  compress: true,
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      { source: "/images/:path*", headers: STATIC_CACHE_HEADERS },
+      { source: "/icons/:path*", headers: STATIC_CACHE_HEADERS },
+      { source: "/og-image.png", headers: STATIC_CACHE_HEADERS },
+    ];
   },
   experimental: {
     serverActions: {

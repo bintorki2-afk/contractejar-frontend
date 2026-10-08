@@ -23,11 +23,11 @@ export default function FooterBottomBar({
       <p className="text-sm font-medium text-gray-600 dark:text-white/60">{copyright}</p>
 
       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-white/60 font-medium">
-        <Link href={termsHref} className="transition hover:text-brand">
+        <Link href={termsHref} className="inline-flex min-h-10 items-center transition hover:text-brand">
           {terms}
         </Link>
         <span>-</span>
-        <Link href={privacyHref} className="transition hover:text-brand">
+        <Link href={privacyHref} className="inline-flex min-h-10 items-center transition hover:text-brand">
           {privacy}
         </Link>
       </div>

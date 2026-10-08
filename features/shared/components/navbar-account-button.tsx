@@ -1,11 +1,31 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import UserSheet from "@/features/auth/components/user-sheet";
+const AVATAR_CLASS =
+  "flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-sm font-bold text-brand transition-colors hover:bg-brand-background-green/80 dark:bg-[#16352f] dark:text-[#48c0b8]";
+
+/** Same avatar while the sheet chunk loads (no empty gap in the header). */
+function AvatarPlaceholder() {
+  const user = useAuthStore((state) => state.user);
+  const displayName = user?.name || user?.full_name || user?.fname || "";
+  return (
+    <button type="button" className={AVATAR_CLASS} aria-busy="true">
+      {getUserInitials(displayName) || "٠"}
+    </button>
+  );
+}
+
+// The account sheet (profile form, zod, phone input…) is only needed by
+// signed-in customers — keep it out of every visitor's first-load bundle.
+const UserSheet = dynamic(
+  () => import("@/features/auth/components/user-sheet"),
+  { ssr: false, loading: AvatarPlaceholder },
+);
 import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import { getUserInitials } from "@/features/auth/utils/get-user-initials";
 import { cn } from "@/lib/utils";
@@ -42,10 +62,7 @@ export default function NavbarAccountButton({
           type="button"
           aria-label={t("account")}
           title={displayName || t("account")}
-          className={cn(
-            "flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-background-green text-sm font-bold text-brand transition-colors hover:bg-brand-background-green/80 dark:bg-[#16352f] dark:text-[#48c0b8]",
-            className,
-          )}
+          className={cn(AVATAR_CLASS, className)}
         >
           {getUserInitials(displayName) || "٠"}
         </button>

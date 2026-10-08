@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import type { MouseEvent, ReactNode } from "react";
 import { ArrowUpLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -79,8 +79,8 @@ export default function NavbarNavLink({
   }
 
   return (
-    <Link href={href} onClick={handleClick} className={className}>
+    <IntentLink href={href} onClick={handleClick} className={className}>
       {content}
-    </Link>
+    </IntentLink>
   );
 }

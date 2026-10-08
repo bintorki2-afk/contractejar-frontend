@@ -8,7 +8,8 @@ import {
 } from "@/features/services/components/services-route-chrome";
 import ServicesSideBackNav from "@/features/services/components/services-side-back-nav";
 import NavbarShell from "@/features/shared/components/navbar-shell";
-import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 
 import type { Metadata } from "next";
 
@@ -22,9 +23,16 @@ export default async function ServicesLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const footer = await getTranslations("footer");
+  const [footer, locale, messages] = await Promise.all([
+    getTranslations("footer"),
+    getLocale(),
+    getMessages(),
+  ]);
 
   return (
+    // Service flows need the full message set on the client (wizard, orders,
+    // properties…) — nested provider replaces the root's core subset.
+    <NextIntlClientProvider locale={locale} messages={messages}>
     <div
       data-services-layout
       className="flex min-h-screen flex-col bg-brand-background"
@@ -64,5 +72,6 @@ export default async function ServicesLayout({
         />
       </FlowRouteFooterOnly>
     </div>
+    </NextIntlClientProvider>
   );
 }

@@ -25,7 +25,7 @@ export default function FooterSupportColumn({
         <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
           <Headphones className="size-4 text-brand" aria-hidden="true" />
           {phoneHref ? (
-            <a href={phoneHref} dir="ltr" className="transition hover:text-brand">
+            <a href={phoneHref} dir="ltr" className="inline-flex min-h-10 items-center transition hover:text-brand">
               {phone}
             </a>
           ) : (
@@ -45,7 +45,7 @@ export default function FooterSupportColumn({
         {email && email.trim() !== "" ? (
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
             <Mail className="size-4 text-brand" aria-hidden="true" />
-            <a href={`mailto:${email}`} className="transition hover:text-brand">
+            <a href={`mailto:${email}`} className="inline-flex min-h-10 items-center transition hover:text-brand">
               {email}
             </a>
           </p>

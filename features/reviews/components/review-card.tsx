@@ -1,5 +1,3 @@
-import { Quote } from "lucide-react";
-
 import ReviewStars from "@/features/reviews/components/review-stars";
 import type { Review } from "@/features/reviews/types/review";
 import { cn } from "@/lib/utils";
@@ -33,10 +31,15 @@ export default function ReviewCard({
     >
       <div className="flex items-center justify-between">
         <ReviewStars rating={review.rating} />
-        <Quote
-          className="size-6 text-brand-secondary/25"
+        <svg
+          className="size-6 fill-none stroke-brand-secondary/25"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
           aria-hidden="true"
-        />
+        >
+          <use href="#aqdi-quote" />
+        </svg>
       </div>
 
       <blockquote className="grow text-sm leading-relaxed text-foreground/90">

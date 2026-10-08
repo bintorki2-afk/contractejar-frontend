@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import IntentLink from "@/components/navigation/intent-link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import {
@@ -156,7 +156,7 @@ export default function NavbarMain({
           "dark:bg-[#151c1b] dark:border dark:border-[#232b2a]",
         )}
       >
-        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3">
+        <IntentLink href="/" className="flex min-w-0 shrink-0 items-center gap-3">
           <Image
             src="/images/logo.png"
             alt=""
@@ -174,7 +174,7 @@ export default function NavbarMain({
               {brandTagline}
             </p>
           </div>
-        </Link>
+        </IntentLink>
 
         <nav
           aria-label="Main navigation"

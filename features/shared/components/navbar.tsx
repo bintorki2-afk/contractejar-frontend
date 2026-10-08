@@ -164,10 +164,12 @@ export default function Navbar({ dialogLabels }: NavbarProps) {
         </div>
       </header>
 
+      {/* Spacer under the fixed header: CSS default (--header-h) reserves the
+          space on the server render; the measured height refines it on mount. */}
       <div
         aria-hidden="true"
         className="shrink-0"
-        style={{ height: headerHeight || undefined }}
+        style={{ height: headerHeight ? `${headerHeight}px` : "var(--header-h)" }}
       />
     </>
   );

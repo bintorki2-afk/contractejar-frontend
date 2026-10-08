@@ -1,7 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
+import Image from "next/image";
+
 import { useEffect, useRef, useState } from "react";
+
+import { runWhenIdle } from "@/lib/perf/run-when-idle";
 
 import styles from "./hero-visual.module.css";
 
@@ -22,6 +25,12 @@ type HeroVisualProps = {
 export default function HeroVisual({ alt }: HeroVisualProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.72);
+  // Ambient motion starts after the first interaction (or ~3 s after load):
+  // a scene that animates from the first frame keeps the page "visually
+  // incomplete" for Speed Index and competes with the first paint (#27).
+  const [live, setLive] = useState(false);
+
+  useEffect(() => runWhenIdle(() => setLive(true), { maxDelayMs: 3000 }), []);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -38,7 +47,10 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
   return (
     <div className="w-full">
       <div ref={wrapRef} className={styles.wrap} role="img" aria-label={alt}>
-        <div className={styles.stage} style={{ transform: `scale(${scale})` }}>
+        <div
+          className={`${styles.stage} ${live ? "" : styles.paused}`}
+          style={{ transform: `scale(${scale})` }}
+        >
           <div className={styles.glow} />
           <div className={styles.ring} />
           <div className={`${styles.ring} ${styles.r2}`} />
@@ -72,7 +84,17 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
                   </span>
                 </div>
 
-                <img className={styles.contract} src="/images/hero-contract.webp" alt="" />
+                {/* LCP element on phones: preloaded, sized to the mockup (max 312px wide). */}
+                <Image
+                  className={styles.contract}
+                  src="/images/hero-contract.webp"
+                  alt=""
+                  width={566}
+                  height={774}
+                  sizes="(max-width: 1023px) 312px, 334px"
+                  priority
+                  fetchPriority="high"
+                />
 
                 <div className={styles.success}>
                   <div className={styles.cc}>
@@ -107,11 +129,11 @@ export default function HeroVisual({ alt }: HeroVisualProps) {
           </div>
 
           <div className={`${styles.fc} ${styles.chip} ${styles.c2}`}>
-            <img src="/images/general-authority.png" alt="" />
+            <Image src="/images/general-authority.png" alt="" width={84} height={23} sizes="84px" />
             <span>مرخّص من الهيئة</span>
           </div>
           <div className={`${styles.fc} ${styles.chip} ${styles.c3}`}>
-            <img src="/images/ejar.png" alt="" />
+            <Image src="/images/ejar.png" alt="" width={48} height={22} sizes="48px" />
             <span>موثّق رسميًا</span>
           </div>
           <div className={`${styles.pill} ${styles.p1}`}>

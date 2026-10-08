@@ -20,10 +20,12 @@ import {
   ThemeProvider,
   THEME_NO_FLASH_SCRIPT,
 } from "@/features/shared/theme/theme-provider";
+import SvgSprite from "@/components/svg-sprite";
 import SiteBackground from "@/features/shared/components/site-background";
 import InstallPrompt from "@/features/shared/components/install-prompt";
 import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo/page-metadata";
 import { getAppSettings } from "@/features/settings/services/get-app-settings";
+import { pickCoreMessages } from "@/i18n/client-messages";
 import {
   resolveFooterPhoneHref,
   resolveFooterSocialLinks,
@@ -33,8 +35,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
 
 // Self-hosted (next/font/local) instead of next/font/google: the Google Fonts
 // fetch at build time made CI non-deterministic (build aborts if fonts.googleapis.com
-// is unreachable). Same font, same Arabic subset, weights 400/500/600/700 only
-// (medium/semibold/bold/extrabold→700). Files live in app/fonts/*.woff2.
+// is unreachable). Same font, weights 400/500/600/700 only
+// (medium/semibold/bold/extrabold→700). Files live in app/fonts/*.woff2 —
+// subset to the Arabic blocks (U+0600–06FF, 0750–077F, 0870–08FF) without
+// TrueType hinting: 178 KB → 106 KB for the four weights (#27). Regenerate
+// with `pyftsubset … --no-hinting --layout-features='*'` if the font changes.
 const ibmPlexSansArabic = localFont({
   variable: "--font-ibm-plex-sans-arabic",
   display: "swap",
@@ -187,6 +192,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        <SvgSprite />
         <SiteBackground />
         <ThemeProvider>
           {closedView ? (
@@ -194,7 +200,9 @@ export default async function RootLayout({
           ) : (
             <Providers>
               <DirectionProvider dir={direction} direction={direction}>
-                <NextIntlClientProvider locale={locale} messages={messages}>
+                {/* Client messages: core namespaces only — the service flows add
+                    theirs in app/(services)/layout.tsx (see i18n/client-messages.ts). */}
+                <NextIntlClientProvider locale={locale} messages={pickCoreMessages(messages)}>
                   {children}
                   <InstallPrompt />
                   <CookieNotice />

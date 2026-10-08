@@ -1,6 +1,5 @@
 "use client";
 
-import * as Sentry from "@sentry/browser";
 import { useEffect, useState } from "react";
 
 /**
@@ -18,14 +17,24 @@ export default function GlobalError({
   const [reference, setReference] = useState<string>("");
 
   useEffect(() => {
-    let id = "";
-    try {
-      id = Sentry.captureException(error) || "";
-    } catch {
-      // ignore
-    }
-    const raw = id || error.digest || "";
-    setReference(raw ? raw.slice(0, 8).toUpperCase() : "");
+    // Sentry is loaded on demand (kept out of the critical bundle, #27).
+    let cancelled = false;
+    const fallback = error.digest || "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- derived from the error prop
+    setReference(fallback ? fallback.slice(0, 8).toUpperCase() : "");
+    void import("@sentry/browser")
+      .then((Sentry) => {
+        if (cancelled) return;
+        const id = Sentry.captureException(error) || "";
+        const raw = id || fallback;
+        setReference(raw ? raw.slice(0, 8).toUpperCase() : "");
+      })
+      .catch(() => {
+        // ignore
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [error]);
 
   return (
