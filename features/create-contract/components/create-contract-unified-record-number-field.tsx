@@ -20,6 +20,7 @@ import {
   resolveFieldChromeState,
 } from "@/lib/ui/field-chrome";
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractUnifiedRecordNumberFieldProps = {
   label: string;
@@ -46,7 +47,7 @@ export default function CreateContractUnifiedRecordNumberField({
 }: CreateContractUnifiedRecordNumberFieldProps) {
   const inputId = useId();
   const subscriber = getUnifiedRecordNumberSubscriber(value);
-  const digitCount = value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length;
+  const digitCount = digitsOnly(value).length;
   const showInvalid = invalid || Boolean(errorMessage);
   const chrome = resolveFieldChromeState({
     invalid: showInvalid,
@@ -89,7 +90,7 @@ export default function CreateContractUnifiedRecordNumberField({
           maxLength={UNIFIED_RECORD_NUMBER_SUBSCRIBER_LENGTH}
           value={subscriber}
           onChange={(event) => {
-            const nextDigits = event.target.value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+            const nextDigits = digitsOnly(event.target.value);
             onChange(
               toUnifiedRecordNumberInputValue(
                 `${UNIFIED_RECORD_NUMBER_PREFIX}${nextDigits}`,

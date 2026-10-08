@@ -37,10 +37,19 @@ function mapBathroomsCount(unit: PropertyUnitApiItem) {
   return displayCount(unit.The_number_of_toilets ?? unit.The_number_of_the_toilet);
 }
 
+function displayFee(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? String(parsed) : "";
+}
+
 function mapMeterRegistration(
   value: string | null | undefined,
 ): UnitDataState["electricityMeterRegistration"] {
-  if (value === "owner" || value === "tenant") {
+  if (value === "owner" || value === "tenant" || value === "shared") {
     return value;
   }
 
@@ -84,8 +93,10 @@ export function mapApiUnitToUnitData(
     electricityMeterRegistration: mapMeterRegistration(
       unit.electricity_meter_ownership,
     ),
+    electricitySharedMonthlyFee: displayFee(unit.electricity_shared_monthly_fee),
     addWaterMeter: Boolean(unit.water_meter),
     waterMeterNumber: unit.water_meter_number?.trim() ?? "",
     waterMeterRegistration: mapMeterRegistration(unit.water_meter_ownership),
+    waterSharedMonthlyFee: displayFee(unit.water_shared_monthly_fee),
   };
 }

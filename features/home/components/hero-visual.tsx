@@ -13,7 +13,7 @@ type HeroVisualProps = {
 /**
  * Animated hero visual: a floating 3D iPhone showing a documented Ejar/REGA
  * tenancy contract, with an in-screen success confirmation and floating
- * trust chips. Desktop-only (the parent hides it below `lg`).
+ * trust chips. Shown first on phones (lighter motion) and beside the copy on desktop.
  *
  * The whole scene is authored at a fixed 760x700 design size and scaled to the
  * container width, so the 3D transforms stay crisp at any column width.

@@ -1203,7 +1203,13 @@ export const useCreateContractDraftStore = create<CreateContractDraftStore>()(
         return {
           ...currentState,
           ...persisted,
-          deed: { ...initial.deed, ...(persisted.deed ?? {}) },
+          deed: {
+            ...initial.deed,
+            ...(persisted.deed ?? {}),
+            // The method select is preselected to the Google Maps link.
+            nationalAddressMethod:
+              persisted.deed?.nationalAddressMethod || initial.deed.nationalAddressMethod,
+          },
           owner: {
             ...initial.owner,
             ...persistedOwner,

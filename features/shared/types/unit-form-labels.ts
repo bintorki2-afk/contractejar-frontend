@@ -57,6 +57,8 @@ export type UnitFormLabels = {
     label: string;
     placeholder: string;
   };
+  /** Shown under a toggled-on meter whose number is still empty. */
+  meterNumberRequired?: string;
   addWaterMeter: { label: string };
   waterMeterNumber: {
     label: string;
@@ -75,6 +77,17 @@ export type UnitFormLabels = {
       title: string;
       subtitle: string;
       noFee: string;
+    };
+    shared: {
+      title: string;
+      subtitle: string;
+      footer: string;
+      amountLabel: string;
+      amountPlaceholder: string;
+      /** {monthly} {months} {total} {currency} */
+      totalHint: string;
+      durationUnknownHint: string;
+      termNote: string;
     };
     notice: {
       beforeFee: string;

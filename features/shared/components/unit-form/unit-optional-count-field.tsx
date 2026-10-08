@@ -4,6 +4,7 @@ import { Minus, Plus } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type UnitOptionalCountFieldProps = {
   label: string;
@@ -15,7 +16,7 @@ type UnitOptionalCountFieldProps = {
 };
 
 function parseCount(value: string) {
-  const parsed = Number(value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, ""));
+  const parsed = Number(digitsOnly(value));
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 

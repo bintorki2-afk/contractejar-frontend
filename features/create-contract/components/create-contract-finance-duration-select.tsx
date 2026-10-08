@@ -11,8 +11,6 @@ import { cn } from "@/lib/utils";
 export type FinanceDurationOption = {
   value: string;
   title: string;
-  fee?: string;
-  feeLabel?: string;
 };
 
 type CreateContractFinanceDurationSelectProps = {
@@ -21,18 +19,17 @@ type CreateContractFinanceDurationSelectProps = {
   options: FinanceDurationOption[];
   value: string;
   note?: string;
-  currencyLabel?: string;
   disabled?: boolean;
   invalid?: boolean;
   onChange: (value: string) => void;
 };
 
+/** Duration chips («سنة» / «سنتين» / «مدة أخرى»); the fee preview lives below. */
 export default function CreateContractFinanceDurationSelect({
   label,
   options,
   value,
   note,
-  currencyLabel,
   disabled = false,
   invalid = false,
   onChange,
@@ -54,7 +51,6 @@ export default function CreateContractFinanceDurationSelect({
       >
         {options.map((option) => {
           const selected = value === option.value;
-          const hasFee = Boolean(option.fee);
 
           return (
             <button
@@ -65,7 +61,7 @@ export default function CreateContractFinanceDurationSelect({
               disabled={disabled}
               onClick={() => onChange(option.value)}
               className={cn(
-                "flex min-h-10 flex-col items-center justify-center gap-0.5 rounded-2xl border px-3.5 py-2.5 text-center transition-colors",
+                "flex min-h-10 items-center justify-center rounded-2xl border px-4 py-2.5 text-center transition-colors",
                 selected
                   ? "border-brand bg-brand text-white"
                   : invalid
@@ -77,29 +73,6 @@ export default function CreateContractFinanceDurationSelect({
               <span className="text-xs font-bold leading-4 sm:text-sm">
                 {option.title}
               </span>
-
-              {hasFee ? (
-                <span
-                  className={cn(
-                    "text-[11px] font-bold tabular-nums leading-3.5",
-                    selected ? "text-white/95" : "text-brand-secondary",
-                  )}
-                >
-                  {option.fee}
-                  {currencyLabel ? ` ${currencyLabel}` : ""}
-                </span>
-              ) : null}
-
-              {hasFee && option.feeLabel ? (
-                <span
-                  className={cn(
-                    "text-[9px] leading-3",
-                    selected ? "text-white/75" : "text-[#9a9a9a]",
-                  )}
-                >
-                  {option.feeLabel}
-                </span>
-              ) : null}
             </button>
           );
         })}

@@ -5,6 +5,13 @@ import type {
 } from "@/features/create-contract/types/tenant-step";
 import type { ManualDeedEntryLabels } from "@/features/shared/types/manual-deed-entry-labels";
 
+export type RepresentativeFieldLabels = {
+  idNumber: string;
+  phone: string;
+  birthDate: string;
+  capacityDocument: string;
+};
+
 export type CreateContractLabels = {
   backLabel: string;
   pageTitleResidential: string;
@@ -73,6 +80,8 @@ export type CreateContractLabels = {
     phases: {
       title: string;
       subtitle: string;
+      /** Shown under the title while the stage is locked (address stage). */
+      lockedHint?: string;
     }[];
     deedType: {
       label: string;
@@ -298,6 +307,8 @@ export type CreateContractLabels = {
       waqfSectionTitle: string;
       waqfSectionDescription: string;
       capacityDocumentLabel: string;
+      deceasedFields: RepresentativeFieldLabels;
+      waqfFields: RepresentativeFieldLabels;
     };
   };
   tenant: {
@@ -471,6 +482,16 @@ export type CreateContractLabels = {
           title: string;
           subtitle: string;
           noFee: string;
+        };
+        shared: {
+          title: string;
+          subtitle: string;
+          footer: string;
+          amountLabel: string;
+          amountPlaceholder: string;
+          totalHint: string;
+          durationUnknownHint: string;
+          termNote: string;
         };
         notice: {
           beforeFee: string;
@@ -719,6 +740,12 @@ export type CreateContractLabels = {
       services: string;
       servicesTotal: string;
       docFee: string;
+      documentSurcharge: string;
+      documentSurchargeHint: string;
+      sharedMetersTitle: string;
+      sharedElectricityMeter: string;
+      sharedWaterMeter: string;
+      sharedMetersNote: string;
       total: string;
       priceBeforeCoupon: string;
       discount: string;

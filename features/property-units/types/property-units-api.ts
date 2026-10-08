@@ -20,8 +20,10 @@ export type PropertyUnitApiItem = {
   water_meter: boolean | null;
   electricity_meter_number: string | null;
   water_meter_number: string | null;
-  electricity_meter_ownership?: "owner" | "tenant" | null;
-  water_meter_ownership?: "owner" | "tenant" | null;
+  electricity_meter_ownership?: "owner" | "tenant" | "shared" | null;
+  electricity_shared_monthly_fee?: number | string | null;
+  water_meter_ownership?: "owner" | "tenant" | "shared" | null;
+  water_shared_monthly_fee?: number | string | null;
   contract_type: "housing" | "commercial" | null;
 };
 

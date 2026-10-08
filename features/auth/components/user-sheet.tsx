@@ -136,12 +136,7 @@ export default function UserSheet({ children }: UserSheetProps) {
               />
             </UserSheetSectionCard>
 
-            <UserSheetSocialBar
-              followUs={t("social.followUs")}
-              youtubeLabel={t("social.youtube")}
-              twitterLabel={t("social.twitter")}
-              tiktokLabel={t("social.tiktok")}
-            />
+            <UserSheetSocialBar followUs={t("social.followUs")} />
 
           </div>
         </SheetContent>

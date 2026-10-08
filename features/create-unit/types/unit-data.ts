@@ -4,7 +4,7 @@ export const FURNISHING_TYPE_OPTIONS = ["new", "used"] as const;
 
 export type FurnishingTypeOption = (typeof FURNISHING_TYPE_OPTIONS)[number];
 
-export const METER_REGISTRATION_PARTIES = ["owner", "tenant"] as const;
+export const METER_REGISTRATION_PARTIES = ["owner", "tenant", "shared"] as const;
 
 export type MeterRegistrationParty =
   (typeof METER_REGISTRATION_PARTIES)[number];
@@ -30,9 +30,12 @@ export type UnitDataState = {
   addElectricityMeter: boolean;
   electricityMeterNumber: string;
   electricityMeterRegistration: MeterRegistrationParty | "";
+  /** «عداد مشترك»: monthly amount the tenant pays (SAR), required when shared. */
+  electricitySharedMonthlyFee: string;
   addWaterMeter: boolean;
   waterMeterNumber: string;
   waterMeterRegistration: MeterRegistrationParty | "";
+  waterSharedMonthlyFee: string;
 };
 
 export const EMPTY_UNIT_DATA: UnitDataState = {
@@ -54,9 +57,11 @@ export const EMPTY_UNIT_DATA: UnitDataState = {
   addElectricityMeter: false,
   electricityMeterNumber: "",
   electricityMeterRegistration: "",
+  electricitySharedMonthlyFee: "",
   addWaterMeter: false,
   waterMeterNumber: "",
   waterMeterRegistration: "",
+  waterSharedMonthlyFee: "",
 };
 
 export function isSelectFilled(value: string) {
@@ -96,14 +101,41 @@ export function isUnitDataComplete(
     return true;
   }
 
-  if (
-    unitData.addElectricityMeter &&
-    unitData.electricityMeterRegistration === ""
-  ) {
+  return (
+    isMeterSectionComplete(
+      unitData.addElectricityMeter,
+      unitData.electricityMeterNumber,
+      unitData.electricityMeterRegistration,
+      unitData.electricitySharedMonthlyFee,
+    ) &&
+    isMeterSectionComplete(
+      unitData.addWaterMeter,
+      unitData.waterMeterNumber,
+      unitData.waterMeterRegistration,
+      unitData.waterSharedMonthlyFee,
+    )
+  );
+}
+
+/**
+ * A toggled-on meter needs its number, who it is registered to, and — for a
+ * shared meter — the monthly amount charged to the tenant.
+ */
+export function isMeterSectionComplete(
+  enabled: boolean,
+  meterNumber: string,
+  registration: MeterRegistrationParty | "",
+  sharedMonthlyFee: string,
+) {
+  if (!enabled) {
+    return true;
+  }
+
+  if (meterNumber.trim() === "" || registration === "") {
     return false;
   }
 
-  if (unitData.addWaterMeter && unitData.waterMeterRegistration === "") {
+  if (registration === "shared" && !isPositiveNumber(sharedMonthlyFee)) {
     return false;
   }
 

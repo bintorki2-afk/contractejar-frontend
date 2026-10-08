@@ -51,3 +51,14 @@
 @keyframes draw{0%{stroke-dashoffset:30}22%{stroke-dashoffset:0}86%{stroke-dashoffset:0}100%{stroke-dashoffset:30}}
 @keyframes ripple{0%{transform:scale(1);opacity:.55}35%{transform:scale(1.42);opacity:0}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.glow,.phone,.spark,.sheen,.success,.c1,.c2,.c3,.p1,.tickp{animation:none!important}.tickp{stroke-dashoffset:0!important}.cc::after{display:none}}
+
+/* Phones: the mockup leads the hero — keep only the gentle float, drop the
+   blurred glow, sheen sweep and ripple so scrolling stays smooth. */
+@media (max-width:1023px){
+  .wrap{max-width:420px;}
+  .glow,.sheen,.spark{display:none;}
+  .cc::after{display:none;}
+  .tickp{animation:none;stroke-dashoffset:0;}
+  .success,.c1,.c2,.c3,.p1{animation:none;}
+  .phone{animation-duration:10s;}
+}

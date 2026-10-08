@@ -19,6 +19,7 @@ import {
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { toSaudiMobileInputValue } from "@/lib/validation/format-saudi-mobile-for-form";
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractAgentDataPhaseProps = {
   labels: CreateContractLabels["owner"]["agentData"];
@@ -29,10 +30,12 @@ type CreateContractAgentDataPhaseProps = {
   showFieldErrors?: boolean;
   /** Representative mode (deceased/waqf) collects a capacity document, not a PoA. */
   hidePoaFields?: boolean;
+  /** "page": the section heading is the step's only heading (representative mode). */
+  headingVariant?: "section" | "page";
 };
 
 function isIdNumberComplete(idNumber: string) {
-  return idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length === 10;
+  return digitsOnly(idNumber).length === 10;
 }
 
 export default function CreateContractAgentDataPhase({
@@ -43,6 +46,7 @@ export default function CreateContractAgentDataPhase({
   onChange,
   showFieldErrors = false,
   hidePoaFields = false,
+  headingVariant = "section",
 }: CreateContractAgentDataPhaseProps) {
   const t = useTranslations("createContract");
 
@@ -88,8 +92,15 @@ export default function CreateContractAgentDataPhase({
 
   return (
     <div className="space-y-3">
-      <div className="space-y-1 text-center">
-        <h3 className="text-lg font-extrabold text-brand md:text-xl">
+      <div className={cn("space-y-1 text-center", headingVariant === "page" && "mb-3")}>
+        <h3
+          className={cn(
+            "font-extrabold text-brand",
+            headingVariant === "page"
+              ? "text-xl md:text-2xl"
+              : "text-lg md:text-xl",
+          )}
+        >
           {labels.sectionTitle}
         </h3>
         <p className="text-sm text-[#9a9a9a]">{labels.sectionDescription}</p>
@@ -101,7 +112,7 @@ export default function CreateContractAgentDataPhase({
           placeholder={labels.idNumber.placeholder}
           value={value.idNumber}
           onChange={(idNumber) =>
-            updateField("idNumber", idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").slice(0, 10))
+            updateField("idNumber", digitsOnly(idNumber).slice(0, 10))
           }
           icon={IdCard}
           dir="ltr"

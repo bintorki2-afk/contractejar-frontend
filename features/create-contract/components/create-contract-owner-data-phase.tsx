@@ -17,6 +17,7 @@ import {
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { toSaudiMobileInputValue } from "@/lib/validation/format-saudi-mobile-for-form";
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractOwnerDataPhaseProps = {
   labels: CreateContractLabels["owner"]["ownerData"];
@@ -28,7 +29,7 @@ type CreateContractOwnerDataPhaseProps = {
 };
 
 function isIdNumberComplete(idNumber: string) {
-  return idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length === 10;
+  return digitsOnly(idNumber).length === 10;
 }
 
 export default function CreateContractOwnerDataPhase({
@@ -88,7 +89,7 @@ export default function CreateContractOwnerDataPhase({
           placeholder={labels.idNumber.placeholder}
           value={value.idNumber}
           onChange={(idNumber) =>
-            updateField("idNumber", idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").slice(0, 10))
+            updateField("idNumber", digitsOnly(idNumber).slice(0, 10))
           }
           icon={IdCard}
           dir="ltr"

@@ -1,11 +1,15 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type UnitCountStepperProps = {
   label: string;
+  /** Colored Lucide icon shown beside the label. */
+  icon?: ReactNode;
   value: string;
   onChange: (value: string) => void;
   hint?: string;
@@ -19,7 +23,7 @@ function parseCount(value: string) {
     return 0;
   }
 
-  const parsed = Number(value.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, ""));
+  const parsed = Number(digitsOnly(value));
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
 }
 
@@ -29,6 +33,7 @@ function formatCount(value: number) {
 
 export default function UnitCountStepper({
   label,
+  icon,
   value,
   onChange,
   hint,
@@ -48,9 +53,16 @@ export default function UnitCountStepper({
   return (
     <div className={cn("space-y-2 text-center", className)}>
       <div>
-        <p className="text-sm font-bold text-brand">
-          {label}
-          {required ? <span className="text-red-500"> *</span> : null}
+        <p className="inline-flex items-center justify-center gap-1.5 text-sm font-bold text-brand">
+          {icon ? (
+            <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-background-green dark:bg-[#16352f]">
+              {icon}
+            </span>
+          ) : null}
+          <span>
+            {label}
+            {required ? <span className="text-red-500"> *</span> : null}
+          </span>
         </p>
         {hint ? (
           <p className="mt-1 text-[11px] leading-4 text-[#9a9a9a]">{hint}</p>

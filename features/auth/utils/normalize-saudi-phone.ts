@@ -1,10 +1,12 @@
+import { digitsOnly } from "@/lib/utils/digits";
+
 export function normalizeSaudiPhone(phone: string): string {
   return phone.trim().replace(/\s/g, "");
 }
 
 /** 9-digit Saudi national mobile, e.g. 512345678 */
 export function getSaudiNationalMobile(phone: string): string | null {
-  const digits = phone.trim().replace(/\s/g, "").replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "");
+  const digits = digitsOnly(phone.trim().replace(/\s/g, ""));
 
   if (!digits) {
     return null;

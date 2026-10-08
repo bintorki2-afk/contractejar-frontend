@@ -11,7 +11,9 @@ import {
   buildOrderExtraSections,
   collectLabelledAttachments,
 } from "@/features/create-contract/utils/build-order-extra-sections";
-import { useTenantRoles } from "@/features/create-contract/hooks/use-tenant-roles";
+import { useContractPeriods } from "@/features/create-contract/hooks/use-contract-periods";
+import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
+import { useContractPricing } from "@/features/pricing/hooks/use-contract-pricing";
 
 type UseSubmitOrderArgs = {
   summary: CreateContractReviewOrderSummary;
@@ -77,7 +79,8 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
   const t = useTranslations("createContract.payment.reviewDialog");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<SubmitOrderResult | null>(null);
-  const tenantRolesQuery = useTenantRoles();
+  const { pricing } = useContractPricing();
+  const contractPeriodsQuery = useContractPeriods(toPropertyContractType(contractType));
 
   async function submitOrder({
     contactWhatsapp,
@@ -113,14 +116,22 @@ export function useSubmitOrder({ summary, contractType }: UseSubmitOrderArgs) {
         overviewSection,
         ...summary.sections.map((section) => ({
           title: section.title,
-          fields: section.fields.map((field) => ({
-            label: field.label,
-            value: field.value,
-          })),
+          fields: [
+            ...section.fields.map((field) => ({
+              label: field.label,
+              value: field.value,
+            })),
+            // Attachments by real file name (the files themselves are
+            // forwarded separately, captioned).
+            ...(section.attachments ?? []).map((attachment) => ({
+              label: attachment.label,
+              value: attachment.fileName,
+            })),
+          ],
         })),
-        // Agent/representative, deed details, tenant obligations, conditions,
-        // unit extras — previously collected but never forwarded.
-        ...buildOrderExtraSections(tenantRolesQuery.data ?? []),
+        // Fees (duration rule + document surcharge + meter transfer), shared
+        // meter terms, map location and coupon — not part of the review cards.
+        ...buildOrderExtraSections(pricing, contractPeriodsQuery.data ?? []),
       ],
     };
 

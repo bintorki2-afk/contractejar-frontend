@@ -10,6 +10,8 @@ import {
   Lightbulb,
 } from "lucide-react";
 
+import GuideTutorialsSection from "@/features/guide/components/guide-tutorials-section";
+
 type Step = { title: string; desc: string };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -112,6 +114,16 @@ export default async function GuidePage() {
             </ul>
           </section>
         </div>
+
+        {/* Tutorials (config: features/guide/tutorials.ts) */}
+        <GuideTutorialsSection
+          labels={{
+            title: t("tutorials.title"),
+            subtitle: t("tutorials.subtitle"),
+            comingSoon: t("tutorials.comingSoon"),
+            watch: t("tutorials.watch"),
+          }}
+        />
 
         {/* CTA */}
         <section className="flex flex-col items-center gap-5 rounded-3xl bg-brand px-6 py-12 text-center text-white">

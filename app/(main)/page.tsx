@@ -59,6 +59,8 @@ export default async function Home() {
       residentialCta: tHero("residentialCta"),
       commercialCta: tHero("commercialCta"),
       mostRequested: tHero("mostRequested"),
+      lessorChangeCta: tHero("lessorChangeCta"),
+      lessorChangeHint: tHero("lessorChangeHint"),
       whatsapp: tHero("whatsapp"),
       visualAlt: tHero("visualAlt"),
       imageUrl: "/images/hero.png",

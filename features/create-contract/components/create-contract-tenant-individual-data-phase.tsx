@@ -11,6 +11,7 @@ import type { IndividualTenantData } from "@/features/create-contract/types/tena
 import { isPhoneComplete } from "@/lib/validation/owner-step-validation";
 import { isAdultBirthDateComplete } from "@/lib/validation/birth-date-year-options";
 import { toSaudiMobileInputValue } from "@/lib/validation/format-saudi-mobile-for-form";
+import { digitsOnly } from "@/lib/utils/digits";
 
 type CreateContractTenantIndividualDataPhaseProps = {
   labels: CreateContractLabels["tenant"]["individualData"];
@@ -21,7 +22,7 @@ type CreateContractTenantIndividualDataPhaseProps = {
 };
 
 function isIdNumberComplete(idNumber: string) {
-  return idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").length === 10;
+  return digitsOnly(idNumber).length === 10;
 }
 
 export default function CreateContractTenantIndividualDataPhase({
@@ -51,7 +52,7 @@ export default function CreateContractTenantIndividualDataPhase({
           placeholder={labels.idNumber.placeholder}
           value={value.idNumber}
           onChange={(idNumber) =>
-            updateField("idNumber", idNumber.replace(/[٠-٩۰-۹]/g, (d) => "٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10 + "").replace(/\D/g, "").slice(0, 10))
+            updateField("idNumber", digitsOnly(idNumber).slice(0, 10))
           }
           icon={IdCard}
           dir="ltr"

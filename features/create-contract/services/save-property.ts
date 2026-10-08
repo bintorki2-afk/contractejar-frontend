@@ -36,3 +36,26 @@ export async function saveProperty({
     message: response.data.message,
   };
 }
+
+/** Undo «حفظ بيانات العقار» (`DELETE /save/property/{contract_id}`). */
+export async function unsaveProperty(contractId: number) {
+  const response = await apiRequest<SavePropertyApiResponse>(
+    `/save/property/${contractId}`,
+    {
+      method: "DELETE",
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok || response.data?.success === false) {
+    return {
+      ok: false as const,
+      error:
+        response.error ||
+        response.data?.message ||
+        "Failed to remove saved property",
+    };
+  }
+
+  return { ok: true as const, message: response.data?.message };
+}

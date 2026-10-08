@@ -41,7 +41,12 @@ export default function CreateContractOwnerStep({
   const isRepresentative = representativeMode !== null;
 
   // #30/#31: deceased-owner / waqf deeds collect the legal representative
-  // (heirs' agent / waqf trustee) with a mandatory capacity document.
+  // (heirs' agent / waqf trustee) with a mandatory capacity document. Every
+  // field is labelled after the representative («الناظر» / «وكيل الورثة»).
+  const representativeFields =
+    representativeMode === "waqf"
+      ? labels.representative.waqfFields
+      : labels.representative.deceasedFields;
   const representativeLabels = {
     ...labels.agentData,
     sectionTitle:
@@ -52,9 +57,20 @@ export default function CreateContractOwnerStep({
       representativeMode === "waqf"
         ? labels.representative.waqfSectionDescription
         : labels.representative.deceasedSectionDescription,
+    idNumber: {
+      ...labels.agentData.idNumber,
+      label: representativeFields.idNumber,
+    },
+    phone: {
+      ...labels.agentData.phone,
+      label: representativeFields.phone,
+    },
+    birthDateLabel: representativeFields.birthDate,
     powerOfAttorney: {
       ...labels.agentData.powerOfAttorney,
-      label: labels.representative.capacityDocumentLabel,
+      label:
+        representativeFields.capacityDocument ||
+        labels.representative.capacityDocumentLabel,
     },
   };
 
@@ -86,10 +102,14 @@ export default function CreateContractOwnerStep({
   return (
     <div className="space-y-4">
       <div className="p-3 md:p-5">
-        <CreateContractStepPhaseHeader
-          title={phase.title}
-          subtitle={phase.subtitle}
-        />
+        {/* The representative section carries its own heading, so the generic
+            «بيانات مالك العقار» header is only shown for a self owner. */}
+        {isRepresentative ? null : (
+          <CreateContractStepPhaseHeader
+            title={phase.title}
+            subtitle={phase.subtitle}
+          />
+        )}
 
         <div className="space-y-3">
           {isRepresentative ? (
@@ -101,6 +121,7 @@ export default function CreateContractOwnerStep({
               onChange={setAgentData}
               showFieldErrors={showFieldErrors}
               hidePoaFields
+              headingVariant="page"
             />
           ) : (
             <>

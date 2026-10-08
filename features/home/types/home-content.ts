@@ -9,6 +9,8 @@ export type HomeHeroResolved = {
   residentialCta: string;
   commercialCta: string;
   mostRequested: string;
+  lessorChangeCta: string;
+  lessorChangeHint: string;
   whatsappLabel: string;
   whatsappHref: string;
   visualAlt: string;

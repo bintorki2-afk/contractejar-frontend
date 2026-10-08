@@ -1,6 +1,13 @@
 "use client";
 
-import { CheckCircle2, Clock, CreditCard, LoaderCircle, Search } from "lucide-react";
+import {
+  ArrowLeftRight,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  LoaderCircle,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -13,7 +20,9 @@ import {
   trackOrder,
   type TrackedOrder,
 } from "@/features/guest-session/services/track-order";
+import { getLessorChangePaymentUrl } from "@/features/lessor-change/services/get-lessor-change-payment-url";
 import { cn } from "@/lib/utils";
+import { digitsOnly } from "@/lib/utils/digits";
 
 const STEP_LABELS: Record<number, string> = {
   1: "الصك",
@@ -24,10 +33,6 @@ const STEP_LABELS: Record<number, string> = {
   6: "البيانات المالية",
   7: "الدفع",
 };
-
-function toAsciiDigits(value: string) {
-  return value.replace(/[٠-٩۰-۹]/g, (d) => String("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹".indexOf(d) % 10));
-}
 
 type TrackOrderFormProps = {
   /** Prefilled from a smart link (`/r/{order}`). */
@@ -46,10 +51,34 @@ export default function TrackOrderForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TrackedOrder | null>(null);
+  const [isOpeningPayment, setIsOpeningPayment] = useState(false);
 
-  const orderDigits = toAsciiDigits(order).replace(/\D/g, "");
+  const isLessorChange =
+    result?.kind === "lessor_change" || result?.contract_type === "lessor_change";
+  const orderDigits = digitsOnly(order);
   const mobileValid = getSaudiNationalMobile(mobile) !== null;
   const canSubmit = orderDigits.length >= 4 && mobileValid && !isLoading;
+
+  // Lessor-change requests pay through `GET /payment/lessor-change/{uuid}`
+  // (a JSON read that hands back the Moyasar page URL), so the button resolves
+  // it here instead of linking straight to the API.
+  async function handleLessorChangePayment(uuid: string) {
+    if (isOpeningPayment) {
+      return;
+    }
+
+    setIsOpeningPayment(true);
+    try {
+      const payment = await getLessorChangePaymentUrl(uuid);
+      if (payment.ok && "paymentUrl" in payment) {
+        window.location.assign(payment.paymentUrl);
+        return;
+      }
+      setError(t("failed"));
+    } finally {
+      setIsOpeningPayment(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,7 +93,7 @@ export default function TrackOrderForm({
 
     const response = await trackOrder({
       order: orderDigits,
-      mobile: toAsciiDigits(mobile).replace(/\D/g, ""),
+      mobile: digitsOnly(mobile),
     });
 
     setIsLoading(false);
@@ -146,10 +175,22 @@ export default function TrackOrderForm({
               <p className="text-2xl font-extrabold tracking-wide text-brand" dir="ltr">
                 {result.order_number}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {result.contract_type === "commercial" ? t("typeCommercial") : t("typeHousing")}
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                {isLessorChange ? (
+                  <ArrowLeftRight className="size-4 text-brand" aria-hidden="true" />
+                ) : null}
+                {isLessorChange
+                  ? t("typeLessorChange")
+                  : result.contract_type === "commercial"
+                    ? t("typeCommercial")
+                    : t("typeHousing")}
                 {result.name_real_estate ? ` · ${result.name_real_estate}` : ""}
               </p>
+              {isLessorChange && typeof result.fee === "number" ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("lessorChangeFee", { fee: result.fee.toLocaleString("en-US") })}
+                </p>
+              ) : null}
             </div>
             <span
               className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold text-white"
@@ -178,25 +219,41 @@ export default function TrackOrderForm({
               <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
                 {t("awaitingPaymentBody")}
               </p>
-              <Button
-                asChild
-                className="mt-3 h-11 w-full rounded-full bg-brand text-sm font-bold text-white hover:bg-brand/90"
-              >
-                <Link href={result.payment_url}>
-                  <CreditCard className="size-4" aria-hidden="true" />
+              {isLessorChange ? (
+                <Button
+                  type="button"
+                  disabled={isOpeningPayment}
+                  onClick={() => void handleLessorChangePayment(result.uuid)}
+                  className="mt-3 h-11 w-full rounded-full bg-brand text-sm font-bold text-white hover:bg-brand/90"
+                >
+                  {isOpeningPayment ? (
+                    <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <CreditCard className="size-4" aria-hidden="true" />
+                  )}
                   {t("payNow")}
-                </Link>
-              </Button>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  className="mt-3 h-11 w-full rounded-full bg-brand text-sm font-bold text-white hover:bg-brand/90"
+                >
+                  <Link href={result.payment_url}>
+                    <CreditCard className="size-4" aria-hidden="true" />
+                    {t("payNow")}
+                  </Link>
+                </Button>
+              )}
             </div>
           ) : null}
 
-          {!result.is_paid && result.step < 7 ? (
+          {!isLessorChange && !result.is_paid && result.step < 7 ? (
             <p className="text-sm text-muted-foreground">
               {t("nextStep", { step: STEP_LABELS[result.step] ?? String(result.step) })}
             </p>
           ) : null}
 
-          {result.timeline.length > 0 ? (
+          {(result.timeline ?? []).length > 0 ? (
             <ol className="space-y-3 border-s-2 border-brand/20 ps-4">
               {result.timeline.map((item, index) => {
                 const isLast = index === result.timeline.length - 1;
@@ -214,7 +271,7 @@ export default function TrackOrderForm({
                     </p>
                     {item.at ? (
                       <p className="text-xs text-muted-foreground" dir="ltr">
-                        {new Date(item.at).toLocaleString("ar-SA-u-nu-latn", {
+                        {new Date(item.at).toLocaleString("ar-SA-u-ca-gregory-nu-latn", {
                           dateStyle: "medium",
                           timeStyle: "short",
                         })}

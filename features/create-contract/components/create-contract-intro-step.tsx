@@ -8,11 +8,11 @@ import {
   Loader2,
   MessageCircle,
   UserCheck,
-  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import CreateContractPaperworkIcon from "@/features/create-contract/components/create-contract-paperwork-icon";
+import CreateContractPriceSheetDialog from "@/features/create-contract/components/create-contract-price-sheet-dialog";
 import CreateContractRequirementItem from "@/features/create-contract/components/create-contract-requirement-item";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import {
@@ -20,15 +20,9 @@ import {
   type ContractTypeId,
 } from "@/features/create-contract/types/contract-type";
 import { usePaperwork } from "@/features/create-contract/hooks/use-paperwork";
-import { useServicesPricing } from "@/features/create-contract/hooks/use-services-pricing";
+import { useContractPricing } from "@/features/pricing/hooks/use-contract-pricing";
+import { getPricingTier } from "@/features/pricing/types/contract-pricing";
 import CustomIcon from "@/features/shared/components/custom-icon";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { useState } from "react";
 
 type CreateContractIntroStepProps = {
@@ -56,19 +50,21 @@ export default function CreateContractIntroStep({
   onStart,
   isStarting = false,
 }: CreateContractIntroStepProps) {
-  const price = prices[contractType];
   const [open, setOpen] = useState(false);
 
   const propertyContractType = toPropertyContractType(contractType);
 
   const { data: paperwork, isLoading } = usePaperwork(propertyContractType);
 
-  const { data: servicesPricing, isLoading: isPricingLoading } =
-    useServicesPricing(propertyContractType);
+  // Single source for the yearly price: `GET /pricing` (static labels are the
+  // last-resort fallback while it loads).
+  const { pricing, isFallback: isPricingFallback } = useContractPricing();
+  const price = isPricingFallback
+    ? prices[contractType]
+    : String(getPricingTier(pricing, propertyContractType).first_year);
 
   const fallbackRequirements = labels.requirements.slice(0, -1);
   const hasApiItems = Boolean(paperwork && paperwork.length > 0);
-  const hasPricingItems = Boolean(servicesPricing && servicesPricing.length > 0);
 
   return (
     <div className="space-y-3 p-3 md:space-y-4 md:p-5">
@@ -145,90 +141,20 @@ export default function CreateContractIntroStep({
           </div>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <button
-              type="button"
-              className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-sm font-medium text-brand dark:text-[#48c0b8]"
-            >
-              {labels.viewAllPrices}
-              <ArrowUpLeft className="size-4" aria-hidden="true" />
-            </button>
-          </DialogTrigger>
-          <DialogContent
-            showCloseButton={false}
-            className="gap-0 overflow-hidden rounded-3xl p-6 sm:max-w-md dark:bg-[#1a2421]"
-          >
-            <div className="flex items-start justify-between gap-4 border-b border-[#ececec] pb-4 dark:border-[#2f403b]">
-              <DialogTitle className="text-base font-bold leading-snug text-foreground dark:text-white">
-                {labels.priceDialog.title}
-              </DialogTitle>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex w-full cursor-pointer items-center justify-center gap-1 py-1 text-sm font-medium text-brand dark:text-[#48c0b8]"
+        >
+          {labels.viewAllPrices}
+          <ArrowUpLeft className="size-4" aria-hidden="true" />
+        </button>
 
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="shrink-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-[#24302c]"
-                  aria-label={labels.priceDialog.close}
-                >
-                  <X className="size-4" aria-hidden="true" />
-                </Button>
-              </DialogClose>
-            </div>
-
-            {isPricingLoading && !hasPricingItems ? (
-              <ul className="mt-5 space-y-3">
-                {[0, 1, 2].map((index) => (
-                  <li
-                    key={index}
-                    className="flex items-center justify-between gap-4 py-1"
-                  >
-                    <span className="h-4 w-40 animate-pulse rounded bg-[#ececec] dark:bg-[#24302c]" />
-                    <span className="h-4 w-12 animate-pulse rounded bg-[#ececec] dark:bg-[#24302c]" />
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            {hasPricingItems ? (
-              <ul className="mt-5 space-y-3 leading-relaxed text-[#333333] dark:text-white">
-                {servicesPricing!.map((item, index) => (
-                  <li
-                    key={`${item.name}-${index}`}
-                    className="flex items-center justify-between gap-4 border-b border-[#ececec] pb-3 last:border-b-0 dark:border-[#2f403b]"
-                  >
-                    <span className="text-sm font-medium">{item.name}</span>
-                    <span className="flex shrink-0 items-center gap-1 font-bold text-brand dark:text-[#48c0b8]">
-                      {item.price}
-                      <CustomIcon
-                        src="/icons/ryal.svg"
-                        size={16}
-                        className="text-brand dark:text-[#48c0b8]"
-                      />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            {!isPricingLoading && !hasPricingItems ? (
-              <ul className="mt-5 list-disc space-y-6 ps-5 leading-relaxed text-[#333333] dark:text-white">
-                <li>{labels.priceDialog.yearOrLess}</li>
-                <li>{labels.priceDialog.additionalYear}</li>
-              </ul>
-            ) : null}
-
-            <DialogClose asChild>
-              <Button
-                type="button"
-                className="mt-6 h-12 w-full rounded-full bg-[#ececec] text-base font-semibold text-[#666666] hover:bg-brand hover:text-white dark:bg-[#24302c] dark:text-[#9eb5af] dark:hover:bg-[#0f6b5c] dark:hover:text-white"
-              >
-                {labels.priceDialog.close}
-              </Button>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
+        <CreateContractPriceSheetDialog
+          open={open}
+          onOpenChange={setOpen}
+          contractType={contractType}
+        />
 
         <Button
           type="button"

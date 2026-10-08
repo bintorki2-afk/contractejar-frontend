@@ -43,12 +43,18 @@ export function classifyPaymentTypeName(name: string): PaymentTypeKind {
  */
 export function resolveContractDurationMonths(input: {
   isCustomDuration: boolean;
+  /** Months straight from the API period row (preferred over label parsing). */
+  periodMonths?: number | null;
   periodLabel?: string | null;
   customYears?: number | "";
   customMonths?: number | "";
 }): ContractDurationMonths {
   if (input.isCustomDuration) {
     return "custom";
+  }
+
+  if (typeof input.periodMonths === "number" && input.periodMonths > 0) {
+    return input.periodMonths;
   }
 
   const label = input.periodLabel?.trim() ?? "";

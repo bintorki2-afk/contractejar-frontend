@@ -19,7 +19,7 @@ type CreateContractFinanceAccordionProps = {
 
 /**
  * Optional expandable section inside the finance step. Shares the visual
- * language of CreateContractStageAccordion (rounded card, badge, chevron,
+ * language of CreateContractStageCard (rounded card, badge, chevron,
  * smooth grid 0fr→1fr fold) but without the numbered/locked/complete stage
  * semantics — it's a toggleable add-on, not a sequential step.
  */

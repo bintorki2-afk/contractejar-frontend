@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import Image from "next/image";
 
 import { useCreateContractSteps } from "@/features/create-contract/hooks/use-create-contract-steps";
@@ -85,6 +85,7 @@ export default function CreateContractStepper({
   const existingPropertyContext = useCreateContractDraftStore(
     (state) => state.existingPropertyContext,
   );
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const isPaymentStep = currentStep === "payment";
   const ownerSkipped = isOwnerStepSkipped({
     selectedDeedType,
@@ -98,6 +99,27 @@ export default function CreateContractStepper({
 
     return true;
   });
+
+  // Small screens scroll the chain horizontally instead of clipping it: keep
+  // the active step in view whenever it changes.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    const active = scroller?.querySelector<HTMLElement>('[aria-current="step"]');
+
+    if (!scroller || !active) {
+      return;
+    }
+
+    if (scroller.scrollWidth <= scroller.clientWidth) {
+      return;
+    }
+
+    const activeCenter = active.offsetLeft + active.offsetWidth / 2;
+    scroller.scrollTo({
+      left: activeCenter - scroller.clientWidth / 2,
+      behavior: "smooth",
+    });
+  }, [currentStep]);
 
   useEffect(() => {
     if (!skippingOwnerStep) {
@@ -115,7 +137,10 @@ export default function CreateContractStepper({
 
   return (
     <div className="sticky top-0 z-20 rounded-t-3xl bg-white px-2.5 py-3 sm:px-4 sm:py-4 md:p-5 dark:bg-[#1a2421]">
-      <div className="flex w-full flex-nowrap items-center justify-between gap-0.5 overflow-x-auto py-1 no-scrollbar sm:justify-evenly sm:gap-2 sm:overflow-x-visible">
+      <div
+        ref={scrollerRef}
+        className="flex w-full flex-nowrap items-center justify-between gap-0.5 overflow-x-auto py-1 no-scrollbar sm:justify-evenly sm:gap-2 sm:overflow-x-visible"
+      >
         {visibleSteps.map((step, index) => {
           const stepIndex = CREATE_CONTRACT_STEPS.indexOf(step);
           const isSkipped = step === "owner" && ownerSkipped;
@@ -150,7 +175,7 @@ export default function CreateContractStepper({
                   isIntro
                     ? cn(
                         stepPillClassName,
-                        "gap-0.5 border border-brand/15 bg-white text-brand shadow-sm sm:gap-1.5 dark:border-[#2f403b] dark:bg-[#1a2421] dark:text-[#48c0b8]",
+                        "gap-1 border border-brand/15 bg-white text-brand shadow-sm sm:gap-1.5 dark:border-[#2f403b] dark:bg-[#1a2421] dark:text-[#48c0b8]",
                         isUnlocked
                           ? "cursor-pointer hover:opacity-90 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-secondary/30"
                           : "cursor-not-allowed opacity-50",
@@ -172,10 +197,13 @@ export default function CreateContractStepper({
                     width={20}
                     height={22}
                     aria-hidden="true"
-                    className="h-3.5 w-auto shrink-0 object-contain sm:h-5"
+                    className="h-4 w-auto shrink-0 object-contain sm:h-5"
                   />
                 )}
-                <span>{labels.steps[step]}</span>
+                {/* The intro pill is logo-only on phones so the whole chain fits. */}
+                <span className={isIntro ? "hidden sm:inline" : undefined}>
+                  {labels.steps[step]}
+                </span>
               </button>
             </Fragment>
           );
@@ -186,6 +214,7 @@ export default function CreateContractStepper({
           className={getConnectorClassName(isPaymentStep)}
         />
 
+        {/* Final step: the Ejar mark, always fully visible (never cropped). */}
         <button
           type="button"
           title={labels.ejarLogoAlt}
@@ -195,7 +224,7 @@ export default function CreateContractStepper({
           onClick={() => goToStep("payment")}
           className={cn(
             stepPillClassName,
-            "shrink-0 grow-0 px-1.5 sm:px-3",
+            "grow-0 px-2 sm:px-3.5",
             isStepUnlocked("payment")
               ? "cursor-pointer hover:opacity-90 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-secondary/30"
               : "cursor-not-allowed opacity-50",
@@ -204,28 +233,13 @@ export default function CreateContractStepper({
               : "bg-brand-background dark:bg-[#16352f]",
           )}
         >
-          {/* Mobile: icon only (crop text). Desktop: full EJAR mark. */}
-          <span className="relative block size-5 overflow-hidden sm:hidden">
-            <Image
-              src="/images/ejar.png"
-              alt=""
-              width={88}
-              height={32}
-              aria-hidden="true"
-              className={cn(
-                "absolute top-0 right-0 h-full w-auto max-w-none object-contain object-right",
-                isPaymentStep && "brightness-0 invert",
-                !isPaymentStep && "dark:brightness-125",
-              )}
-            />
-          </span>
           <Image
             src="/images/ejar.png"
             alt={labels.ejarLogoAlt}
             width={88}
             height={32}
             className={cn(
-              "hidden h-8 w-auto shrink-0 object-contain sm:block",
+              "h-4 w-auto shrink-0 object-contain sm:h-8",
               isPaymentStep && "brightness-0 invert",
               !isPaymentStep && "dark:brightness-125",
             )}
@@ -233,26 +247,19 @@ export default function CreateContractStepper({
         </button>
       </div>
 
-      <div dir="rtl" className="mx-auto mt-3 flex w-[90%] items-end gap-2 sm:mt-4">
-        <Image
-          src="/images/contract-line-r.svg"
-          alt=""
-          width={203}
-          height={26}
-          aria-hidden="true"
-          className="h-auto min-w-0 flex-1 object-contain object-right dark:opacity-70"
-        />
-        <p className="shrink-0 text-center text-[11px] font-medium text-brand sm:text-xs md:text-sm dark:text-[#48c0b8]">
+      {/* Tagline, once, on a clean dotted rule. */}
+      <div
+        dir="rtl"
+        className="mx-auto mt-3 flex w-[92%] items-center gap-2.5 sm:mt-4 sm:gap-3"
+        aria-hidden="true"
+      >
+        <span className="size-2 shrink-0 rounded-full bg-brand-secondary/70 dark:bg-[#48c0b8]/70" />
+        <span className="h-0 min-w-0 flex-1 border-t-2 border-dotted border-brand-secondary/40 dark:border-[#48c0b8]/40" />
+        <p className="shrink-0 text-center text-[11px] font-semibold text-brand sm:text-xs md:text-sm dark:text-[#48c0b8]">
           {labels.journey}
         </p>
-        <Image
-          src="/images/contract-line-l.svg"
-          alt=""
-          width={203}
-          height={26}
-          aria-hidden="true"
-          className="h-auto min-w-0 flex-1 object-contain object-left dark:opacity-70"
-        />
+        <span className="h-0 min-w-0 flex-1 border-t-2 border-dotted border-brand-secondary/40 dark:border-[#48c0b8]/40" />
+        <span className="size-2 shrink-0 rounded-full bg-brand-secondary/70 dark:bg-[#48c0b8]/70" />
       </div>
     </div>
   );

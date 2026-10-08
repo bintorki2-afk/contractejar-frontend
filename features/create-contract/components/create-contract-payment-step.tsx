@@ -17,7 +17,6 @@ import CreateContractDiscountCodeField from "@/features/create-contract/componen
 import CreateContractPaymentHero from "@/features/create-contract/components/create-contract-payment-hero";
 import CreateContractPaymentNavigation from "@/features/create-contract/components/create-contract-payment-navigation";
 import CreateContractPaymentSummary from "@/features/create-contract/components/create-contract-payment-summary";
-import CreateContractReviewOrderDialog from "@/features/create-contract/components/create-contract-review-order-dialog";
 import CreateContractSaveLaterDialog from "@/features/create-contract/components/create-contract-save-later-dialog";
 import { SAVE_LATER_ON_PAYMENT_ENABLED } from "@/features/create-contract/config";
 import CreateContractSavePropertyDialog from "@/features/create-contract/components/create-contract-save-property-dialog";
@@ -27,11 +26,10 @@ import { useContractPaymentMethodFlow } from "@/features/create-contract/hooks/u
 import { useCreateContractPaymentStep } from "@/features/create-contract/hooks/use-create-contract-payment-step";
 import { useSaveContractDraft } from "@/features/create-contract/hooks/use-save-contract-draft";
 import { useSaveProperty } from "@/features/create-contract/hooks/use-save-property";
+import { useCouponAvailability } from "@/features/pricing/hooks/use-coupon-availability";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
-import type { CreateContractStep } from "@/features/create-contract/types/create-contract-step";
-import type { DeedTypeId } from "@/features/create-contract/types/deed-type";
 import {
   formatPaymentAmount,
   PAYMENT_BREAKDOWN,
@@ -44,24 +42,10 @@ import LegalDocumentDialog, {
 type CreateContractPaymentStepProps = {
   labels: CreateContractLabels["payment"];
   saveLaterDialogLabels: CreateContractLabels["tenant"]["saveLaterDialog"];
-  deedTypeLabels: Record<DeedTypeId, string>;
-  deedAttachmentLabels: {
-    label: string;
-    salePaperLabel?: string;
-    frontLabel?: string;
-    backLabel?: string;
-    inheritanceLabel?: string;
-    heirsPoaLabel?: string;
-    endowmentCertLabel?: string;
-    trusteeshipLabel?: string;
-    guardiansPoaLabel?: string;
-    deceasedDeedLabel?: string;
-  };
   contractType: ContractTypeId;
   /** Guest flow: the WhatsApp number typed on the submit step (lead phone). */
   fallbackPhone?: string;
   onBack: () => void;
-  onEditStep: (step: CreateContractStep) => void;
 };
 
 function withTemplate(
@@ -77,12 +61,9 @@ function withTemplate(
 export default function CreateContractPaymentStep({
   labels,
   saveLaterDialogLabels,
-  deedTypeLabels,
-  deedAttachmentLabels,
   contractType,
   fallbackPhone = "",
   onBack,
-  onEditStep,
 }: CreateContractPaymentStepProps) {
   const tFooter = useTranslations("footer");
   const router = useRouter();
@@ -98,11 +79,13 @@ export default function CreateContractPaymentStep({
   const { appliedCoupon, isApplying, applyCoupon, clearCouponDraft } =
     useApplyContractCoupon(contractUuid);
   const financeSummaryQuery = useContractFinanceSummary(contractUuid);
-  const { submitSaveProperty, isSaving } = useSaveProperty();
+  const { submitSaveProperty, submitUnsaveProperty, isSaving } = useSaveProperty();
   const { saveDraft, isSaving: isSavingDraft } = useSaveContractDraft();
+  const { available: couponsAvailable } = useCouponAvailability();
   const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false);
   const [saveLaterDialogOpen, setSaveLaterDialogOpen] = useState(false);
-  const [reviewOrderDialogOpen, setReviewOrderDialogOpen] = useState(false);
+  // Guards the save-property toggle against double clicks while a request runs.
+  const savePropertyBusyRef = useRef(false);
   const [legalDocument, setLegalDocument] = useState<LegalDocumentKind | null>(
     null,
   );
@@ -119,6 +102,19 @@ export default function CreateContractPaymentStep({
   );
 
   const fallbackTotal = PAYMENT_BREAKDOWN[contractType].total;
+  // «هل تود حفظ بيانات العقار؟»: hidden when the contract came from a saved
+  // property (server `saved_property.show_option === false`, or locally a
+  // real-property session); the toggle starts from the server's `saved`.
+  const existingPropertyContext = useCreateContractDraftStore(
+    (state) => state.existingPropertyContext,
+  );
+  const savedPropertyState = financeSummaryQuery.data?.saved_property ?? null;
+  const showSavePropertyOption =
+    savedPropertyState?.show_option !== false &&
+    existingPropertyContext === null &&
+    contractSession?.isReal !== true;
+  const savePropertyChecked =
+    paymentData.savePropertyData || savedPropertyState?.saved === true;
   const payableTotal = appliedCoupon
     ? appliedCoupon.totalPriceAfterCoupon
     : (financeSummaryQuery.data?.total_price ?? fallbackTotal);
@@ -197,16 +193,43 @@ export default function CreateContractPaymentStep({
   });
 
   function handleSwitchChange(checked: boolean) {
+    if (savePropertyBusyRef.current || isSaving) {
+      return;
+    }
+
     if (checked) {
       setIsPropertyDialogOpen(true);
       return;
     }
 
-    setPaymentData({
-      ...paymentData,
-      savePropertyData: false,
-      propertyName: "",
-    });
+    void handleUnsaveProperty();
+  }
+
+  async function handleUnsaveProperty() {
+    savePropertyBusyRef.current = true;
+
+    try {
+      // Nothing was saved on the server yet → just clear the local flag.
+      if (!paymentData.savePropertyData && savedPropertyState?.saved !== true) {
+        setPaymentData({ ...paymentData, savePropertyData: false, propertyName: "" });
+        return;
+      }
+
+      const result = await submitUnsaveProperty({
+        missingContractSession:
+          labels.savePropertyData.dialog.missingContractSession,
+        submitError: labels.savePropertyData.dialog.submitError,
+      });
+
+      if (!result.ok) {
+        return;
+      }
+
+      setPaymentData({ ...paymentData, savePropertyData: false, propertyName: "" });
+      void financeSummaryQuery.refetch();
+    } finally {
+      savePropertyBusyRef.current = false;
+    }
   }
 
   function handlePropertyDialogOpenChange(open: boolean) {
@@ -214,22 +237,33 @@ export default function CreateContractPaymentStep({
   }
 
   async function handleSaveProperty(propertyName: string) {
-    const result = await submitSaveProperty(propertyName, {
-      missingContractSession: labels.savePropertyData.dialog.missingContractSession,
-      submitError: labels.savePropertyData.dialog.submitError,
-      submitSuccess: labels.savePropertyData.dialog.submitSuccess,
-    });
-
-    if (!result.ok) {
+    if (savePropertyBusyRef.current) {
       return;
     }
 
-    setPaymentData({
-      ...paymentData,
-      savePropertyData: true,
-      propertyName: result.propertyName,
-    });
-    setIsPropertyDialogOpen(false);
+    savePropertyBusyRef.current = true;
+
+    try {
+      const result = await submitSaveProperty(propertyName, {
+        missingContractSession: labels.savePropertyData.dialog.missingContractSession,
+        submitError: labels.savePropertyData.dialog.submitError,
+        submitSuccess: labels.savePropertyData.dialog.submitSuccess,
+      });
+
+      if (!result.ok) {
+        return;
+      }
+
+      setPaymentData({
+        ...paymentData,
+        savePropertyData: true,
+        propertyName: result.propertyName,
+      });
+      setIsPropertyDialogOpen(false);
+      void financeSummaryQuery.refetch();
+    } finally {
+      savePropertyBusyRef.current = false;
+    }
   }
 
   async function handleConfirmSaveLater() {
@@ -258,10 +292,7 @@ export default function CreateContractPaymentStep({
       <div className="p-3 md:p-5">
         <div className="space-y-3">
           <CreateContractPaymentHero
-            journeyMessage={labels.journeyMessage}
             securePaymentLabel={labels.securePaymentLabel}
-            reviewOrderLabel={labels.reviewOrderLabel}
-            onReviewOrder={() => setReviewOrderDialogOpen(true)}
           />
 
           <CreateContractPaymentSummary
@@ -299,33 +330,37 @@ export default function CreateContractPaymentStep({
             </div>
           ) : null}
 
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#e8e8e8] bg-white px-4 py-4 dark:border-[#2f403b] dark:bg-[#121a18]">
-            <label className="flex w-full cursor-pointer items-center justify-between gap-3">
-              <span className="flex flex-col gap-1">
-                <span className="text-sm font-semibold leading-relaxed text-brand dark:text-[#48c0b8]">
-                  {labels.savePropertyData.label}
+          {showSavePropertyOption ? (
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#e8e8e8] bg-white px-4 py-4 dark:border-[#2f403b] dark:bg-[#121a18]">
+              <label className="flex w-full cursor-pointer items-center justify-between gap-3">
+                <span className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold leading-relaxed text-brand dark:text-[#48c0b8]">
+                    {labels.savePropertyData.label}
+                  </span>
+                  <span className="text-xs leading-relaxed text-[#7f7f7f] dark:text-[#9eb5af]">
+                    {labels.savePropertyData.description}
+                  </span>
                 </span>
-                <span className="text-xs leading-relaxed text-[#7f7f7f] dark:text-[#9eb5af]">
-                  {labels.savePropertyData.description}
-                </span>
-              </span>
-              <Switch
-                dir="ltr"
-                checked={paymentData.savePropertyData}
-                onCheckedChange={handleSwitchChange}
-                disabled={isSaving || paymentData.savePropertyData}
-                className="h-6 w-11 shrink-0 data-checked:bg-brand-secondary data-unchecked:bg-[#d9d9d9] disabled:cursor-not-allowed disabled:opacity-100 dark:data-unchecked:bg-[#2f403b]"
-              />
-            </label>
-          </div>
+                <Switch
+                  dir="ltr"
+                  checked={savePropertyChecked}
+                  onCheckedChange={handleSwitchChange}
+                  disabled={isSaving}
+                  className="h-6 w-11 shrink-0 data-checked:bg-brand-secondary data-unchecked:bg-[#d9d9d9] disabled:cursor-not-allowed disabled:opacity-70 dark:data-unchecked:bg-[#2f403b]"
+                />
+              </label>
+            </div>
+          ) : null}
 
-          <CreateContractDiscountCodeField
-            labels={labels.discountCode}
-            appliedCoupon={appliedCoupon}
-            isApplying={isApplying}
-            onApply={applyCoupon}
-            onClear={clearCouponDraft}
-          />
+          {couponsAvailable ? (
+            <CreateContractDiscountCodeField
+              labels={labels.discountCode}
+              appliedCoupon={appliedCoupon}
+              isApplying={isApplying}
+              onApply={applyCoupon}
+              onClear={clearCouponDraft}
+            />
+          ) : null}
 
           <div className="flex justify-center">
             <Image
@@ -419,13 +454,15 @@ export default function CreateContractPaymentStep({
         selectedMethod={paymentFlow.selectedPaymentMethod}
         onSelect={paymentFlow.selectPaymentMethod}
         payNowExtra={
-          <CreateContractDiscountCodeField
-            labels={labels.discountCode}
-            appliedCoupon={appliedCoupon}
-            isApplying={isApplying}
-            onApply={applyCoupon}
-            onClear={clearCouponDraft}
-          />
+          couponsAvailable ? (
+            <CreateContractDiscountCodeField
+              labels={labels.discountCode}
+              appliedCoupon={appliedCoupon}
+              isApplying={isApplying}
+              onApply={applyCoupon}
+              onClear={clearCouponDraft}
+            />
+          ) : null
         }
       />
 
@@ -436,16 +473,6 @@ export default function CreateContractPaymentStep({
         orderNumber={contractId}
         isSaving={isSavingDraft}
         onConfirm={() => void handleConfirmSaveLater()}
-      />
-
-      <CreateContractReviewOrderDialog
-        open={reviewOrderDialogOpen}
-        onOpenChange={setReviewOrderDialogOpen}
-        labels={labels.reviewDialog}
-        contractType={contractType}
-        deedTypeLabels={deedTypeLabels}
-        deedAttachmentLabels={deedAttachmentLabels}
-        onEditStep={onEditStep}
       />
 
       <p className="mb-6 flex items-center justify-center gap-2 text-xs text-[#9a9a9a] dark:text-[#9eb5af]">
