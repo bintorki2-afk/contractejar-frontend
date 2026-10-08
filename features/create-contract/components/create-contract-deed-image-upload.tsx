@@ -13,6 +13,11 @@ import { useTranslations } from "next-intl";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  compressImageFile,
+  MAX_SERVER_ACTION_UPLOAD_BYTES,
+} from "@/lib/files/compress-image";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -60,9 +65,11 @@ function isImageFile(file: File) {
   return file.type.startsWith("image/");
 }
 
-// Same limits as the server (`mimes:jpg,jpeg,png,webp,pdf|max:10240`): reject
-// on selection instead of failing at «إرسال الطلب» after the whole wizard.
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+// Same types as the server (`mimes:jpg,jpeg,png,webp,pdf`), rejected on
+// selection instead of failing at «إرسال الطلب». Size: the server accepts
+// 10 MB but uploads pass through a Vercel function (4.5 MB per request), so
+// 4 MB per file after compression is the limit that actually works.
+const MAX_UPLOAD_BYTES = MAX_SERVER_ACTION_UPLOAD_BYTES;
 const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "pdf"]);
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
 
@@ -251,17 +258,21 @@ export default function CreateContractDeedImageUpload({
     };
   }, [previewUrl]);
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const picked = Array.from(event.target.files ?? []);
-    const files = picked.filter(
-      (file) =>
-        (pdfOnly ? isPdfFile(file) : isAllowedUpload(file)) &&
-        file.size <= MAX_UPLOAD_BYTES,
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.target;
+    const picked = Array.from(input.files ?? []);
+    input.value = "";
+
+    const allowed = picked.filter((file) =>
+      pdfOnly ? isPdfFile(file) : isAllowedUpload(file),
     );
+    // Phone photos (3–8 MB) are shrunk before they are kept or uploaded.
+    const compressed = await Promise.all(allowed.map((file) => compressImageFile(file)));
+    const files = compressed.filter((file) => file.size <= MAX_UPLOAD_BYTES);
 
     if (files.length < picked.length) {
       toast.error(
-        picked.some((file) => file.size > MAX_UPLOAD_BYTES)
+        compressed.some((file) => file.size > MAX_UPLOAD_BYTES)
           ? t("uploadTooLarge")
           : t("uploadInvalidType"),
       );
@@ -270,8 +281,6 @@ export default function CreateContractDeedImageUpload({
     if (files.length > 0) {
       onChange(single ? [files[0]] : [...value, ...files]);
     }
-
-    event.target.value = "";
   }
 
   function handleDelete(index: number) {
@@ -320,7 +329,7 @@ export default function CreateContractDeedImageUpload({
         accept={accept}
         className="sr-only"
         aria-invalid={showInvalid}
-        onChange={handleFileChange}
+        onChange={(event) => void handleFileChange(event)}
       />
 
       {!hideUploadArea ? (

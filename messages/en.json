@@ -2880,7 +2880,7 @@
       "otpLengthHint": "The code is 4 to 6 digits",
       "verifyAndSubmit": "Verify and submit"
     },
-    "uploadTooLarge": "The file is larger than 10 MB — choose a smaller image or file.",
+    "uploadTooLarge": "The file is larger than 4 MB — take a lower-resolution photo or choose a smaller PDF.",
     "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF.",
     "rentAmountWholeRiyals": "Only whole riyals are used — halalas after the decimal point are not added to the contract value."
   },

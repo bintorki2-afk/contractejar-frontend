@@ -27,6 +27,12 @@ import { isSubleaseContract } from "@/features/create-contract/utils/is-sublease
 import { mapDeedTypeToInstrumentType } from "@/features/create-contract/utils/map-deed-type-to-instrument-type";
 import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
 import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
+import { MAX_SERVER_ACTION_UPLOAD_BYTES, totalBytes } from "@/lib/files/compress-image";
+
+// One step's attachments travel in one request (Vercel: 4.5 MB max) — say so
+// clearly instead of a failure the customer cannot act on.
+const STEP_UPLOAD_TOO_LARGE =
+  "حجم مرفقات هذه الخطوة أكبر من 4 ميجابايت مجتمعة. صوّر المستندات بدقة أقل أو أرسل ملفات PDF أصغر، ثم أعد الإرسال.";
 
 export type SyncContractStage =
   | "session"
@@ -203,6 +209,22 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         deedTypeSupportsManualEntry(deedType) &&
         isManualDeedEntryComplete(deed.manualDeedEntry);
 
+      const step1Files = [
+        ...deedPages,
+        firstFile(deed.deedFrontFiles, deed.deedFrontPersistedFiles),
+        firstFile(deed.deedBackFiles, deed.deedBackPersistedFiles),
+        isDeceased ? firstFile(deed.deedInheritanceFiles, deed.deedInheritancePersistedFiles) : undefined,
+        isDeceased ? firstFile(deed.deedHeirsPoaFiles, deed.deedHeirsPoaPersistedFiles) : undefined,
+        isWaqf ? firstFile(deed.deedEndowmentCertFiles, deed.deedEndowmentCertPersistedFiles) : undefined,
+        isWaqf ? firstFile(deed.deedTrusteeshipFiles, deed.deedTrusteeshipPersistedFiles) : undefined,
+        (isDeceased && deed.hasMinorHeirs) || (isWaqf && deed.isMultipleTrusteeshipDeedCopy)
+          ? firstFile(deed.deedGuardiansPoaFiles, deed.deedGuardiansPoaPersistedFiles)
+          : undefined,
+      ];
+      if (totalBytes(step1Files) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+        return { ok: false, stage: "deed", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+      }
+
       const step1 = await submitContractStep1({
         contractId,
         instrumentType: mapDeedTypeToInstrumentType(deedType),
@@ -273,6 +295,9 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
           owner.agentData.powerOfAttorneyFiles,
           owner.agentPersistedFiles,
         );
+        if (totalBytes(agentFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+          return { ok: false, stage: "owner", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+        }
         const step3 = await submitContractStep3({
           contractId,
           ownerData: owner.ownerData,
@@ -292,6 +317,9 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         tenantData.organization.powerOfAttorneyFiles,
         tenant.tenantPersistedFiles,
       );
+      if (totalBytes(tenantOrgFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
+        return { ok: false, stage: "tenant", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+      }
       const step4 = await submitContractStep4({
         contractId,
         tenantData: {
