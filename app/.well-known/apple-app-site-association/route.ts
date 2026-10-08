@@ -1,19 +1,25 @@
 import { NextResponse } from "next/server";
 
+import {
+  APP_LINK_PATHS,
+  getAppleTeamId,
+  getIosBundleId,
+} from "@/lib/app-links/config";
+
+export const dynamic = "force-dynamic";
+
 /**
- * iOS Universal Links. Served only when the Apple Team ID is configured
- * (`IOS_TEAM_ID` in Vercel env) — until then iOS falls back to the website.
- * Must be served as JSON with no redirect, at exactly this path.
+ * iOS Universal Links (`/.well-known/apple-app-site-association`).
+ * Served as JSON with no redirect; 404 until `APPLE_TEAM_ID` is configured.
+ * Covers the smart order links, order tracking and the lessor-change flow.
  */
 export function GET() {
-  const teamId = process.env.IOS_TEAM_ID?.trim();
-  const bundleId = process.env.IOS_BUNDLE_ID?.trim() || "com.contractejar.app";
-
+  const teamId = getAppleTeamId();
   if (!teamId) {
     return new NextResponse(null, { status: 404 });
   }
 
-  const appID = `${teamId}.${bundleId}`;
+  const appID = `${teamId}.${getIosBundleId()}`;
 
   return NextResponse.json(
     {
@@ -22,8 +28,9 @@ export function GET() {
         details: [
           {
             appIDs: [appID],
-            components: [{ "/": "/r/*", comment: "smart order links" }],
-            paths: ["/r/*"],
+            components: APP_LINK_PATHS.map((path) => ({ "/": path })),
+            // Legacy key for iOS < 13.
+            paths: [...APP_LINK_PATHS],
           },
         ],
       },
