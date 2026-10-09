@@ -5,6 +5,7 @@ import type {
 } from "@/features/requests/types/request";
 import type { ContractListItem } from "@/features/requests/types/contract-list-item";
 import { normalizeContractStatusSnapshot } from "@/features/requests/utils/normalize-contract-status";
+import { formatRefundLabel, resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 
 type ContractCardLabels = {
   housing: string;
@@ -72,6 +73,12 @@ function resolveLastUpdatedSource(contract: ContractListItem): string {
 }
 
 function resolveStatus(contract: ContractListItem): RequestStatus {
+  // Batch D: refund is a status *case* (`refunded`), never an id — and
+  // «قيد المراجعة» is no longer a refund state.
+  if (resolveRefundInfo(contract).refunded) {
+    return "returned";
+  }
+
   if (contract.is_completed) {
     return "completed";
   }
@@ -83,7 +90,8 @@ function resolveStatus(contract: ContractListItem): RequestStatus {
   const statusText =
     contract.status_label || contract.contract_status_name || "";
 
-  if (statusText.includes("مرتجع")) {
+  // Older API without `status_key`: the refund row's Arabic name.
+  if (statusText.includes("مرتجع") || statusText.includes("مسترجع")) {
     return "returned";
   }
 
@@ -94,6 +102,11 @@ function resolveActionType(
   contract: ContractListItem,
   status: RequestStatus,
 ): RequestActionType {
+  // A refunded order is closed: never offer «أكمل الدفع».
+  if (status === "returned") {
+    return "help-center";
+  }
+
   if (!contract.is_completed && contract.step !== 7) {
     return "none";
   }
@@ -102,7 +115,7 @@ function resolveActionType(
     return contract.is_completed ? "dual-actions" : "complete-payment";
   }
 
-  if (status === "completed" || status === "returned") {
+  if (status === "completed") {
     return "help-center";
   }
 
@@ -131,6 +144,7 @@ export function mapContractToRequestCard(
   labels: ContractCardLabels,
 ): RequestCardData {
   const status = resolveStatus(contract);
+  const refund = resolveRefundInfo(contract);
   const contractType =
     contract.contract_type === "commercial" ? "commercial" : "residential";
   const requestNumber = String(contract.uuid);
@@ -166,6 +180,7 @@ export function mapContractToRequestCard(
     journeyStatus: snapshot.journey_status || null,
     journeyStatusLabel: snapshot.journey_status_label || null,
     paymentSuccessful: contract.is_completed,
+    refundLabel: refund.refunded || refund.partial ? formatRefundLabel(refund) : null,
     paymentStatusLabel:
       snapshot.journey_status_label || snapshot.status_label || null,
     payableAmount: resolvePayableAmount(contract),

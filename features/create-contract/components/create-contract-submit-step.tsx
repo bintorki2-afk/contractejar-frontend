@@ -63,6 +63,9 @@ type CreateContractSubmitStepProps = {
     trusteeshipLabel?: string;
     guardiansPoaLabel?: string;
     deceasedDeedLabel?: string;
+    paperLabel?: string;
+    adversePossessionLabel?: string;
+    economicCitiesLabel?: string;
   };
   onBack: () => void;
   onEditStep: (step: CreateContractStep) => void;

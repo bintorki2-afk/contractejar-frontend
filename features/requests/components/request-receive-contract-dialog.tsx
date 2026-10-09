@@ -12,7 +12,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import RequestCompletePaymentButton from "@/features/requests/components/request-complete-payment-button";
+import OrderNotificationsList from "@/features/notifications/components/order-notifications-list";
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import RefundBanner from "@/features/requests/components/refund-banner";
 import type { ContractPaymentMethodLabels } from "@/features/create-contract/hooks/use-contract-payment-method-flow";
 import { buildTemplateJourney } from "@/features/requests/data/order-journey";
 import { useContractJourney } from "@/features/requests/hooks/use-contract-journey";
@@ -63,7 +65,7 @@ export default function RequestReceiveContractDialog({
     enabled: open,
   });
 
-  const showPayButton = actionType === "complete-payment";
+  const showPayButton = actionType === "complete-payment" && !detail?.refund?.refunded;
   // رقم الطلب الظاهر للعميل هو الـ uuid (6 أرقام) وليس المعرّف الداخلي.
   const requestId = detail?.uuid || contractUuid || String(contractId);
   const subtitle = labels.subtitle.replace("{number}", String(requestId));
@@ -147,8 +149,20 @@ export default function RequestReceiveContractDialog({
           </div>
         ) : null}
 
-        {journey.length > 0 ? (
+        {detail?.refund ? (
+          <div className="mb-4">
+            <RefundBanner info={detail.refund} />
+          </div>
+        ) : null}
+
+        {journey.length > 0 && !detail?.refund?.refunded ? (
           <OrderJourneySteps steps={journey} showSentence />
+        ) : null}
+
+        {detail ? (
+          <div className="mt-5">
+            <OrderNotificationsList orderNumber={String(requestId)} />
+          </div>
         ) : null}
 
         {!loading && detail && journey.length === 0 && !error ? (

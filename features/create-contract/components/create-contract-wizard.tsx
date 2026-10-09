@@ -171,6 +171,10 @@ export default function CreateContractWizard({
                     trusteeshipLabel: labels.deed.deedImage.trusteeshipLabel,
                     guardiansPoaLabel: labels.deed.deedImage.guardiansPoaLabel,
                     deceasedDeedLabel: labels.deed.deceased.deedLabel,
+                    paperLabel: labels.deed.deedImage.paperLabel,
+                    adversePossessionLabel:
+                      labels.deed.deedImage.adversePossessionLabel,
+                    economicCitiesLabel: labels.deed.deedImage.economicCitiesLabel,
                   }}
                   onBack={goBack}
                   onEditStep={goToStep}

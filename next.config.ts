@@ -28,9 +28,14 @@ const CSP = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // clarity.ms: Microsoft Clarity session recordings (features/analytics/clarity-script.tsx).
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms",
+  // Ad pixels loaded from GTM (docs/ads-tracking.md): Google Ads conversion
+  // (googleadservices / googleads.g.doubleclick), TikTok Pixel
+  // (analytics.tiktok.com) and Snap Pixel (sc-static.net). Without these the
+  // CSP silently blocks the tags and no conversion is recorded.
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://www.googleadservices.com https://googleads.g.doubleclick.net https://analytics.tiktok.com https://sc-static.net",
   `connect-src 'self' https: wss:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
-  "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com",
+  // td.doubleclick.net: Google Ads conversion/remarketing iframe (docs/ads-tracking.md).
+  "frame-src 'self' blob: data: https://*.moyasar.com https://www.googletagmanager.com https://td.doubleclick.net",
   "worker-src 'self' blob:",
   "object-src 'none'",
 ].join("; ");
@@ -56,6 +61,26 @@ const SECURITY_HEADERS = [
 const STATIC_CACHE_HEADERS = [
   { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
 ];
+
+// Hosts allowed for next/image remote sources: the API's public storage.
+const PRODUCTION_API_HOST = "aqdi-new-backend-main-production.up.railway.app";
+const apiImageHost = (() => {
+  try {
+    const url = new URL(apiBase);
+    return url.protocol === "https:" ? url.hostname : "";
+  } catch {
+    return "";
+  }
+})();
+const IMAGE_REMOTE_PATTERNS = Array.from(
+  new Set([PRODUCTION_API_HOST, apiImageHost].filter(Boolean)),
+).flatMap((hostname) =>
+  ["/storage/**", "/uploads/**", "/images/**"].map((pathname) => ({
+    protocol: "https" as const,
+    hostname,
+    pathname,
+  })),
+);
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -89,23 +114,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/storage/**",
-      },
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "aqid.subcodeco.com",
-        pathname: "/images/**",
-      },
-    ],
+    // Backend storage only (صقر ١ on Railway + whatever host NEXT_PUBLIC_BASE_URL
+    // points at). The legacy third-party image host was removed (batch D, W3).
+    remotePatterns: IMAGE_REMOTE_PATTERNS,
   },
 };
 

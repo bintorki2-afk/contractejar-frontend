@@ -3,6 +3,7 @@
 > المصدر في الكود: `lib/analytics/track.ts` (الدالة `track(event, params)`).
 > كل حدث يُدفع إلى `window.dataLayer` بالشكل `{ event: "<الاسم>", ...المعاملات }`.
 > بدون `NEXT_PUBLIC_GTM_ID` لا يُرسل شيء (الدالة لا تفعل شيئاً).
+> **دليل الربط خطوة بخطوة (Google Ads + TikTok Pixel بأسماء الحقول حرفياً):** `docs/ads-tracking.md`.
 
 ## قائمة الأحداث
 

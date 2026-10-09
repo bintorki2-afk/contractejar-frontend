@@ -1,4 +1,5 @@
 import { normalizeOrderJourney } from "@/features/requests/data/order-journey";
+import { resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 import type {
   ContractDetail,
   ContractJourneyStep,
@@ -95,6 +96,7 @@ export function normalizeContractDetail(
   return {
     ...snapshot,
     uuid: asNullableString(raw.uuid) ?? undefined,
+    refund: resolveRefundInfo(raw),
     is_completed: Boolean(raw.is_completed),
     is_draft: Boolean(raw.is_draft),
     step: asNullableNumber(raw.step) ?? undefined,

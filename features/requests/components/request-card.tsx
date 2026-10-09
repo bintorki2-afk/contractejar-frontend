@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Home, Info } from "lucide-react";
+import { Building2, Home, Info, RotateCcw } from "lucide-react";
 import type { CSSProperties } from "react";
 
 import { contractFinanceSummaryKeys } from "@/features/create-contract/query-keys";
@@ -137,7 +137,14 @@ export default function RequestCard({ card, labels }: RequestCardProps) {
                 {unitLabel}
               </span>
 
-              <PaymentCompletionBadge card={card} labels={labels} />
+              {card.refundLabel ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
+                  <RotateCcw className="size-3.5" aria-hidden="true" />
+                  {card.refundLabel}
+                </span>
+              ) : (
+                <PaymentCompletionBadge card={card} labels={labels} />
+              )}
 
               {!card.isIncompleteDraft && statusType === "draft" ? (
                 <span className="inline-flex items-center rounded-full bg-[#fff1e6] px-3 py-1 text-xs font-bold text-[#e67e22] dark:bg-[#2d1d3d] dark:text-[#b38dfd]">

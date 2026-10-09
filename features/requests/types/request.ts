@@ -28,6 +28,8 @@ export type RequestCardData = {
   journeyStatus: string | null;
   journeyStatusLabel: string | null;
   paymentSuccessful: boolean;
+  /** «تم الاسترجاع · 349 ريال» / «استرجاع جزئي · …» — batch D refunds. */
+  refundLabel: string | null;
   paymentStatusLabel: string | null;
   payableAmount: number | null;
   isIncompleteDraft: boolean;

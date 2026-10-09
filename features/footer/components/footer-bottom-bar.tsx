@@ -30,6 +30,10 @@ export default function FooterBottomBar({
         <Link href={privacyHref} className="inline-flex min-h-10 items-center transition hover:text-brand">
           {privacy}
         </Link>
+        <span>-</span>
+        <Link href="/status" prefetch={false} className="inline-flex min-h-10 items-center transition hover:text-brand">
+          حالة المنصة
+        </Link>
       </div>
     </div>
   );
