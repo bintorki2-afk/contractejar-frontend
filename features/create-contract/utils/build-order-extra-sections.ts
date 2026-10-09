@@ -1,3 +1,4 @@
+import { hasRealMapLocation } from "@/features/create-contract/utils/build-contract-step2-form-data";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { ContractPeriodOption } from "@/features/create-contract/types/contract-period";
 import { mapDeedTypeToInstrumentType } from "@/features/create-contract/utils/map-deed-type-to-instrument-type";
@@ -47,7 +48,10 @@ export function buildOrderExtraSections(
     contractSession?.contractType ?? "housing";
 
   // ── الموقع على الخريطة ──
-  if (deed.mapLocation && (deed.mapLocation.lat || deed.mapLocation.lng)) {
+  if (
+    deed.mapLocation &&
+    hasRealMapLocation(deed.mapLocation.lat, deed.mapLocation.lng)
+  ) {
     sections.push({
       title: "تفاصيل الصك",
       fields: [

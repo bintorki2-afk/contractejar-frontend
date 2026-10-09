@@ -11,8 +11,11 @@ import type { CreateContractLabels } from "@/features/create-contract/types/crea
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
 import {
+  deedTypeIsAdversePossession,
   deedTypeIsDeceasedOwner,
+  deedTypeIsEconomicCitiesAuthority,
   deedTypeIsLeaseRenewal,
+  deedTypeIsPaper,
   deedTypeIsSalePaper,
   deedTypeIsWaqfOwner,
   type DeedTypeId,
@@ -55,6 +58,9 @@ type DeedAttachmentLabels = {
   trusteeshipLabel?: string;
   guardiansPoaLabel?: string;
   deceasedDeedLabel?: string;
+  paperLabel?: string;
+  adversePossessionLabel?: string;
+  economicCitiesLabel?: string;
 };
 
 function hasValue(value: string | null | undefined): value is string {
@@ -295,7 +301,13 @@ export function useContractReviewOrderSummary(
           ? deedAttachmentLabels.salePaperLabel || deedAttachmentLabels.label
           : isDeceased
             ? deedAttachmentLabels.deceasedDeedLabel || deedAttachmentLabels.label
-            : deedAttachmentLabels.label;
+            : deedTypeIsAdversePossession(selectedDeedType)
+              ? deedAttachmentLabels.adversePossessionLabel || deedAttachmentLabels.label
+              : deedTypeIsEconomicCitiesAuthority(selectedDeedType)
+                ? deedAttachmentLabels.economicCitiesLabel || deedAttachmentLabels.label
+                : deedTypeIsPaper(selectedDeedType)
+                  ? deedAttachmentLabels.paperLabel || deedAttachmentLabels.label
+                  : deedAttachmentLabels.label;
 
       pushAttachments(attachments, {
         files: deed.deedFiles,
