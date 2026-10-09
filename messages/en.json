@@ -3305,6 +3305,8 @@
     "typeLessorChange": "Lessor change request",
     "lessorChangeFee": "Service fee: {fee} SAR",
     "journeyTitle": "Your order journey",
+    "invoiceTitle": "Invoice",
+    "invoiceButton": "View invoice",
     "awaitingPaymentBodyLessorChange": "Your request is complete. After payment we start moving the contracts linked to the old deed to the new deed and keep you updated."
   },
   "lessorChange": {

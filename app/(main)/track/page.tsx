@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
+import { buildInvoiceDialogLabels } from "@/features/requests/utils/invoice-dialog-labels";
 import TrackOrderForm from "@/features/track-order/components/track-order-form";
 import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
@@ -23,7 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * summary only (no identity data, no attachments).
  */
 export default async function TrackOrderPage() {
-  const t = await getTranslations("trackPage");
+  const [t, tInvoice] = await Promise.all([
+    getTranslations("trackPage"),
+    getTranslations("requests.card.invoiceDialog"),
+  ]);
+  const invoiceLabels = buildInvoiceDialogLabels(tInvoice);
 
   return (
     <main className="py-14 md:py-20">
@@ -50,7 +55,7 @@ export default async function TrackOrderPage() {
           </p>
         </div>
 
-        <TrackOrderForm />
+        <TrackOrderForm invoiceLabels={invoiceLabels} />
       </div>
     </main>
   );

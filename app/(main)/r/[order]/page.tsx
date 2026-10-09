@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
 import { parseChargeReturn } from "@/features/requests/utils/charge-return";
+import { buildInvoiceDialogLabels } from "@/features/requests/utils/invoice-dialog-labels";
 import { parseFixParam } from "@/features/requests/utils/parse-fix-param";
 import TrackOrderForm from "@/features/track-order/components/track-order-form";
 
@@ -34,8 +35,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * confirms the mobile.
  */
 export default async function SmartOrderLinkPage({ params, searchParams }: Props) {
-  const [{ order }, query] = await Promise.all([params, searchParams]);
-  const t = await getTranslations("trackPage");
+  const [{ order }, query, t, tInvoice] = await Promise.all([
+    params,
+    searchParams,
+    getTranslations("trackPage"),
+    getTranslations("requests.card.invoiceDialog"),
+  ]);
+  const invoiceLabels = buildInvoiceDialogLabels(tInvoice);
   const safeOrder = decodeURIComponent(order).replace(/[^0-9A-Za-z-]/g, "").slice(0, 64);
   const chargeReturn = parseChargeReturn({
     charge: query.charge ?? null,
@@ -74,6 +80,7 @@ export default async function SmartOrderLinkPage({ params, searchParams }: Props
           autoSubmitWhenReady
           chargeReturn={chargeReturn}
           fixRequestId={fixRequestId}
+          invoiceLabels={invoiceLabels}
         />
       </div>
     </main>

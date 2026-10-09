@@ -30,6 +30,9 @@ import OrderChargesList from "@/features/requests/components/order-charges-list"
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
 import PaymentStateChip from "@/features/requests/components/payment-state-chip";
 import RefundBanner from "@/features/requests/components/refund-banner";
+import RequestInvoiceButton from "@/features/requests/components/request-invoice-button";
+import type { RequestInvoiceDialogLabels } from "@/features/requests/types/request-invoice-labels";
+import { buildTrackedOrderInvoice } from "@/features/requests/utils/build-tracked-order-invoice";
 import {
   normalizeCharges,
   normalizePaymentState,
@@ -65,6 +68,8 @@ type TrackOrderFormProps = {
   chargeReturn?: ChargeReturn | null;
   /** دفعة هـ (E4): `?fix=<id>` من الرابط العميق — يُبرز طلب المرفق الناقص. */
   fixRequestId?: number | null;
+  /** دفعة هـ (W-2): تسميات حوار الفاتورة (تُبنى على الخادم من `requests.card.invoiceDialog`). */
+  invoiceLabels?: RequestInvoiceDialogLabels | null;
 };
 
 export default function TrackOrderForm({
@@ -72,6 +77,7 @@ export default function TrackOrderForm({
   autoSubmitWhenReady = false,
   chargeReturn = null,
   fixRequestId = null,
+  invoiceLabels = null,
 }: TrackOrderFormProps) {
   const t = useTranslations("trackPage");
   const [order, setOrder] = useState(initialOrder);
@@ -92,6 +98,16 @@ export default function TrackOrderForm({
   const sideState = normalizeJourneySideState(result?.journey_side_state);
   const returnedCharge =
     chargeReturn ? charges.find((charge) => charge.id === chargeReturn.chargeId) ?? null : null;
+  // دفعة هـ (W-2): الفاتورة من رد التتبّع نفسه (`payment_details`) — تظهر متى
+  // سُجّلت دفعة (Moyasar أو حوالة)، وبعد العودة من دفع رسم (النتيجة تُحدَّث).
+  const trackedInvoice =
+    result && !isLessorChange && invoiceLabels
+      ? buildTrackedOrderInvoice(result, {
+          labels: invoiceLabels,
+          contractTypeLabel:
+            result.contract_type === "commercial" ? t("typeCommercial") : t("typeHousing"),
+        })
+      : null;
   // رحلة الطلب (3 خطوات): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
   // طلب مسترجع بالكامل انتهى: يُعرض سجل الحالات بدل الرحلة.
   const journey =
@@ -264,6 +280,27 @@ export default function TrackOrderForm({
               {!isLessorChange ? <PaymentStateChip state={paymentState} /> : null}
             </div>
           </div>
+
+          {trackedInvoice && invoiceLabels ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e8e8e8] bg-[#fafafa] px-4 py-3 dark:border-[#262d2c] dark:bg-[#151c1b]">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-foreground">{t("invoiceTitle")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {[trackedInvoice.invoice_number, trackedInvoice.net_total_label]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <RequestInvoiceButton
+                label={t("invoiceButton")}
+                contractId={result.id}
+                invoiceLabels={invoiceLabels}
+                invoice={trackedInvoice}
+                data-testid="track-invoice-button"
+                className="h-10"
+              />
+            </div>
+          ) : null}
 
           {chargeReturn && !isLessorChange ? (
             <ChargeReturnBanner

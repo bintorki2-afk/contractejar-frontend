@@ -189,6 +189,12 @@ type RequestInvoiceDialogProps = {
   onOpenChange: (open: boolean) => void;
   contractId: number;
   labels: RequestInvoiceDialogLabels;
+  /**
+   * دفعة هـ (W-2): فاتورة جاهزة من رد الخادم (مثل `payment_details` في
+   * `/contract/track`) — تُعرض كما هي بلا نداء `GET /invoices/{id}` الذي
+   * يتطلّب جلسة صاحب الطلب (صفحة التتبّع بلا حساب).
+   */
+  invoice?: ContractInvoice | null;
 };
 
 type InvoiceDocumentProps = {
@@ -538,17 +544,19 @@ export default function RequestInvoiceDialog({
   onOpenChange,
   contractId,
   labels,
+  invoice: preloadedInvoice = null,
 }: RequestInvoiceDialogProps) {
-  const [isLoading, setIsLoading] = useState(open);
+  const [isLoading, setIsLoading] = useState(open && !preloadedInvoice);
   const [error, setError] = useState<string | null>(null);
-  const [invoice, setInvoice] = useState<ContractInvoice | null>(null);
+  const [fetchedInvoice, setFetchedInvoice] = useState<ContractInvoice | null>(null);
   const [wasOpen, setWasOpen] = useState(open);
+  const invoice = preloadedInvoice ?? fetchedInvoice;
 
   // Reset to a loading state during render when the dialog opens, so the
   // fetch effect below only sets state after the request resolves.
   if (open !== wasOpen) {
     setWasOpen(open);
-    if (open) {
+    if (open && !preloadedInvoice) {
       resetToLoading();
     }
   }
@@ -556,14 +564,14 @@ export default function RequestInvoiceDialog({
   function resetToLoading() {
     setIsLoading(true);
     setError(null);
-    setInvoice(null);
+    setFetchedInvoice(null);
   }
 
   // Bumped by the retry button to re-run the fetch effect.
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || preloadedInvoice) {
       return;
     }
 
@@ -578,17 +586,17 @@ export default function RequestInvoiceDialog({
 
         if (!result.ok) {
           setError(result.error || labels.loadError);
-          setInvoice(null);
+          setFetchedInvoice(null);
           return;
         }
 
-        setInvoice(result.data);
+        setFetchedInvoice(result.data);
         setError(null);
       })
       .catch(() => {
         if (!cancelled) {
           setError(labels.loadError);
-          setInvoice(null);
+          setFetchedInvoice(null);
         }
       })
       .finally(() => {
@@ -600,7 +608,7 @@ export default function RequestInvoiceDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, attempt, contractId, labels.loadError]);
+  }, [open, attempt, contractId, labels.loadError, preloadedInvoice]);
 
   function handlePrint() {
     if (!invoice) {

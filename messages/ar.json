@@ -3345,6 +3345,8 @@
     "typeLessorChange": "طلب تغيير المؤجر",
     "lessorChangeFee": "رسوم الخدمة: {fee} ريال",
     "journeyTitle": "رحلة طلبك",
+    "invoiceTitle": "الفاتورة",
+    "invoiceButton": "عرض الفاتورة",
     "awaitingPaymentBodyLessorChange": "طلبك مكتمل البيانات. بعد الدفع نبدأ نقل العقود المرتبطة بالصك القديم إلى الصك الجديد ونبلغك بكل تحديث."
   },
   "lessorChange": {

@@ -33,6 +33,8 @@ export type TrackedOrder = {
   payment_state?: unknown;
   /** دفعة هـ (E5): رسوم إضافية / فرق سعر. */
   charges?: unknown;
+  /** دفعة هـ (W-2): البنود + الإجماليات التراكمية + سجل الدفعات + `invoice_url` الموقّع. */
+  payment_details?: unknown;
   /** دفعة هـ (E4): طلبات المرفق الناقص المفتوحة. */
   pending_data_requests?: unknown;
   smart_link?: string | null;
