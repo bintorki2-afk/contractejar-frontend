@@ -8,7 +8,7 @@
     "blogTitle": "Blog",
     "blogDescription": "Practical guides on leases in Saudi Arabia: landlord and tenant rights, Ejar documentation, termination, renewal and required documents.",
     "faqTitle": "FAQ",
-    "faqDescription": "Clear answers about documenting a lease with Ejar Contract: fees, documents, timing, the WhatsApp draft and documentation in Ejar."
+    "faqDescription": "Clear answers about documenting a lease with Ejar Contract: fees, documents, timing, order tracking and documentation in Ejar."
   },
   "navbar": {
     "topBar": {
@@ -889,7 +889,7 @@
       "steps": [
         {
           "title": "Track your request status",
-          "description": "Follow every order through six steps: received, paid, review, WhatsApp draft, your review, then documentation in Ejar."
+          "description": "Follow every order through three steps: under review after payment, received by our employee, then documented in Ejar."
         },
         {
           "title": "All your requests in one place",
@@ -919,7 +919,7 @@
       "all": "All",
       "allTypes": "All types",
       "completed": "Completed request",
-      "draftContract": "Contract draft request",
+      "draftContract": "Unpaid order",
       "incomplete": "Draft (incomplete)",
       "cancelled": "Cancelled",
       "showResults": "Show results"
@@ -1108,10 +1108,10 @@
         "close": "Close",
         "loading": "Loading request journey...",
         "retry": "Retry",
-        "draftBadge": "Draft",
+        "draftBadge": "Unpaid",
         "statusUpdatedToast": "Your request status was updated",
         "expectedDurationTitle": "Expected duration",
-        "expectedDurationBody": "After payment we send the contract draft on WhatsApp during working hours (9:00 AM – 1:00 AM daily) for your review; the contract is documented in Ejar only after you review the draft.",
+        "expectedDurationBody": "After payment our employee receives your order during working hours (9:00 AM – 1:00 AM daily) and documents the contract in Ejar directly; you get a notification at every step. If we need an attachment or a correction, we send you a clear request.",
         "contactPrompt": "For more help, feel free to contact us",
         "whatsappCta": "Contact via WhatsApp",
         "whatsappHref": "https://wa.me/"
@@ -1144,7 +1144,7 @@
       "status": {
         "completed": "Completed",
         "completedWithAmount": "Completed · '{'amount'}' SAR",
-        "incomplete": "Contract draft request",
+        "incomplete": "Incomplete order",
         "inProgress": "In progress",
         "returned": "Returned"
       },
@@ -1764,7 +1764,7 @@
       "errorBody": "Something went wrong while submitting your order. You can try again or contact us directly on WhatsApp.",
       "retry": "Try again",
       "back": "Back",
-      "successBodyPayLater": "Your order is saved. Pay now so we start the review and send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft. You can also pay later from your orders page or the link we send you.",
+      "successBodyPayLater": "Your order is saved. Pay now so our employee receives it and documents the contract in Ejar; documentation starts only after payment. You can also pay later from your orders page or the link we send you.",
       "payNowCta": "Pay now",
       "trackOrderCta": "Track order",
       "syncing": {
@@ -1830,7 +1830,7 @@
         "A copy of the deed and the property address.",
         "Leased unit details.",
         "Rent amount.",
-        "We send you a draft contract via WhatsApp for review",
+        "Our employee receives your order after payment",
         "Contract documentation on the Ejar platform"
       ],
       "priceLabel": "Contract price for one year:",
@@ -2661,7 +2661,7 @@
         "previous": "Back",
         "pay": "Pay & Notarize Contract",
         "payWithAmount": "Pay & Notarize Contract – '{'amount'}' SAR",
-        "sendDraft": "Send contract draft via WhatsApp for review",
+        "sendDraft": "Submit the order and pay later",
         "paying": "Redirecting to payment...",
         "payError": "Failed to start payment. Please try again.",
         "save": "Save",
@@ -2737,40 +2737,40 @@
       },
       "methodDialog": {
         "title": "Choose how to receive the contract",
-        "subtitle": "The difference is in the order of steps only – the draft reaches you via WhatsApp in both cases",
+        "subtitle": "The difference is only when you pay – the contract is documented in Ejar only after payment",
         "submitting": "Processing...",
         "draft": {
-          "title": "Receive the contract draft first, then I'll pay",
-          "description": "We send you the contract draft via WhatsApp first",
+          "title": "Submit now, pay later",
+          "description": "Our employee receives your order and starts; documentation after payment",
           "steps": [
-            "Contract draft",
-            "Your review",
+            "Submit the order",
+            "Employee receives it",
             "Payment",
             "Ejar notarization"
           ],
           "note": "Ideal for those who want to review their contract before completing payment."
         },
         "payNow": {
-          "title": "Pay first, then receive the contract draft",
-          "description": "Pay then we send you the contract draft via WhatsApp",
+          "title": "Pay now, then direct documentation",
+          "description": "Pay, then our employee receives and documents your contract in Ejar",
           "badge": "2x Faster",
           "discountBadge": "5% off",
           "steps": [
             "Payment",
-            "Contract draft",
-            "Your review",
+            "Under review",
+            "Employee receives it",
             "Ejar notarization"
           ],
-          "note": "Ideal for those who want to save time. The contract draft is sent via WhatsApp for review before notarization in all cases."
+          "note": "Ideal for those who want to save time: documentation starts right after payment and you get a notification at every step."
         },
         "selected": {
           "draft": {
-            "title": "Draft first, then payment",
-            "description": "You will receive the contract draft via WhatsApp for review before payment"
+            "title": "Submit now, pay later",
+            "description": "Our employee receives your order; the contract is documented after payment"
           },
           "payNow": {
-            "title": "Pay first, then draft",
-            "description": "You will receive the contract draft via WhatsApp after payment",
+            "title": "Pay now, then documentation",
+            "description": "Our employee receives and documents your contract in Ejar after payment",
             "savings": "You saved '{'percent'}'% ('{'amount'}' SAR) and your documentation is 2x faster"
           }
         },
@@ -2779,7 +2779,7 @@
         "currency": "SAR",
         "close": "Close",
         "footerNoteTitle": "In short:",
-        "footerNote": "In both options, you will receive the contract draft via WhatsApp for review before notarization on Ejar – paying now gets you a discount and faster draft delivery.",
+        "footerNote": "In both options our employee receives your order and documents the contract in Ejar after payment – paying now gets you a discount and documentation starts immediately.",
         "missingContractSession": "Contract session is missing. Please restart the contract flow.",
         "draftError": "Could not save the contract draft. Please try again.",
         "changeMethod": "Change",
@@ -2788,12 +2788,12 @@
       "draftSuccessDialog": {
         "title": "Congratulations, your request was received successfully!",
         "paymentStatusLabel": "Payment status: Incomplete",
-        "paymentStatusDescription": "The client wishes to receive the contract draft first, then complete payment",
+        "paymentStatusDescription": "The order was submitted; payment will follow — documentation starts after payment",
         "orderNumberLabel": "Your order number",
         "copy": "Copy",
         "copySuccess": "Order number copied",
         "copyError": "Could not copy the order number",
-        "preparationDescription": "Our team will prepare the contract draft and send it to you via WhatsApp for review",
+        "preparationDescription": "Our employee will receive your order and start working on it; the contract is documented in Ejar once payment is recorded",
         "whatsappCta": "Rental Contract team is happy to hear from you",
         "whatsappHref": "https://wa.me/"
       }
@@ -2893,7 +2893,7 @@
       "title": "Payment successful",
       "description": "Your payment was received successfully",
       "headline": "Payment received ✅",
-      "nextStep": "Next step: the contract draft reaches you on WhatsApp during working hours for review, then we document the contract in Ejar.",
+      "nextStep": "Next step: our employee receives your order during working hours and documents the contract in Ejar; you get a notification at every step.",
       "nextStepLessorChange": "Next step: our team reviews both deeds, transfers the contracts to the new owner in Ejar, and notifies you on WhatsApp when done.",
       "journeyTitle": "Your order journey"
     },
@@ -2917,7 +2917,7 @@
     "lessorChangeTypeLabel": "Lessor change",
     "trackOrder": "Track order",
     "whatsappSupport": "Contact support on WhatsApp",
-    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the contract draft."
+    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the documentation status."
   },
   "startWithAqdi": {
     "dialog": {
@@ -3015,7 +3015,7 @@
       ],
       "cta": "Create a residential lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Draft within working hours; documented after your review.",
+      "responseTime": "Our employee receives your order within working hours and documents it in Ejar directly.",
       "fee": "From SAR 249 / year",
       "steps": [
         "Fill in the property and unit details",
@@ -3023,8 +3023,8 @@
         "Financial details, rent amount and term",
         "Terms and conditions",
         "Review, submit the order, then pay",
-        "Receive the contract draft on WhatsApp for review",
-        "Contract documented in Ejar after you review the draft"
+        "Our employee receives your order and reviews the data",
+        "Contract documented in Ejar with a notification at every step"
       ],
       "requirements": [
         "Valid national ID or residency for the parties",
@@ -3043,7 +3043,7 @@
         },
         {
           "q": "When is the contract documented in Ejar?",
-          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
+          "a": "After payment our employee receives your order and documents the contract in Ejar directly — usually within working hours the same day — with a notification at every step. If we need an attachment or a correction, we send you a clear request."
         },
         {
           "q": "What is the fee?",
@@ -3062,7 +3062,7 @@
       ],
       "cta": "Create a commercial lease",
       "eligibility": "Landlords and tenants (individuals and businesses) and licensed brokers.",
-      "responseTime": "Draft within working hours; documented after your review.",
+      "responseTime": "Our employee receives your order within working hours and documents it in Ejar directly.",
       "fee": "From SAR 349 / year",
       "steps": [
         "Fill in the commercial property and unit details",
@@ -3070,8 +3070,8 @@
         "Financial details, rent amount and term",
         "Terms and conditions",
         "Review, submit the order, then pay",
-        "Receive the contract draft on WhatsApp for review",
-        "Contract documented in Ejar after you review the draft"
+        "Our employee receives your order and reviews the data",
+        "Contract documented in Ejar with a notification at every step"
       ],
       "requirements": [
         "Valid commercial registration (if applicable)",
@@ -3090,7 +3090,7 @@
         },
         {
           "q": "When is the contract documented in Ejar?",
-          "a": "After payment we send you the contract draft on WhatsApp for review; the contract is documented in Ejar only after you review the draft — usually within working hours the same day."
+          "a": "After payment our employee receives your order and documents the contract in Ejar directly — usually within working hours the same day — with a notification at every step. If we need an attachment or a correction, we send you a clear request."
         },
         {
           "q": "What is the fee?",
@@ -3204,7 +3204,7 @@
       "watch": "Watch video"
     },
     "journeyTitle": "Your order journey after submission",
-    "journeySubtitle": "Six clear steps from receiving your order to documenting the contract in Ejar."
+    "journeySubtitle": "Three clear steps from payment to documenting the contract in Ejar."
   },
   "supportPage": {
     "metaTitle": "Support & Help",
@@ -3293,13 +3293,15 @@
     "typeHousing": "Residential contract",
     "typeCommercial": "Commercial contract",
     "awaitingPaymentTitle": "Awaiting payment",
-    "awaitingPaymentBody": "Your order is complete. After payment we send you the contract draft on WhatsApp for review, then document the contract in Ejar.",
+    "awaitingPaymentBody": "Your order is complete. After payment our employee receives it and documents the contract in Ejar, with a notification at every step.",
     "payNow": "Pay now",
     "nextStep": "Next step: {step}",
     "lastUpdate": "Last update: {date}",
     "smartLinkTitle": "Order {order}",
     "smartLinkHeading": "Your order is ready to follow",
     "smartLinkSubtitle": "This is the link for order {order}. Enter your mobile to verify and see the status.",
+    "smartLinkSubtitleChargePaid": "You are back from the payment gateway for order {order}. Enter the mobile used on the order to see the payment result and the updated invoice.",
+    "smartLinkSubtitleFix": "Our employee needs an attachment or a correction for order {order}. Enter the mobile used on the order to see what is required and send it.",
     "typeLessorChange": "Lessor change request",
     "lessorChangeFee": "Service fee: {fee} SAR",
     "journeyTitle": "Your order journey",
@@ -3394,8 +3396,8 @@
     "badge": "Your order journey",
     "titlePrefix": "From order to",
     "titleAccent": "documentation in Ejar",
-    "description": "Six clear steps so you always know where your order stands.",
-    "sentence": "After payment we send you the contract draft on WhatsApp for review, and we document the contract in Ejar only after you review the draft.",
+    "description": "Three clear steps so you always know where your order stands.",
+    "sentence": "After payment our employee receives your order and documents the contract in Ejar directly; you get a notification at every step.",
     "cta": "Start your contract",
     "trackCta": "Track your order"
   }

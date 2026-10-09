@@ -32,6 +32,31 @@ export type AnalyticsEventMap = {
   };
   /** إرسال طلب تغيير المؤجر. */
   lessor_change_submitted: { order_number?: string; value?: number };
+  /** دفعة هـ (E5): ضغط «ادفع» على رسم معلّق (رسوم إضافية / فرق سعر) والانتقال لميسر. */
+  charge_payment_started: {
+    order_number: string;
+    charge_id: number;
+    charge_kind: "price_difference" | "extra_fee" | string;
+    value: number | undefined;
+    currency: "SAR";
+  };
+  /** دفعة هـ (E5): نجاح دفع رسم معلّق — مرة واحدة لكل رسم (`transaction_id` = `chg-{order}-{charge}`). */
+  charge_purchase: {
+    transaction_id: string;
+    order_number: string;
+    charge_id: number;
+    charge_kind: "price_difference" | "extra_fee" | string;
+    value: number | undefined;
+    currency: "SAR";
+  };
+  /** دفعة هـ (E4): العميل أرسل المرفق/التصحيح المطلوب من صفحة التصحيح. */
+  data_request_completed: {
+    order_number: string;
+    request_id: number;
+    section: string;
+    step: number | undefined;
+    resolved: boolean;
+  };
   /** ضغط أي زر واتساب (hero / الدعم / الطلبات…). */
   cta_whatsapp_click: { placement: string };
   /** طلب رمز تحقق OTP. */
@@ -109,5 +134,30 @@ export function trackPurchaseOnce(params: AnalyticsEventMap["purchase"]): boolea
   }
 
   track("purchase", params);
+  return true;
+}
+
+const CHARGE_PURCHASE_STORAGE_PREFIX = "aqdi:charge_purchase:";
+
+/**
+ * `charge_purchase` fired once per charge per browser session (the return
+ * page `/r/{order}?charge=…&status=success` can be refreshed or revisited).
+ */
+export function trackChargePurchaseOnce(params: AnalyticsEventMap["charge_purchase"]): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const key = `${CHARGE_PURCHASE_STORAGE_PREFIX}${params.transaction_id}`;
+  try {
+    if (window.sessionStorage.getItem(key) === "1") {
+      return false;
+    }
+    window.sessionStorage.setItem(key, "1");
+  } catch {
+    // sessionStorage unavailable — fire anyway (better one duplicate than none).
+  }
+
+  track("charge_purchase", params);
   return true;
 }

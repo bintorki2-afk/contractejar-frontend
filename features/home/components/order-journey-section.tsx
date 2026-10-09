@@ -1,10 +1,8 @@
 import {
-  CreditCard,
-  FileCheck2,
   Inbox,
-  MessageCircle,
   PartyPopper,
   SearchCheck,
+  UserCheck,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -13,11 +11,8 @@ import { getTranslations } from "next-intl/server";
 import { ORDER_JOURNEY_TEMPLATE } from "@/features/requests/data/order-journey";
 
 const STEP_ICONS: Record<string, LucideIcon> = {
-  received: Inbox,
-  paid: CreditCard,
   under_review: SearchCheck,
-  whatsapp_draft: MessageCircle,
-  draft_reviewed: FileCheck2,
+  received_by_employee: UserCheck,
   ejar_authenticated: PartyPopper,
 };
 
@@ -29,7 +24,7 @@ type OrderJourneySectionProps = {
 };
 
 /**
- * «رحلة طلبك» — the 6-step order journey (ف2) as a marketing strip. Shared by
+ * «رحلة طلبك» — the 3-step order journey (دفعة هـ) as a marketing strip. Shared by
  * the home page and the guide so the customer sees the same steps that the
  * tracking/order screens show after submission.
  */

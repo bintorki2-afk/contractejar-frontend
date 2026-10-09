@@ -10,6 +10,12 @@ export type RequestActionType =
   | "complete-payment"
   | "dual-actions";
 
+import type {
+  ContractCharge,
+  PaymentState,
+  PendingDataRequest,
+} from "@/features/requests/types/payment-state";
+
 export type RequestCardData = {
   id: string;
   contractId: number;
@@ -32,6 +38,12 @@ export type RequestCardData = {
   refundLabel: string | null;
   paymentStatusLabel: string | null;
   payableAmount: number | null;
+  /** دفعة هـ (E2/E5): شريحة حالة الدفع (5 حالات) من الخادم؛ `null` مع خادم أقدم. */
+  paymentState: PaymentState | null;
+  /** دفعة هـ (E5): الرسوم الإضافية / فروقات السعر (المعلّقة والمدفوعة). */
+  charges: ContractCharge[];
+  /** دفعة هـ (E4): طلبات المرفق الناقص المفتوحة. */
+  pendingDataRequests: PendingDataRequest[];
   isIncompleteDraft: boolean;
   showViewEdit: boolean;
   showDownloadInvoice: boolean;

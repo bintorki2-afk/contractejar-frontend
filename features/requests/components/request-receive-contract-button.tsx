@@ -15,6 +15,7 @@ type RequestReceiveContractButtonProps = {
   actionType: RequestActionType;
   contractId: number;
   contractUuid: string;
+  contractType?: "residential" | "commercial";
   completePaymentLabel: string;
   completePaymentWithAmountLabel: string;
   completePaymentLoadingLabel: string;
@@ -28,6 +29,7 @@ export default function RequestReceiveContractButton({
   actionType,
   contractId,
   contractUuid,
+  contractType,
   completePaymentLabel,
   completePaymentWithAmountLabel,
   completePaymentLoadingLabel,
@@ -57,6 +59,7 @@ export default function RequestReceiveContractButton({
         onOpenChange={setOpen}
         contractId={contractId}
         contractUuid={contractUuid}
+        contractType={contractType}
         actionType={actionType}
         completePaymentLabel={completePaymentLabel}
         completePaymentWithAmountLabel={completePaymentWithAmountLabel}

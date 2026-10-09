@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,13 +22,25 @@ import {
 } from "@/features/guest-session/services/track-order";
 import { getLessorChangePaymentUrl } from "@/features/lessor-change/services/get-lessor-change-payment-url";
 import OrderNotificationsList from "@/features/notifications/components/order-notifications-list";
+import ChargeReturnBanner, {
+  type ChargeReturn,
+} from "@/features/requests/components/charge-return-banner";
+import DataRequestBanner from "@/features/requests/components/data-request-banner";
+import OrderChargesList from "@/features/requests/components/order-charges-list";
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import PaymentStateChip from "@/features/requests/components/payment-state-chip";
 import RefundBanner from "@/features/requests/components/refund-banner";
+import {
+  normalizeCharges,
+  normalizePaymentState,
+  normalizePendingDataRequests,
+} from "@/features/requests/utils/normalize-payment-state";
 import { resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 import RateServiceCard from "@/features/track-order/components/rate-service-card";
 import { isNotarized } from "@/features/track-order/utils/is-notarized";
 import {
   buildTemplateJourney,
+  normalizeJourneySideState,
   normalizeOrderJourney,
 } from "@/features/requests/data/order-journey";
 import { cn } from "@/lib/utils";
@@ -49,11 +61,17 @@ type TrackOrderFormProps = {
   initialOrder?: string;
   /** Focus the mobile field right away (the order number is already known). */
   autoSubmitWhenReady?: boolean;
+  /** دفعة هـ (E5): العودة من ميسر بعد دفع رسم (`?charge=&status=&paid=`). */
+  chargeReturn?: ChargeReturn | null;
+  /** دفعة هـ (E4): `?fix=<id>` من الرابط العميق — يُبرز طلب المرفق الناقص. */
+  fixRequestId?: number | null;
 };
 
 export default function TrackOrderForm({
   initialOrder = "",
   autoSubmitWhenReady = false,
+  chargeReturn = null,
+  fixRequestId = null,
 }: TrackOrderFormProps) {
   const t = useTranslations("trackPage");
   const [order, setOrder] = useState(initialOrder);
@@ -67,13 +85,33 @@ export default function TrackOrderForm({
     result?.kind === "lessor_change" || result?.contract_type === "lessor_change";
   const refund = resolveRefundInfo(result);
   const notarized = Boolean(result) && !isLessorChange && !refund.refunded && isNotarized(result ?? {});
-  // رحلة الطلب (ف2): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
+  // دفعة هـ: حالة الدفع والرسوم وطلبات المرفق الناقص — من الخادم فقط.
+  const paymentState = normalizePaymentState(result?.payment_state);
+  const charges = normalizeCharges(result?.charges);
+  const pendingDataRequests = normalizePendingDataRequests(result?.pending_data_requests);
+  const sideState = normalizeJourneySideState(result?.journey_side_state);
+  const returnedCharge =
+    chargeReturn ? charges.find((charge) => charge.id === chargeReturn.chargeId) ?? null : null;
+  // رحلة الطلب (3 خطوات): من الخادم عند توفرها، وإلا القالب بحالة مشتقة من الدفع.
   // طلب مسترجع بالكامل انتهى: يُعرض سجل الحالات بدل الرحلة.
   const journey =
     result && !isLessorChange && !refund.refunded
       ? (normalizeOrderJourney(result.journey) ??
-        buildTemplateJourney(result.is_paid ? 2 : 1))
+        buildTemplateJourney(result.is_paid ? 1 : 0))
       : null;
+  const dataRequestsRef = useRef<HTMLDivElement | null>(null);
+
+  // الرابط العميق `?fix=`: بعد ظهور النتيجة انزل إلى طلب المرفق الناقص المطلوب.
+  useEffect(() => {
+    if (!result || fixRequestId == null || pendingDataRequests.length === 0) {
+      return;
+    }
+    const target =
+      document.getElementById(`data-request-${fixRequestId}`) ?? dataRequestsRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Only when a new result arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result, fixRequestId]);
   const orderDigits = digitsOnly(order);
   const mobileValid = getSaudiNationalMobile(mobile) !== null;
   const canSubmit = orderDigits.length >= 4 && mobileValid && !isLoading;
@@ -211,18 +249,29 @@ export default function TrackOrderForm({
                 </p>
               ) : null}
             </div>
-            <span
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold text-white"
-              style={{ backgroundColor: result.status_color || "#0B5A3C" }}
-            >
-              {result.is_paid ? (
-                <CheckCircle2 className="size-4" aria-hidden="true" />
-              ) : (
-                <Clock className="size-4" aria-hidden="true" />
-              )}
-              {result.status_label}
-            </span>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold text-white"
+                style={{ backgroundColor: sideState?.color || result.status_color || "#0B5A3C" }}
+              >
+                {result.is_paid ? (
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                ) : (
+                  <Clock className="size-4" aria-hidden="true" />
+                )}
+                {result.status_label}
+              </span>
+              {!isLessorChange ? <PaymentStateChip state={paymentState} /> : null}
+            </div>
           </div>
+
+          {chargeReturn && !isLessorChange ? (
+            <ChargeReturnBanner
+              orderUuid={result.uuid || result.order_number}
+              chargeReturn={chargeReturn}
+              charge={returnedCharge}
+            />
+          ) : null}
 
           {result.status_client_explanation ? (
             <p className="rounded-2xl bg-brand-secondary/10 px-4 py-3 text-sm leading-relaxed">
@@ -231,6 +280,25 @@ export default function TrackOrderForm({
           ) : null}
 
           <RefundBanner info={refund} />
+
+          {!isLessorChange && pendingDataRequests.length > 0 ? (
+            <div ref={dataRequestsRef}>
+              <DataRequestBanner
+                orderUuid={result.uuid || result.order_number}
+                contractType={result.contract_type}
+                requests={pendingDataRequests}
+                highlightId={fixRequestId}
+              />
+            </div>
+          ) : null}
+
+          {!isLessorChange && charges.length > 0 ? (
+            <OrderChargesList
+              orderUuid={result.uuid || result.order_number}
+              charges={charges}
+              mobile={mobile}
+            />
+          ) : null}
 
           {notarized ? <RateServiceCard orderNumber={result.order_number} /> : null}
 
@@ -279,7 +347,12 @@ export default function TrackOrderForm({
           {journey ? (
             <div className="space-y-2">
               <p className="text-sm font-extrabold text-foreground">{t("journeyTitle")}</p>
-              <OrderJourneySteps steps={journey} showSentence />
+              <OrderJourneySteps
+                steps={journey}
+                showSentence
+                sentence={result.journey_sentence}
+                sideState={sideState}
+              />
             </div>
           ) : (result.timeline ?? []).length > 0 ? (
             <ol className="space-y-3 border-s-2 border-brand/20 ps-4">

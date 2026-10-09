@@ -7,6 +7,9 @@ import type { CSSProperties } from "react";
 import { contractFinanceSummaryKeys } from "@/features/create-contract/query-keys";
 import { getContractFinanceSummary } from "@/features/create-contract/services/get-contract-finance-summary";
 import { formatPaymentAmount } from "@/features/create-contract/types/payment-step";
+import DataRequestBanner from "@/features/requests/components/data-request-banner";
+import OrderChargesList from "@/features/requests/components/order-charges-list";
+import PaymentStateChip from "@/features/requests/components/payment-state-chip";
 import RequestCardActions from "@/features/requests/components/request-card-actions";
 import RequestCopyIdButton from "@/features/requests/components/request-copy-id-button";
 import RequestIncompleteActions from "@/features/requests/components/request-incomplete-actions";
@@ -137,7 +140,10 @@ export default function RequestCard({ card, labels }: RequestCardProps) {
                 {unitLabel}
               </span>
 
-              {card.refundLabel ? (
+              {card.paymentState && !card.isIncompleteDraft ? (
+                // دفعة هـ: شريحة حالة الدفع من الخادم (5 حالات) بدل شارة «مكتمل · المبلغ».
+                <PaymentStateChip state={card.paymentState} />
+              ) : card.refundLabel ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
                   <RotateCcw className="size-3.5" aria-hidden="true" />
                   {card.refundLabel}
@@ -190,6 +196,19 @@ export default function RequestCard({ card, labels }: RequestCardProps) {
             </p>
           </div>
         </div>
+      ) : null}
+
+      {!card.isIncompleteDraft && card.pendingDataRequests.length > 0 ? (
+        <DataRequestBanner
+          orderUuid={card.uuid}
+          contractType={card.contractType}
+          requests={card.pendingDataRequests}
+          className="mt-5"
+        />
+      ) : null}
+
+      {!card.isIncompleteDraft && card.charges.some((charge) => charge.status === "pending") ? (
+        <OrderChargesList orderUuid={card.uuid} charges={card.charges} pendingOnly className="mt-5" />
       ) : null}
 
       <div className="mt-5">

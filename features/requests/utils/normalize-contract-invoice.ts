@@ -3,6 +3,12 @@ import type {
   ContractInvoiceItem,
   InvoiceStatus,
 } from "@/features/requests/types/contract-invoice";
+import {
+  normalizeCharges,
+  normalizePaymentDetails,
+  normalizePaymentState,
+  normalizePaymentTotals,
+} from "@/features/requests/utils/normalize-payment-state";
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -55,8 +61,16 @@ function normalizeItems(raw: unknown): ContractInvoiceItem[] {
         asString(row.price_label) ||
         "—",
       is_discount: asBoolean(row.is_discount) || (amount !== null && amount < 0),
+      kind: asNullableString(row.kind),
+      charge_id: asNullableNumber(row.charge_id),
     };
   });
+}
+
+function labelOrAmount(label: unknown, amount: number | null): string {
+  const text = asString(label);
+  if (text) return text;
+  return amount !== null ? `${amount.toLocaleString("en-US", { maximumFractionDigits: 2 })} ريال` : "";
 }
 
 export function normalizeContractInvoice(
@@ -73,6 +87,19 @@ export function normalizeContractInvoice(
   const isPaid = asBoolean(raw.is_paid) || status === "paid";
   const isRefunded =
     asBoolean(raw.is_refunded) || status === "refunded" || status === "returned";
+
+  // دفعة هـ: التراكمي + سجل الدفعات. `payment_details` (إن وُجد) يحمل نفس
+  // الحقول؛ الجذر له الأولوية لأنه ما تصنعه نقطة الفاتورة نفسها.
+  const details = normalizePaymentDetails(raw.payment_details);
+  const totals = raw.totals ? normalizePaymentTotals(raw.totals) : details?.totals ?? normalizePaymentTotals(null);
+  const originalTotal = asNullableNumber(raw.original_total) ?? totals.original;
+  const extraTotal = asNullableNumber(raw.extra_total) ?? totals.extra;
+  const refundedTotal = asNullableNumber(raw.refunded_total) ?? totals.refunded;
+  const netTotal = asNullableNumber(raw.net_total) ?? totals.net;
+  const transactions = Array.isArray(raw.transactions)
+    ? normalizePaymentDetails({ transactions: raw.transactions })?.transactions ?? []
+    : details?.transactions ?? [];
+  const charges = Array.isArray(raw.charges) ? normalizeCharges(raw.charges) : details?.charges ?? [];
 
   return {
     contractId,
@@ -104,5 +131,26 @@ export function normalizeContractInvoice(
     print_label: asString(raw.print_label),
     is_paid: isPaid,
     is_refunded: isRefunded,
+    is_cumulative:
+      asBoolean(raw.is_cumulative) ||
+      (extraTotal ?? 0) > 0 ||
+      (refundedTotal ?? 0) > 0 ||
+      transactions.length > 1,
+    original_total_label: labelOrAmount(raw.original_total_label, originalTotal),
+    extra_total_label: labelOrAmount(raw.extra_total_label, extraTotal),
+    refunded_total_label: labelOrAmount(raw.refunded_total_label, refundedTotal),
+    net_total_label: labelOrAmount(raw.net_total_label, netTotal),
+    totals: {
+      ...totals,
+      original: originalTotal,
+      extra: extraTotal,
+      refunded: refundedTotal,
+      net: netTotal,
+    },
+    transactions,
+    charges,
+    payment_state: normalizePaymentState(raw.payment_state) ?? details?.state ?? null,
+    payment_method_label: asNullableString(raw.payment_method_label),
+    invoice_url: asNullableString(raw.invoice_url) ?? asNullableString(raw.print_url) ?? details?.invoice_url ?? null,
   };
 }

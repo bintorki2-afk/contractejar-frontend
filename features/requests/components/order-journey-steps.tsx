@@ -1,7 +1,8 @@
-import { Check } from "lucide-react";
+import { Ban, Check, RotateCcw } from "lucide-react";
 
 import {
   ORDER_JOURNEY_SENTENCE,
+  type OrderJourneySideState,
   type OrderJourneyStep,
   type OrderJourneyStepState,
 } from "@/features/requests/data/order-journey";
@@ -76,8 +77,12 @@ function JourneyDot({
 
 type OrderJourneyStepsProps = {
   steps: OrderJourneyStep[];
-  /** Show the ف2 rule sentence under the steps. */
+  /** Show the journey sentence under the steps. */
   showSentence?: boolean;
+  /** Sentence from the server (`journey_sentence`); falls back to the shared constant. */
+  sentence?: string | null;
+  /** دفعة هـ: حالة جانبية (ملغي / مسترجع) تُعرض بلون مميز بدل تقدّم الرحلة. */
+  sideState?: OrderJourneySideState | null;
   /** Hide step descriptions for a denser list. */
   compact?: boolean;
   /** Explanatory mode (guide): no progress colouring, every step readable. */
@@ -86,19 +91,25 @@ type OrderJourneyStepsProps = {
 };
 
 /**
- * Vertical timeline of the 6 order journey steps (ف2) — used on the
- * payment-success screen, order tracking, and the order detail dialog.
+ * Vertical timeline of the 3 order journey steps (دفعة هـ: قيد المراجعة ←
+ * مستلم من الموظف ← تم التوثيق) — used on the payment-success screen, order
+ * tracking, and the order detail dialog. A side state (ملغي / مسترجع) is
+ * shown as a distinct chip and the steps are dimmed.
  */
 export default function OrderJourneySteps({
   steps,
   showSentence = true,
+  sentence,
+  sideState = null,
   compact = false,
   neutral = false,
   className,
 }: OrderJourneyStepsProps) {
   return (
     <div className={cn("space-y-4", className)}>
-      <ol className="relative space-y-0">
+      {sideState ? <OrderJourneySideStateChip state={sideState} /> : null}
+
+      <ol className={cn("relative space-y-0", sideState && "opacity-60")} aria-live="polite">
         {steps.map((step, index) => {
           const isLast = index === steps.length - 1;
           const nextState = isLast ? null : steps[index + 1]?.state;
@@ -154,9 +165,10 @@ export default function OrderJourneySteps({
                     {step.description}
                   </p>
                 ) : null}
-                {dateLabel ? (
-                  <p className="text-[11px] text-[#9a9a9a] dark:text-[#6f7f7a]" dir="ltr">
-                    {dateLabel}
+                {dateLabel || step.by ? (
+                  <p className="flex flex-wrap items-center gap-x-2 text-[11px] text-[#9a9a9a] dark:text-[#6f7f7a]">
+                    {dateLabel ? <span dir="ltr">{dateLabel}</span> : null}
+                    {step.by ? <span>· {step.by}</span> : null}
                   </p>
                 ) : null}
               </div>
@@ -165,13 +177,19 @@ export default function OrderJourneySteps({
         })}
       </ol>
 
-      {showSentence ? <OrderJourneySentence /> : null}
+      {showSentence && !sideState ? <OrderJourneySentence sentence={sentence} /> : null}
     </div>
   );
 }
 
-/** جملة قاعدة المسودة قبل التوثيق (ف2). */
-export function OrderJourneySentence({ className }: { className?: string }) {
+/** جملة الرحلة (دفعة هـ): من الخادم عند توفرها، وإلا الثابتة المشتركة. */
+export function OrderJourneySentence({
+  className,
+  sentence,
+}: {
+  className?: string;
+  sentence?: string | null;
+}) {
   return (
     <p
       className={cn(
@@ -179,7 +197,35 @@ export function OrderJourneySentence({ className }: { className?: string }) {
         className,
       )}
     >
-      {ORDER_JOURNEY_SENTENCE}
+      {sentence?.trim() || ORDER_JOURNEY_SENTENCE}
     </p>
+  );
+}
+
+/** شارة الحالة الجانبية: «ملغي» رمادي / «مسترجع» بنفسجي (أو لون الخادم). */
+export function OrderJourneySideStateChip({ state }: { state: OrderJourneySideState }) {
+  const color = state.color || (state.key === "refunded" ? "#7c3aed" : "#6b7280");
+  const Icon = state.key === "refunded" ? RotateCcw : Ban;
+  const dateLabel = formatStepDate(state.at);
+
+  return (
+    <div
+      className="flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3"
+      style={{ borderColor: `${color}55`, backgroundColor: `${color}14` }}
+      data-testid="journey-side-state"
+    >
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold text-white"
+        style={{ backgroundColor: color }}
+      >
+        <Icon className="size-3.5" aria-hidden="true" />
+        {state.label}
+      </span>
+      {dateLabel ? (
+        <span className="text-[11px] text-[#6f6f6f] dark:text-[#9eb5af]" dir="ltr">
+          {dateLabel}
+        </span>
+      ) : null}
+    </div>
   );
 }

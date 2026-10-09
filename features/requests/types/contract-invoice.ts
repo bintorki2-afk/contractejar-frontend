@@ -1,4 +1,18 @@
-export type InvoiceStatus = "paid" | "unpaid" | "refunded" | "returned" | string;
+import type {
+  ContractCharge,
+  PaymentState,
+  PaymentTotals,
+  PaymentTransaction,
+} from "@/features/requests/types/payment-state";
+
+export type InvoiceStatus =
+  | "paid"
+  | "unpaid"
+  | "partially_paid"
+  | "partially_refunded"
+  | "refunded"
+  | "returned"
+  | string;
 
 export type ContractInvoiceItem = {
   index: number | string;
@@ -8,6 +22,9 @@ export type ContractInvoiceItem = {
   amount: number | null;
   amount_label: string;
   is_discount: boolean;
+  /** دفعة هـ: `fee|document|meter|discount|vat|extra_fee|price_difference|refund` (قد يغيب). */
+  kind: string | null;
+  charge_id: number | null;
 };
 
 /**
@@ -45,6 +62,19 @@ export type ContractInvoice = {
   print_label: string;
   is_paid: boolean;
   is_refunded: boolean;
+  /** دفعة هـ (E5): الفاتورة التراكمية — الأصل + الإضافي − المسترجع = الصافي (كلها من الخادم). */
+  is_cumulative: boolean;
+  original_total_label: string;
+  extra_total_label: string;
+  refunded_total_label: string;
+  net_total_label: string;
+  totals: PaymentTotals;
+  transactions: PaymentTransaction[];
+  charges: ContractCharge[];
+  payment_state: PaymentState | null;
+  payment_method_label: string | null;
+  /** صفحة الفاتورة الموقّعة على الخادم (طباعة / PDF). */
+  invoice_url: string | null;
 };
 
 export type ContractInvoiceApiResponse = {

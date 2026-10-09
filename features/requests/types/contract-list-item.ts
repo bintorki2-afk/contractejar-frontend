@@ -38,6 +38,12 @@ export type ContractListItem = {
   refund?: { status?: string | null; amount?: number | string | null; refunded_at?: string | null } | null;
   refunded_amount?: number | string | null;
   is_refunded?: boolean;
+  /** دفعة هـ: حالة الدفع / الرسوم / طلبات المرفق الناقص / الحالة الجانبية — من الخادم. */
+  payment_state?: unknown;
+  charges?: unknown;
+  pending_data_requests?: unknown;
+  journey_side_state?: unknown;
+  journey_sentence?: string | null;
 };
 
 export type ContractsPagination = {

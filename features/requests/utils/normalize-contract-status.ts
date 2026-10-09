@@ -1,4 +1,12 @@
-import { normalizeOrderJourney } from "@/features/requests/data/order-journey";
+import {
+  normalizeJourneySideState,
+  normalizeOrderJourney,
+} from "@/features/requests/data/order-journey";
+import {
+  normalizeCharges,
+  normalizePaymentState,
+  normalizePendingDataRequests,
+} from "@/features/requests/utils/normalize-payment-state";
 import { resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 import type {
   ContractDetail,
@@ -32,7 +40,7 @@ function normalizeStatusType(value: unknown): ContractStatusType {
 }
 
 export function normalizeJourneySteps(raw: unknown): ContractJourneyStep[] {
-  // The API now returns the 6-step ف2 journey (`label/done/current/at`);
+  // The API returns the 3-step journey (دفعة هـ: `label/done/current/at/by`);
   // older payloads used `status_label/state`. Both map onto the same model.
   const steps = normalizeOrderJourney(raw);
   if (!steps) {
@@ -46,6 +54,7 @@ export function normalizeJourneySteps(raw: unknown): ContractJourneyStep[] {
     description: step.description,
     state: step.state,
     at: step.at,
+    by: step.by ?? null,
   }));
 }
 
@@ -85,6 +94,7 @@ export function normalizeContractStatusSnapshot(
       asNullableString(raw.journey_status_label) || statusLabel,
     journey: normalizeJourneySteps(raw.journey),
     journey_sentence: asNullableString(raw.journey_sentence),
+    journey_side_state: normalizeJourneySideState(raw.journey_side_state),
   };
 }
 
@@ -100,5 +110,8 @@ export function normalizeContractDetail(
     is_completed: Boolean(raw.is_completed),
     is_draft: Boolean(raw.is_draft),
     step: asNullableNumber(raw.step) ?? undefined,
+    payment_state: normalizePaymentState(raw.payment_state),
+    charges: normalizeCharges(raw.charges),
+    pending_data_requests: normalizePendingDataRequests(raw.pending_data_requests),
   };
 }

@@ -56,7 +56,8 @@ export function toAccountNotification(item: AccountNotificationApiItem): Account
     title: item.title?.trim() || "",
     body: item.body?.trim() || "",
     kind: item.kind ?? null,
-    href: toInternalHref(item.smart_link ?? item.url),
+    // دفعة هـ: رابط «مطلوب منك» العميق (`/r/{order}?fix=…`) له الأولوية على الرابط الذكي العام.
+    href: toInternalHref(extras.deepLink) ?? toInternalHref(item.smart_link ?? item.url),
     isRead: Boolean(item.is_read || item.read_at),
     createdAt: item.created_at_iso ?? item.created_at ?? null,
     couponCode: extras.couponCode,
