@@ -51,6 +51,14 @@ export type StepSyncResult =
 
 type DraftState = ReturnType<typeof useCreateContractDraftStore.getState>;
 
+export type StepSyncOptions = {
+  /**
+   * وضع التصحيح (دفعة هـ): الطلب مدفوع وبياناته على الخادم؛ خطوة لم يُضف فيها
+   * العميل ملفاً جديداً (الصك / صورة العنوان) تُتخطّى بدل إرسالها فارغة.
+   */
+  fixMode?: boolean;
+};
+
 function firstFile(files: File[], persisted: PersistedFile[]): File | undefined {
   if (files.length > 0 && files[0] instanceof File) {
     return files[0];
@@ -68,7 +76,11 @@ function allFiles(files: File[], persisted: PersistedFile[]): File[] {
 }
 
 /** الصك (step1). */
-export async function syncDeedStep(store: DraftState, contractId: number): Promise<StepSyncResult> {
+export async function syncDeedStep(
+  store: DraftState,
+  contractId: number,
+  options: StepSyncOptions = {},
+): Promise<StepSyncResult> {
   const { deed } = store;
   const deedType = deed.selectedDeedType;
   if (deedType === "") {
@@ -97,6 +109,11 @@ export async function syncDeedStep(store: DraftState, contractId: number): Promi
   ];
   if (totalBytes(step1Files) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
     return { ok: false, stage: "deed", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
+  }
+
+  const hasNewDeedInput = step1Files.some(Boolean) || useManual;
+  if (options.fixMode && !hasNewDeedInput) {
+    return { ok: true, skipped: true, fix: null };
   }
 
   const step1 = await submitContractStep1({
@@ -133,7 +150,11 @@ export async function syncDeedStep(store: DraftState, contractId: number): Promi
 }
 
 /** العنوان الوطني (step2) — لا يُرسل للباطن، ولا عند تجديد عقد بنفس العنوان. */
-export async function syncAddressStep(store: DraftState, contractId: number): Promise<StepSyncResult> {
+export async function syncAddressStep(
+  store: DraftState,
+  contractId: number,
+  options: StepSyncOptions = {},
+): Promise<StepSyncResult> {
   const { deed } = store;
   const deedType = deed.selectedDeedType;
   if (deedType === "") {
@@ -149,12 +170,17 @@ export async function syncAddressStep(store: DraftState, contractId: number): Pr
     return { ok: true, skipped: true, fix: null };
   }
 
+  const imageAddress = firstFile(deed.nationalAddressPhotoFiles, deed.nationalAddressPhotoPersistedFiles);
+  if (options.fixMode && deed.nationalAddressMethod === "photo" && !imageAddress) {
+    return { ok: true, skipped: true, fix: null };
+  }
+
   const step2 = await submitContractStep2({
     contractId,
     addressMethod: deed.nationalAddressMethod,
     latitude: deed.mapLocation.lat,
     longitude: deed.mapLocation.lng,
-    imageAddress: firstFile(deed.nationalAddressPhotoFiles, deed.nationalAddressPhotoPersistedFiles),
+    imageAddress,
     addressUrl: deed.nationalAddressLinkUrl.trim() || undefined,
     manualAddress: deed.nationalAddressManual,
   });
@@ -267,7 +293,10 @@ export async function syncFinanceStep(store: DraftState, contractId: number): Pr
 }
 
 /** خطوة الخادم (1..6) → دالة الإرسال. */
-export const STEP_SYNCERS: Record<number, (store: DraftState, contractId: number) => Promise<StepSyncResult>> = {
+export const STEP_SYNCERS: Record<
+  number,
+  (store: DraftState, contractId: number, options?: StepSyncOptions) => Promise<StepSyncResult>
+> = {
   1: syncDeedStep,
   2: syncAddressStep,
   3: syncOwnerStep,

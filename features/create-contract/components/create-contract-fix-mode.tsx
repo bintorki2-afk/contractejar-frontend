@@ -181,24 +181,36 @@ export default function CreateContractFixMode({
       }
 
       const fixes: ContractStepFixPayload[] = [];
+      let sentAnything = false;
+      let failure: string | null = null;
       for (const step of steps) {
-        const outcome = await STEP_SYNCERS[step](store, fixMode.contractId);
+        const outcome = await STEP_SYNCERS[step](store, fixMode.contractId, { fixMode: true });
         if (!outcome.ok) {
           if (outcome.status === 401 || outcome.status === 403 || outcome.status === 404) {
             setLoginOpen(true);
             return;
           }
-          toast.error(outcome.error || "تعذّر إرسال التعديل. حاول مرة أخرى.");
-          return;
+          failure = outcome.error || "تعذّر إرسال التعديل. حاول مرة أخرى.";
+          break;
         }
-        if (!outcome.skipped && outcome.fix) {
-          fixes.push(outcome.fix);
+        if (!outcome.skipped) {
+          sentAnything = true;
+          if (outcome.fix) fixes.push(outcome.fix);
         }
       }
 
       const changed = fixes.some((payload) => payload.changed_fields.length > 0);
       const resolved = fixes.some((payload) => payload.resolved_request_ids.includes(fixMode.requestId));
-      if (!changed && !resolved) {
+
+      if (failure && !resolved) {
+        toast.error(failure);
+        return;
+      }
+      if (failure) {
+        // The requested item already reached the server; only a later step failed.
+        toast.warning(failure);
+      }
+      if (!sentAnything || (!changed && !resolved)) {
         toast.warning("لم يتغيّر شيء — ارفع المرفق المطلوب أو عدّل البيانات ثم اضغط متابعة.");
         return;
       }

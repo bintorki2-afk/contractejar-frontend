@@ -5,7 +5,7 @@ import {
   backendStepsForWizardStep,
   fixWizardStepFor,
 } from "@/features/create-contract/types/contract-fix-mode";
-import { parseChargeReturn, chargeTransactionId } from "@/features/requests/components/charge-return-banner";
+import { chargeTransactionId, parseChargeReturn } from "@/features/requests/utils/charge-return";
 import { buildFixHref } from "@/features/requests/components/data-request-banner";
 import {
   normalizeCharges,

@@ -19,10 +19,13 @@
 | `otp_requested` | طلب رمز تحقق | `context` (`login` / `checkout`) | تشخيص فقط |
 | `otp_verified` | نجاح التحقق من الرمز | `context` | تشخيص / إنشاء حساب |
 | `generate_lead` | (قديم — يبقى للتوافق) إرسال إشعار الطلب لقناة الأعمال | `order_number`، `contract_type`، `currency`، `value` (من `NEXT_PUBLIC_LEAD_VALUE`) | الوسوم المضبوطة سابقاً على هذا الحدث تستمر |
+| `charge_payment_started` | دفعة هـ (E5): ضغط «ادفع» على رسم معلّق (رسوم إضافية / فرق سعر) في `/track` أو «طلباتي» والانتقال لميسر | `order_number`، `charge_id`، `charge_kind` (`extra_fee` / `price_difference`)، `value` (مبلغ الرسم من الخادم)، `currency: "SAR"` | بدء دفع إضافي (Begin checkout ثانوي) |
+| `charge_purchase` | دفعة هـ (E5): العودة من ميسر إلى `/r/{order}?charge={cid}&status=success` **والخادم يؤكد أن الرسم مدفوع** — مرة واحدة لكل رسم (حارس `sessionStorage`) | `transaction_id` = `chg-{order}-{charge}` (مفتاح فاتورة ميسر نفسه)، `order_number`، `charge_id`، `charge_kind`، `value`، `currency: "SAR"` | تحويل شراء ثانوي (لا يُحتسب ضمن `purchase` الأصلي لأن `transaction_id` مختلف) |
+| `data_request_completed` | دفعة هـ (E4): العميل أرسل المرفق/التصحيح المطلوب من وضع التصحيح (`/create-contract?fix=…`) | `order_number`، `request_id`، `section` (اسم القسم)، `step`، `resolved` (`true` إذا أغلق الخادم الطلب تلقائياً) | قياس استجابة العملاء لطلبات المرفق الناقص (تشخيص / أتمتة) |
 
 ## ضبط الوسوم في GTM (خطوات مختصرة)
 
-1. **المتغيرات (Variables):** أنشئ متغيرات من نوع *Data Layer Variable* بالأسماء: `order_number`، `contract_type`، `value`، `transaction_id`، `currency`، `step`، `placement`.
+1. **المتغيرات (Variables):** أنشئ متغيرات من نوع *Data Layer Variable* بالأسماء: `order_number`، `contract_type`، `value`، `transaction_id`، `currency`، `step`، `placement`، و(دفعة هـ) `charge_id`، `charge_kind`، `request_id`، `section`، `resolved`.
 2. **المشغّلات (Triggers):** لكل حدث أنشئ مشغّل *Custom Event* باسم الحدث حرفياً (مثل `purchase`).
 3. **Google Ads — Conversion Tracking:**
    - الشراء: وسم Google Ads Conversion على مشغّل `purchase`، واملأ *Conversion Value* بـ `{{value}}` و*Currency Code* بـ `{{currency}}` و*Transaction ID* بـ `{{transaction_id}}` (يمنع تكرار العدّ).
@@ -37,6 +40,7 @@
 - **تحقّق فعلي (فحص 2026-10-08، Playwright مع GTM تجريبي):** الترتيب المسجّل في dataLayer لرحلة كاملة: `wizard_start` ← `wizard_step` 1..6 ← `review` ← `otp_requested` ← `otp_verified` ← `order_submitted` ← `payment_started` (value من الخادم) ← (بوابة ميسر) ← `purchase` مرة واحدة (لا يتكرر بعد تحديث الصفحة)، و`lessor_change_submitted` بقيمة 400.
 
 - التحويلات تُرسل من المتصفح فقط؛ لا توجد تحويلات من الخادم (Server-side) حالياً.
+- دفعة هـ: `charge_purchase` يعتمد على حالة الرسم من الخادم (`charges[].status = paid` في نتيجة `/contract/track`) لا على معاملات رابط العودة؛ `?status=success` مع رسم ما زال `pending` لا يطلق الحدث (تظهر رسالة «نؤكد الدفع مع البوابة»).
 - `purchase` يعتمد على تأكيد الخادم لحالة الدفع (`GET /status/success/{uuid}`) وليس على معاملات الرابط، فلا يُطلق عند فشل الدفع.
 - إشعار الكوكيز يظهر فقط عند ضبط `NEXT_PUBLIC_GTM_ID`، وموافقة Consent Mode الافتراضية «granted» (انظر `features/analytics/components/gtm-scripts.tsx`).
 - للاختبار: افتح الموقع مع `?gtm_debug=x` أو استخدم Tag Assistant، ثم مرّ على المعالج حتى نجاح الدفع وراقب الأحداث في Data Layer.

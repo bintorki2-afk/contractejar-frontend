@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
-import { parseChargeReturn } from "@/features/requests/components/charge-return-banner";
+import { parseChargeReturn } from "@/features/requests/utils/charge-return";
 import { parseFixParam } from "@/features/requests/utils/parse-fix-param";
 import TrackOrderForm from "@/features/track-order/components/track-order-form";
 
