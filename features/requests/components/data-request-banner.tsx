@@ -4,9 +4,10 @@ import Link from "next/link";
 import type { PendingDataRequest } from "@/features/requests/types/payment-state";
 import { cn } from "@/lib/utils";
 
-/** `/create-contract?id=…&fix=…&order=…&step=…` — وضع التصحيح في المعالج (W1d). */
+/** `/create-contract?id=…&fix=…&order=…&cid=…&step=…` — وضع التصحيح في المعالج (W1d). */
 export function buildFixHref(input: {
   orderUuid: string;
+  contractId: number;
   contractType: "residential" | "commercial" | "housing" | string | null | undefined;
   requestId: number;
   step: number | null | undefined;
@@ -16,6 +17,7 @@ export function buildFixHref(input: {
     id: type,
     fix: String(input.requestId),
     order: String(input.orderUuid),
+    cid: String(Math.trunc(input.contractId)),
   });
   if (input.step != null && Number.isFinite(input.step)) {
     params.set("step", String(Math.trunc(input.step)));
@@ -25,6 +27,8 @@ export function buildFixHref(input: {
 
 type DataRequestBannerProps = {
   orderUuid: string;
+  /** Numeric contract id (`GET /contracts/{id}` in fix mode). */
+  contractId: number;
   contractType: string | null | undefined;
   requests: PendingDataRequest[];
   /** `?fix=<id>` from the smart link / push: that request is emphasised. */
@@ -38,6 +42,7 @@ type DataRequestBannerProps = {
  */
 export default function DataRequestBanner({
   orderUuid,
+  contractId,
   contractType,
   requests,
   highlightId = null,
@@ -80,6 +85,7 @@ export default function DataRequestBanner({
             <Link
               href={buildFixHref({
                 orderUuid,
+                contractId,
                 contractType,
                 requestId: request.id,
                 step: request.step,

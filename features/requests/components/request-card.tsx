@@ -201,6 +201,7 @@ export default function RequestCard({ card, labels }: RequestCardProps) {
       {!card.isIncompleteDraft && card.pendingDataRequests.length > 0 ? (
         <DataRequestBanner
           orderUuid={card.uuid}
+          contractId={card.contractId}
           contractType={card.contractType}
           requests={card.pendingDataRequests}
           className="mt-5"

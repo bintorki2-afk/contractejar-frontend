@@ -285,6 +285,7 @@ export default function TrackOrderForm({
             <div ref={dataRequestsRef}>
               <DataRequestBanner
                 orderUuid={result.uuid || result.order_number}
+                contractId={result.id}
                 contractType={result.contract_type}
                 requests={pendingDataRequests}
                 highlightId={fixRequestId}

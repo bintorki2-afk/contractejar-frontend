@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 
 import CreateContractDeedStep from "@/features/create-contract/components/create-contract-deed-step";
+import CreateContractFixMode, {
+  type CreateContractFixParams,
+} from "@/features/create-contract/components/create-contract-fix-mode";
 import CreateContractFinanceStep from "@/features/create-contract/components/create-contract-finance-step";
 import CreateContractHeader from "@/features/create-contract/components/create-contract-header";
 import CreateContractIntroStep from "@/features/create-contract/components/create-contract-intro-step";
@@ -30,6 +33,8 @@ import { usePersistStoreHydrated } from "@/features/shared/hooks/use-persist-sto
 type CreateContractWizardProps = {
   labels: CreateContractLabels;
   contractType: ContractTypeId;
+  /** دفعة هـ (E4): عند وجوده يُعرض وضع التصحيح بدل المعالج الكامل. */
+  fix?: CreateContractFixParams | null;
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
 };
@@ -37,9 +42,38 @@ type CreateContractWizardProps = {
 export default function CreateContractWizard({
   labels,
   contractType,
+  fix = null,
   isDarkMode = false,
   onToggleDarkMode,
 }: CreateContractWizardProps) {
+  if (fix) {
+    return (
+      <CreateContractFixMode
+        labels={labels}
+        contractType={contractType}
+        fix={fix}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={onToggleDarkMode}
+      />
+    );
+  }
+
+  return (
+    <CreateContractFullWizard
+      labels={labels}
+      contractType={contractType}
+      isDarkMode={isDarkMode}
+      onToggleDarkMode={onToggleDarkMode}
+    />
+  );
+}
+
+function CreateContractFullWizard({
+  labels,
+  contractType,
+  isDarkMode = false,
+  onToggleDarkMode,
+}: Omit<CreateContractWizardProps, "fix">) {
   const { currentStep, goNext, goBack, goToStep } = useCreateContractSteps();
   const { handleStart: startFreshContract, isStarting } = useStartFreshContract(contractType);
   // GTM: wizard_start / wizard_step (docs/analytics-events.md).
@@ -63,6 +97,16 @@ export default function CreateContractWizard({
   const skipOwnerToTenant = useCreateContractDraftStore(
     (state) => state.skipOwnerToTenant,
   );
+  // A fix-mode draft left behind (customer navigated away mid-correction) is
+  // not a new order: clear it so the full wizard starts clean.
+  const staleFixMode = useCreateContractDraftStore((state) => state.fixMode);
+  useEffect(() => {
+    if (isDraftHydrated && staleFixMode) {
+      const store = useCreateContractDraftStore.getState();
+      store.setFixMode(null);
+      store.resetDraft();
+    }
+  }, [isDraftHydrated, staleFixMode]);
   const ownerSkipped = isOwnerStepSkipped({
     selectedDeedType,
     instrumentType,

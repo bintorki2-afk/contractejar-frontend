@@ -8,6 +8,7 @@ import {
   persistedToFiles,
   type PersistedFile,
 } from "@/lib/storage/persisted-files";
+import type { ContractFixModeState } from "@/features/create-contract/types/contract-fix-mode";
 import type { DeedTypeId } from "@/features/create-contract/types/deed-type";
 import { deedTypeIsLeaseRenewal } from "@/features/create-contract/types/deed-type";
 import type { LeaseRenewalAddressMode } from "@/features/create-contract/types/lease-renewal-address-mode";
@@ -146,6 +147,8 @@ type CreateContractDraftStore = {
   contractFinancialData: ContractFinancialData | null;
   contractFinanceSummaryData: ContractFinancialData | null;
   existingPropertyContext: ExistingPropertyContractContext | null;
+  /** دفعة هـ (E4): وضع التصحيح — خطوة واحدة فقط على طلب مدفوع (null = معالج عادي). */
+  fixMode: ContractFixModeState | null;
   deed: DeedDraftState;
   owner: OwnerDraftState;
   tenant: TenantDraftState;
@@ -153,6 +156,7 @@ type CreateContractDraftStore = {
   paymentData: PaymentDataState;
   contactWhatsapp: string;
   skippingOwnerStep: boolean;
+  setFixMode: (state: ContractFixModeState | null) => void;
   setCurrentStep: (step: CreateContractStep) => void;
   goNextStep: () => void;
   goBackStep: () => void;
@@ -452,6 +456,7 @@ function createInitialState() {
     contractFinancialData: null as ContractFinancialData | null,
     contractFinanceSummaryData: null as ContractFinancialData | null,
     existingPropertyContext: null as ExistingPropertyContractContext | null,
+    fixMode: null as ContractFixModeState | null,
     deed: { ...INITIAL_DEED },
     owner: { ...INITIAL_OWNER, ownerData: { ...EMPTY_OWNER_DATA }, agentData: { ...EMPTY_AGENT_DATA } },
     tenant: {
@@ -470,6 +475,7 @@ export const useCreateContractDraftStore = create<CreateContractDraftStore>()(
   persist(
     (set, get) => ({
       ...createInitialState(),
+      setFixMode: (fixMode) => set({ fixMode }),
       setCurrentStep: (step) => set({ currentStep: step, skippingOwnerStep: false }),
       goNextStep: () => {
         const index = CREATE_CONTRACT_STEPS.indexOf(get().currentStep);
@@ -1127,6 +1133,7 @@ export const useCreateContractDraftStore = create<CreateContractDraftStore>()(
         contractFinancialData: state.contractFinancialData,
         contractFinanceSummaryData: state.contractFinanceSummaryData,
         existingPropertyContext: state.existingPropertyContext,
+        fixMode: state.fixMode,
         deed: {
           currentPhaseIndex: state.deed.currentPhaseIndex,
           selectedDeedType: state.deed.selectedDeedType,

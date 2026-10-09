@@ -170,6 +170,7 @@ export default function RequestReceiveContractDialog({
         {pendingDataRequests.length > 0 ? (
           <DataRequestBanner
             orderUuid={detail?.uuid || contractUuid}
+            contractId={contractId}
             contractType={contractType}
             requests={pendingDataRequests}
             className="mb-4"

@@ -7,6 +7,7 @@ import {
   hasContractStep4PowerOfAttorneyFile,
   type ContractStep4Payload,
 } from "@/features/create-contract/utils/build-contract-step4-payload";
+import { normalizeContractStepFix } from "@/features/create-contract/types/contract-fix-api";
 import { apiFormDataRequest, apiRequest } from "@/lib/api/api-request";
 
 type ContractStep4ApiResponse = {
@@ -14,6 +15,8 @@ type ContractStep4ApiResponse = {
   code: number;
   success: boolean;
   data?: ContractStep4ApiData;
+  /** دفعة هـ (E4): وضع التصحيح — الحقول المتغيّرة والطلبات المحلولة. */
+  fix?: unknown;
 };
 
 export async function submitContractStep4(payload: ContractStep4Payload) {
@@ -40,6 +43,7 @@ export async function submitContractStep4(payload: ContractStep4Payload) {
     ok: true as const,
     data: response.data.data,
     message: response.data.message,
+    fix: normalizeContractStepFix(response.data.fix),
   };
 }
 
