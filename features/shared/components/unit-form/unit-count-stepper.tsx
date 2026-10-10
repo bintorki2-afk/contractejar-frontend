@@ -75,7 +75,7 @@ export default function UnitCountStepper({
       >
         <button
           type="button"
-          aria-label="decrease"
+          aria-label={`إنقاص ${label}`}
           disabled={!canDecrease}
           onClick={() => setCount(currentCount - 1)}
           className={cn(
@@ -92,7 +92,7 @@ export default function UnitCountStepper({
 
         <button
           type="button"
-          aria-label="increase"
+          aria-label={`زيادة ${label}`}
           disabled={!canIncrease}
           onClick={() => setCount(currentCount + 1)}
           className={cn(

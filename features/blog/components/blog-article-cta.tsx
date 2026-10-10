@@ -20,21 +20,26 @@ export default async function BlogArticleCta() {
           {t("description")}
         </p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-          <Link href="/create-contract?id=residential" className="sm:w-auto">
-            <Button className="h-12 w-full gap-3 rounded-full bg-white px-6 text-sm font-semibold text-brand dark:!text-[#005848] hover:bg-white/90 sm:w-auto">
+          {/* QA WEB-16: one link styled as a button — not a <button> inside an <a>. */}
+          <Button
+            asChild
+            className="h-12 w-full gap-3 rounded-full bg-white px-6 text-sm font-semibold text-brand dark:!text-[#005848] hover:bg-white/90 sm:w-auto"
+          >
+            <Link href="/create-contract?id=residential">
               <span>{t("residentialCta")}</span>
               <ArrowUpLeft className="size-4" aria-hidden="true" />
-            </Button>
-          </Link>
-          <Link href="/create-contract?id=commercial" className="sm:w-auto">
-            <Button
-              variant="outline"
-              className="h-12 w-full gap-3 rounded-full border-white/40 bg-transparent px-6 text-sm font-semibold text-white hover:bg-white/10 hover:text-white sm:w-auto"
-            >
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-12 w-full gap-3 rounded-full border-white/40 bg-transparent px-6 text-sm font-semibold text-white hover:bg-white/10 hover:text-white sm:w-auto"
+          >
+            <Link href="/create-contract?id=commercial">
               <span>{t("commercialCta")}</span>
               <ArrowUpLeft className="size-4" aria-hidden="true" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

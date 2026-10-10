@@ -114,7 +114,7 @@ export default async function ServicePage({
       <div className="container">
         {/* Breadcrumb */}
         <nav
-          aria-label="breadcrumb"
+          aria-label="مسار التنقل"
           className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground"
         >
           <Link href="/" className="inline-flex min-h-10 items-center transition-colors hover:text-brand">

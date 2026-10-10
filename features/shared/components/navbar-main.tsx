@@ -177,7 +177,7 @@ export default function NavbarMain({
         </IntentLink>
 
         <nav
-          aria-label="Main navigation"
+          aria-label="التنقل الرئيسي"
           className="hidden flex-1 items-center justify-center gap-6 lg:flex xl:gap-8"
         >
           <NavbarNavLink {...homeItem} />
