@@ -134,7 +134,7 @@ export default async function RootLayout({
     ? null
     : await getWebsiteClosedView(websiteStatus, locale);
 
-  // Organization + WebSite structured data (JSON-LD): يعرّف كيان «عقد إيجار»
+  // Organization + WebSite structured data (JSON-LD): يعرّف كيان «عقدي»
   // (الاسم/الشعار/التواصل) لمحركات البحث ومحرّكات AI ليظهر كمصدر موثوق.
   // رقم الدعم وحسابات التواصل من إعدادات الخادم (لا أرقام ولا حسابات ثابتة في الكود).
   const supportTel = (resolveFooterPhoneHref(settings) ?? "tel:+966597500014").replace(/^tel:/, "");
@@ -142,7 +142,7 @@ export default async function RootLayout({
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "عقد إيجار",
+    name: "عقدي",
     alternateName: "منصة توثيق عقود الإيجار",
     legalName: "مؤسسة عقدي العقارية",
     url: SITE_URL,
@@ -161,7 +161,7 @@ export default async function RootLayout({
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "عقد إيجار",
+    name: "عقدي",
     url: SITE_URL,
     inLanguage: "ar",
   };

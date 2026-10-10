@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "حالة المنصة",
-  description: "حالة خدمات منصة عقد إيجار الآن: الطلبات، قاعدة البيانات، الإشعارات، وبوابة الدفع.",
+  description: "حالة خدمات منصة عقدي الآن: الطلبات، قاعدة البيانات، الإشعارات، وبوابة الدفع.",
   path: "/status",
   noindex: true,
 });
@@ -42,7 +42,7 @@ export default async function StatusPage() {
           </div>
           <h1 className="text-3xl font-bold leading-tight md:text-4xl">هل كل شيء يعمل؟</h1>
           <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground">
-            نعرض هنا حالة خدمات «عقد إيجار» لحظة بلحظة. إذا واجهت مشكلة والصفحة تقول إن كل شيء سليم، تواصل معنا من{" "}
+            نعرض هنا حالة خدمات «عقدي» لحظة بلحظة. إذا واجهت مشكلة والصفحة تقول إن كل شيء سليم، تواصل معنا من{" "}
             <Link href="/support" className="font-bold text-brand underline-offset-4 hover:underline">
               صفحة الدعم
             </Link>

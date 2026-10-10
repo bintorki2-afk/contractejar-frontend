@@ -21,7 +21,7 @@ export function buildWhatsappHref(
   return `https://wa.me/${normalized}`;
 }
 
-// رقم دعم «عقد إيجار» (0597500014) — القيمة الاحتياطية الوحيدة في الكود (قاعدة ف18).
+// رقم دعم «عقدي» (0597500014) — القيمة الاحتياطية الوحيدة في الكود (قاعدة ف18).
 // المصدر الفعلي هو إعدادات الخادم (`whatsapp_contact` / `whatsapp` / `support_phone`
 // من GET /settings)؛ تُستخدم هذه القيمة فقط عند غياب الإعداد أو بقاء العيّنة التجريبية.
 export const DEFAULT_CONTACT_NUMBER = "966597500014";

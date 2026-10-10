@@ -99,7 +99,7 @@ type OrderPayload = {
 };
 
 function buildMessage(order: OrderPayload): string {
-  const lines: string[] = ["🆕 طلب جديد — عقد إيجار"];
+  const lines: string[] = ["🆕 طلب جديد — عقدي"];
 
   if (order.orderNumber) lines.push(`رقم الطلب: ${order.orderNumber}`);
   if (order.contractType) lines.push(`نوع العقد: ${order.contractType}`);

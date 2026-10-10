@@ -1,4 +1,4 @@
-# Security contact for contractejar.com (عقد إيجار)
+# Security contact for contractejar.com (عقدي)
 # https://www.rfc-editor.org/rfc/rfc9116
 # ⚠️ تأكد أن بريد التواصل أدناه يصل فعلاً (فعّل support@contractejar.com على
 #    الدومين) — بريد غير موجود أسوأ من عدم وجود الملف.

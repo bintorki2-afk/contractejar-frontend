@@ -13,8 +13,8 @@ describe("JsonLd (regression: 944d81c — stored XSS via settings social links)"
   });
 
   it("still produces valid JSON", () => {
-    const html = renderToStaticMarkup(<JsonLd data={{ name: "عقد إيجار <1>" }} />);
+    const html = renderToStaticMarkup(<JsonLd data={{ name: "عقدي <1>" }} />);
     const json = html.replace(/^<script[^>]*>/, "").replace(/<\/script>$/, "");
-    expect(JSON.parse(json)).toEqual({ name: "عقد إيجار <1>" });
+    expect(JSON.parse(json)).toEqual({ name: "عقدي <1>" });
   });
 });

@@ -60,7 +60,7 @@ const LABELS: RequestInvoiceDialogLabels = {
   tableDescription: "الوصف",
   tableAmount: "المبلغ",
   title: "الفاتورة",
-  platformName: "عقد إيجار",
+  platformName: "عقدي",
   platformSubtitle: "منصة توثيق عقود الإيجار",
   printLabel: "طباعة / تحميل الفاتورة",
   totalDueLabel: "الإجمالي المستحق",
@@ -118,7 +118,7 @@ describe("W-2 — invoice on /track and /r/{order} from the track payload", () =
     expect(invoice?.transactions).toHaveLength(1);
     expect(invoice?.transactions[0]).toMatchObject({ kind: "bank_transfer", amount: 249, reference: "QA-TRF-301" });
     expect(invoice?.payment_state?.label).toBe("مدفوع · حوالة · 249 ر.س");
-    expect(invoice?.platform_name).toBe("عقد إيجار");
+    expect(invoice?.platform_name).toBe("عقدي");
     expect(invoice?.print_label).toBe("طباعة / تحميل الفاتورة");
     expect(invoice?.datetime_label).toMatch(/^10\/10\/2026, 01:45$/);
   });

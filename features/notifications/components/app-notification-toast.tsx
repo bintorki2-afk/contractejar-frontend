@@ -33,13 +33,13 @@ export default function AppNotificationToast({
 
         <Image
           src="/images/logo.png"
-          alt="عقد إيجار"
+          alt="عقدي"
           width={24}
           height={24}
           className="size-4 shrink-0 object-contain"
         />
         </div>
-        <span className="font-bold text-white">عقد إيجار</span>
+        <span className="font-bold text-white">عقدي</span>
       </div>
 
       <div className="flex items-start gap-3 p-4">

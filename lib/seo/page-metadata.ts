@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://contractejar.com";
-export const SITE_NAME = "عقد إيجار";
+export const SITE_NAME = "عقدي";
 export const SITE_TAGLINE = "منصة توثيق عقود الإيجار";
 export const DEFAULT_OG_IMAGE = { url: "/og-image.png", width: 1200, height: 630, alt: `${SITE_NAME} — ${SITE_TAGLINE}` };
 
@@ -12,7 +12,7 @@ type PageMetadataInput = {
   description: string;
   /** Canonical path, e.g. `/guide`. */
   path: string;
-  /** Use the title verbatim (no `| عقد إيجار` suffix). */
+  /** Use the title verbatim (no `| عقدي` suffix). */
   absoluteTitle?: boolean;
   /** `noindex, nofollow` for transactional / personal pages. */
   noindex?: boolean;
