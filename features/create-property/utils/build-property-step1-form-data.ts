@@ -1,3 +1,4 @@
+import { hasRealMapLocation } from "@/features/create-contract/utils/build-contract-step2-form-data";
 import type { PropertyDeedTypeId } from "@/features/create-property/types/deed-type";
 import type { PropertyNationalAddressMethodId } from "@/features/create-property/types/national-address";
 import {
@@ -28,6 +29,8 @@ export type PropertyStep1FormPayload = {
   manualAddress?: ManualNationalAddressData;
   latitude: number;
   longitude: number;
+  /** `housing` | `commercial` — sent on create (QA PROPS-5: was never sent). */
+  contractType?: "housing" | "commercial";
 };
 
 export function appendPropertyStep1Fields(
@@ -39,6 +42,10 @@ export function appendPropertyStep1Fields(
   }
 
   formData.append("instrument_type", payload.instrumentType);
+
+  if (payload.contractType) {
+    formData.append("contract_type", payload.contractType);
+  }
 
   if (payload.imageInstrument) {
     formData.append("image_instrument", payload.imageInstrument);
@@ -95,8 +102,13 @@ export function appendPropertyStep1Fields(
     appendManualDeedEntryFields(formData, payload.manualDeedEntry);
   }
 
-  formData.append("latitude", String(payload.latitude));
-  formData.append("longitude", String(payload.longitude));
+  // QA PROPS-6: the Riyadh map placeholder was saved as every property's
+  // location. Only a real pin is sent; for a Google Maps link the server
+  // reads the coordinates from `address_url`.
+  if (hasRealMapLocation(payload.latitude, payload.longitude)) {
+    formData.append("latitude", String(payload.latitude));
+    formData.append("longitude", String(payload.longitude));
+  }
 
   if (payload.addressMethod === "photo" && payload.imageAddress) {
     formData.append("image_address", payload.imageAddress);

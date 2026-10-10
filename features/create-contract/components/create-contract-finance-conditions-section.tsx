@@ -151,6 +151,9 @@ export default function CreateContractFinanceConditionsSection({
           <Input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
+            // QA ORDERS-COM-6: a condition typed but never «+»-ed was lost on
+            // «متابعة» — leaving the field commits it.
+            onBlur={addCondition}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();

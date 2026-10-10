@@ -13,6 +13,8 @@ import {
 } from "@/features/create-property/types/deed-type";
 import { parsePropertyId } from "@/features/create-property/utils/parse-property-id";
 import { isPropertyDeedDataComplete } from "@/features/create-property/utils/validate-property-deed-data";
+import { toPropertyContractType } from "@/features/create-property/utils/contract-type";
+import { parsePropertyType } from "@/features/properties/types/property-type";
 
 export function useSubmitPropertyStep1() {
   const searchParams = useSearchParams();
@@ -181,7 +183,12 @@ export function useSubmitPropertyStep1() {
               ...payload,
               propertyId: editPropertyId,
             })
-          : await submitPropertyStep1(payload);
+          : await submitPropertyStep1({
+              ...payload,
+              contractType: toPropertyContractType(
+                parsePropertyType(searchParams.get("type") ?? undefined),
+              ),
+            });
 
       if (!result.ok) {
         return result;

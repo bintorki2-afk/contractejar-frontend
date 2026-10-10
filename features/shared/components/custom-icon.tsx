@@ -29,11 +29,34 @@ function injectSvgColors(svg: SVGSVGElement, size: number) {
   });
 }
 
+/**
+ * The riyal glyph is the only currency marker next to many amounts; without
+ * a text alternative screen readers and text extraction read «400» with no
+ * currency (QA PROPS-19). It gets a visually hidden «ريال».
+ */
+const CURRENCY_ICON_TEXT: Record<string, string> = {
+  "/icons/ryal.svg": "ريال",
+};
+
 export default function CustomIcon({
   src,
   size = 24,
   className,
 }: CustomIconProps) {
+  const currencyText = CURRENCY_ICON_TEXT[src];
+  if (currencyText) {
+    return (
+      <>
+        <IconSvg src={src} size={size} className={className} />
+        <span className="sr-only">{` ${currencyText}`}</span>
+      </>
+    );
+  }
+
+  return <IconSvg src={src} size={size} className={className} />;
+}
+
+function IconSvg({ src, size = 24, className }: CustomIconProps) {
   return (
     <ReactSVG
       src={src}

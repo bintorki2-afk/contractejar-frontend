@@ -1,5 +1,6 @@
 "use client";
 
+import { fileNameFromUrl } from "@/features/shared/utils/attachment-preview-actions";
 import {
   Check,
   CloudDownload,
@@ -116,7 +117,7 @@ function DeedFileRow({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cfe8e0] bg-[#f3faf7] px-3 py-2.5 dark:border-[#2f403b] dark:bg-[#16352f]">
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      <div className="flex w-full min-w-0 items-center gap-2.5 sm:w-auto sm:flex-1">
         <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand dark:text-[#48c0b8]">
           <Check className="size-4 shrink-0" aria-hidden="true" />
           <span>{labels.attached}</span>
@@ -173,7 +174,7 @@ function ExistingImageRow({
   onChangeFile: () => void;
   onDelete: () => void;
 }) {
-  const fileName = url.split("/").pop() || url;
+  const fileName = fileNameFromUrl(url);
   const extension = fileName.includes(".")
     ? (fileName.split(".").pop()?.toLowerCase() ?? "")
     : "";
@@ -181,7 +182,7 @@ function ExistingImageRow({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cfe8e0] bg-[#f3faf7] px-3 py-2.5 dark:border-[#2f403b] dark:bg-[#16352f]">
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      <div className="flex w-full min-w-0 items-center gap-2.5 sm:w-auto sm:flex-1">
         <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand dark:text-[#48c0b8]">
           <Check className="size-4 shrink-0" aria-hidden="true" />
           <span>{labels.attached}</span>

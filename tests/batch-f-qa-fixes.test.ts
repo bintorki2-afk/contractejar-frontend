@@ -104,3 +104,73 @@ describe("WEB-3 / WEB-4 — one Gregorian, Latin-digit date format", () => {
     expect(formatArDateTime("not-a-date")).toBe("");
   });
 });
+
+import { EMPTY_UNIT_DATA } from "@/features/create-unit/types/unit-data";
+import { buildUnitFieldsPayload } from "@/features/create-unit/utils/build-unit-api-payload";
+import { appendPropertyStep1Fields } from "@/features/create-property/utils/build-property-step1-form-data";
+import { fileNameFromUrl } from "@/features/shared/utils/attachment-preview-actions";
+import { sourceLinkRel } from "@/features/blog/components/blog-detail-sources";
+
+describe("PROPS-14 / ORDERS-RES-9 / ORDERS-COM-2 — unit payload", () => {
+  const unit = {
+    ...EMPTY_UNIT_DATA,
+    unitTypeId: "1",
+    unitUsageId: "2",
+    totalArea: "120",
+    floorNumber: "1",
+    unitNumber: "A1",
+  };
+
+  it("sends untouched counters as 0 instead of dropping them (saved as NULL)", () => {
+    const payload = buildUnitFieldsPayload(unit);
+    expect(payload.tootal_rooms).toBe(0);
+    expect(payload.The_number_of_toilets).toBe(0);
+    expect(payload.The_number_of_kitchens).toBe(0);
+    expect(payload.window_ac).toBe(0);
+    expect(payload.split_ac).toBe(0);
+  });
+
+  it("keeps «مؤثثة» even when new/used was not chosen", () => {
+    const payload = buildUnitFieldsPayload({ ...unit, furnished: true, furnishingType: "" });
+    expect(payload.furnished).toBe(true);
+    expect("type_furnished" in payload).toBe(false);
+    expect(buildUnitFieldsPayload({ ...unit, furnished: true, furnishingType: "new" }).type_furnished).toBe(true);
+  });
+});
+
+describe("PROPS-5 / PROPS-6 — property step 1 form data", () => {
+  const base = { instrumentType: "electronic", addressMethod: "link", addressUrl: "https://maps.google.com/?q=21.3891,39.8579" } as const;
+
+  it("sends contract_type and never the Riyadh placeholder coordinates", () => {
+    const formData = new FormData();
+    appendPropertyStep1Fields(formData, { ...base, latitude: 24.7136, longitude: 46.6753, contractType: "commercial" } as never);
+    expect(formData.get("contract_type")).toBe("commercial");
+    expect(formData.has("latitude")).toBe(false);
+    expect(formData.has("longitude")).toBe(false);
+    expect(formData.get("address_url")).toBe(base.addressUrl);
+  });
+
+  it("sends a real pin", () => {
+    const formData = new FormData();
+    appendPropertyStep1Fields(formData, { ...base, latitude: 21.4858, longitude: 39.1925 } as never);
+    expect(formData.get("latitude")).toBe("21.4858");
+    expect(formData.has("contract_type")).toBe(false);
+  });
+});
+
+describe("PROPS-20 — attachment names", () => {
+  it("hides the field key of a signed backend link", () => {
+    expect(fileNameFromUrl("http://x/api/v2/real-estates/14/deed-image/image_instrument?expires=1&signature=a")).toBe("");
+  });
+  it("keeps a real file name", () => {
+    expect(fileNameFromUrl("http://x/storage/deeds/deed-123.pdf")).toBe("deed-123.pdf");
+  });
+});
+
+describe("WEB-21 — blog sources rel", () => {
+  it("nofollows non-government domains only", () => {
+    expect(sourceLinkRel("https://ejari.sa/x")).toContain("nofollow");
+    expect(sourceLinkRel("https://www.ejar.sa/x")).toContain("nofollow");
+    expect(sourceLinkRel("https://moj.gov.sa/x")).not.toContain("nofollow");
+  });
+});

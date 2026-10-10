@@ -2959,7 +2959,10 @@
     "lessorChangeTypeLabel": "تغيير المؤجر",
     "trackOrder": "تتبّع الطلب",
     "whatsappSupport": "تواصل مع الدعم عبر واتساب",
-    "whatsappSupportMessage": "السلام عليكم، دفعت رسوم الطلب رقم {order} وأرغب بالاستفسار عن حالة التوثيق."
+    "whatsappSupportMessage": "السلام عليكم، دفعت رسوم الطلب رقم {order} وأرغب بالاستفسار عن حالة التوثيق.",
+    "notFoundTitle": "لم نجد هذا الطلب",
+    "notFoundDescription": "تأكد من رقم الطلب في الرابط، أو تتبّع طلبك برقم الطلب ورقم الجوال.",
+    "notFoundTrackLabel": "تتبّع طلب"
   },
   "startWithAqdi": {
     "dialog": {

@@ -2959,7 +2959,10 @@
     "lessorChangeTypeLabel": "Lessor change",
     "trackOrder": "Track order",
     "whatsappSupport": "Contact support on WhatsApp",
-    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the documentation status."
+    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the documentation status.",
+    "notFoundTitle": "We couldn't find this order",
+    "notFoundDescription": "Check the order number in the link, or track your order with its number and your mobile.",
+    "notFoundTrackLabel": "Track an order"
   },
   "startWithAqdi": {
     "dialog": {

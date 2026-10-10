@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuthStore } from "@/features/auth/stores/use-auth-store";
 import { getSaudiNationalMobile } from "@/features/auth/utils/normalize-saudi-phone";
 import {
   trackOrder,
@@ -154,6 +155,28 @@ export default function TrackOrderForm({
     }
   }
 
+  async function runTrack(orderValue: string, mobileValue: string, silent = false) {
+    setIsLoading(true);
+    setError(null);
+    setResult(null);
+
+    const response = await trackOrder({
+      order: orderValue,
+      mobile: digitsOnly(mobileValue),
+    });
+
+    setIsLoading(false);
+
+    if (!response.ok) {
+      if (!silent) {
+        setError(response.notFound ? t("notFound") : t("failed"));
+      }
+      return;
+    }
+
+    setResult(response.order);
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canSubmit) {
@@ -161,24 +184,34 @@ export default function TrackOrderForm({
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-    setResult(null);
+    await runTrack(orderDigits, mobile);
+  }
 
-    const response = await trackOrder({
-      order: orderDigits,
-      mobile: digitsOnly(mobile),
-    });
-
-    setIsLoading(false);
-
-    if (!response.ok) {
-      setError(response.notFound ? t("notFound") : t("failed"));
+  // QA ORDERS-COM-10: a signed-in customer coming back from paying a charge
+  // (or from a `?fix=` link) was asked for the mobile again. Use the account's
+  // mobile and look the order up once; if it is not that account's order, the
+  // form simply stays as it was (no error) for the customer to fill in.
+  const accountMobile = useAuthStore((state) => state.user?.mobile || state.user?.phone || "");
+  const autoTracked = useRef(false);
+  useEffect(() => {
+    if (autoTracked.current || !initialOrder || (!chargeReturn && fixRequestId == null)) {
       return;
     }
-
-    setResult(response.order);
-  }
+    const national = getSaudiNationalMobile(accountMobile);
+    if (!national) {
+      return;
+    }
+    const localMobile = `0${national}`;
+    // Deferred out of the effect body (no synchronous cascading render).
+    const id = window.setTimeout(() => {
+      autoTracked.current = true;
+      setMobile(localMobile);
+      void runTrack(digitsOnly(initialOrder), localMobile, true);
+    }, 0);
+    return () => window.clearTimeout(id);
+    // Runs once the persisted account is known.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountMobile]);
 
   return (
     <div className="mx-auto w-full max-w-xl space-y-6">

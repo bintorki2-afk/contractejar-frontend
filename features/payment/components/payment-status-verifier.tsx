@@ -1,6 +1,7 @@
 "use client";
 
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, SearchX } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -37,6 +38,9 @@ type PaymentStatusVerifierLabels = {
   retryPaymentErrorLabel: string;
   checkingTitle: string;
   checkingDescription: string;
+  notFoundTitle: string;
+  notFoundDescription: string;
+  notFoundTrackLabel: string;
   completedMessage: string;
   failedMessage: string;
   successHeadline: string;
@@ -48,6 +52,12 @@ type PaymentStatusVerifierLabels = {
   whatsappSupportMessage: string;
 };
 
+function isOrderNotFoundPayload(payload: unknown): boolean {
+  if (!payload || typeof payload !== "object") return false;
+  const row = payload as { not_found?: unknown; data?: { exists?: unknown } | null };
+  return row.not_found === true || row.data?.exists === false;
+}
+
 type PaymentStatusVerifierProps = {
   contractUuid: string;
   status: "success" | "error";
@@ -57,6 +67,7 @@ type PaymentStatusVerifierProps = {
 
 type VerificationState =
   | { state: "loading" }
+  | { state: "not_found" }
   | ({ state: "resolved" } & PaymentStatusUiState);
 
 export default function PaymentStatusVerifier({
@@ -109,6 +120,11 @@ export default function PaymentStatusVerifier({
         }
 
         if (!isMounted) {
+          return;
+        }
+
+        if (isOrderNotFoundPayload(payload)) {
+          setVerification({ state: "not_found" });
           return;
         }
 
@@ -180,6 +196,38 @@ export default function PaymentStatusVerifier({
           <p className="mt-3 text-sm leading-relaxed text-[#7f7f7f]">
             {labels.checkingDescription}
           </p>
+        </div>
+      </section>
+    );
+  }
+
+  if (verification.state === "not_found") {
+    return (
+      <section className="container py-8 lg:py-10">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm md:p-12 dark:bg-[#1a2421]">
+          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-brand-background text-brand">
+            <SearchX className="size-9" aria-hidden="true" />
+          </div>
+          <h1 className="mt-6 text-2xl font-extrabold text-brand md:text-3xl">
+            {labels.notFoundTitle}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-[#6f6f6f] dark:text-[#9eb5af]">
+            {labels.notFoundDescription}
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              href="/track"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-brand px-6 text-sm font-bold text-white hover:bg-brand/90"
+            >
+              {labels.notFoundTrackLabel}
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-[#e8e8e8] px-6 text-sm font-bold text-brand dark:border-[#2f403b] dark:text-[#48c0b8]"
+            >
+              {labels.backToHomeLabel}
+            </Link>
+          </div>
         </div>
       </section>
     );

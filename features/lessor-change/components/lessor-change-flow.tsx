@@ -155,7 +155,7 @@ async function notifyLessorChangeOrder(
               label: labels.birthDate,
               value: `${dob.day}/${dob.month}/${dob.year} (${dob.calendarType === "hijri" ? "هجري" : "ميلادي"})`,
             },
-            { label: labels.fee, value: String(order.fee) },
+            { label: labels.fee, value: `${order.fee.toLocaleString("en-US")} ريال` },
             { label: labels.notes, value: draft.notes },
           ],
         },
