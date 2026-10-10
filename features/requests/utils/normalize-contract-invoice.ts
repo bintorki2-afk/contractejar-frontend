@@ -96,6 +96,10 @@ export function normalizeContractInvoice(
   const extraTotal = asNullableNumber(raw.extra_total) ?? totals.extra;
   const refundedTotal = asNullableNumber(raw.refunded_total) ?? totals.refunded;
   const netTotal = asNullableNumber(raw.net_total) ?? totals.net;
+  const dueTotal = asNullableNumber(raw.due_total) ?? totals.due ?? null;
+  const outstandingTotal = asNullableNumber(raw.outstanding) ?? totals.outstanding ?? 0;
+  const owesMore =
+    (asBoolean(raw.has_outstanding) || outstandingTotal > 0) && dueTotal !== null && dueTotal > 0;
   const transactions = Array.isArray(raw.transactions)
     ? normalizePaymentDetails({ transactions: raw.transactions })?.transactions ?? []
     : details?.transactions ?? [];
@@ -122,8 +126,13 @@ export function normalizeContractInvoice(
     vat: asNullableNumber(raw.vat),
     vat_label: asString(raw.vat_label),
     total_due_label: asString(raw.total_due_label),
-    total_amount_label: asString(raw.total_amount_label),
-    total_amount: asNullableNumber(raw.total_amount),
+    // QA WEB-26: «الإجمالي المستحق» = what is owed. While money is still
+    // outstanding the server's `due_total` (additive) is the bottom line;
+    // otherwise `total_amount` (the cumulative net) as before.
+    total_amount_label: owesMore
+      ? asString(raw.due_total_label) || labelOrAmount(null, dueTotal)
+      : asString(raw.total_amount_label),
+    total_amount: owesMore ? dueTotal : asNullableNumber(raw.total_amount),
     amount_mismatch: asBoolean(raw.amount_mismatch),
     status,
     status_label: asString(raw.status_label),

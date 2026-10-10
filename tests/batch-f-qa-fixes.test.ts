@@ -187,3 +187,22 @@ describe("APP-7 / W-10 (website side) — fix outcome message", () => {
     expect(partial.remaining_items).toEqual(["صورة الوكالة"]);
   });
 });
+
+import { normalizeContractInvoice } from "@/features/requests/utils/normalize-contract-invoice";
+
+describe("WEB-26 — server invoice («طلباتي») bottom line", () => {
+  it("shows the due total while a charge is outstanding", () => {
+    const invoice = normalizeContractInvoice(
+      { contract_id: 318, total_amount: 2149, total_amount_label: "2,149 ريال", due_total: 2224, due_total_label: "2,224 ريال", outstanding: 75, has_outstanding: true },
+      318,
+    );
+    expect(invoice.total_amount).toBe(2224);
+    expect(invoice.total_amount_label).toBe("2,224 ريال");
+  });
+
+  it("keeps total_amount when nothing is outstanding", () => {
+    const invoice = normalizeContractInvoice({ contract_id: 1, total_amount: 349, total_amount_label: "349 ريال", due_total: 349, outstanding: 0 }, 1);
+    expect(invoice.total_amount).toBe(349);
+    expect(invoice.total_amount_label).toBe("349 ريال");
+  });
+});
