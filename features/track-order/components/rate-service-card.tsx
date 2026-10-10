@@ -16,7 +16,7 @@ const PLAY_STORE_REVIEW_URL = process.env.NEXT_PUBLIC_PLAY_STORE_REVIEW_URL || "
  */
 export default function RateServiceCard({ orderNumber }: { orderNumber: string }) {
   const whatsappBase = useWhatsappHref();
-  const text = `أبغى أقيّم خدمة «عقد إيجار» لطلبي رقم ${orderNumber}: ⭐⭐⭐⭐⭐\nملاحظاتي: `;
+  const text = `أبغى أقيّم خدمة «عقدي» لطلبي رقم ${orderNumber}: ⭐⭐⭐⭐⭐\nملاحظاتي: `;
   const whatsappHref = `${whatsappBase}${whatsappBase.includes("?") ? "&" : "?"}text=${encodeURIComponent(text)}`;
 
   return (

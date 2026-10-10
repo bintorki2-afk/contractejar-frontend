@@ -198,7 +198,7 @@ export default function PhoneLoginForm() {
                 autoComplete="tel-national"
                 autoFocus
                 placeholder={t("phonePlaceholder")}
-                className="h-full flex-1 bg-transparent px-4 text-base font-medium text-foreground outline-none placeholder:text-muted-foreground/70 md:text-sm"
+                className="h-full w-0 min-w-0 flex-1 bg-transparent px-4 text-base font-medium text-foreground outline-none placeholder:text-muted-foreground/70 md:text-sm"
                 {...field}
               />
             </div>

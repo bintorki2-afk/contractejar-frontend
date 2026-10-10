@@ -16,6 +16,8 @@ export type AccountNotification = {
   amount: number | null;
   /** Order number (contract uuid / lessor-change uuid) the notification belongs to. */
   orderNumber: string | null;
+  /** QA W-12: a charge request whose charge was later cancelled. */
+  cancelled?: boolean;
 };
 
 export type AccountNotificationApiItem = {
@@ -64,6 +66,7 @@ export function toAccountNotification(item: AccountNotificationApiItem): Account
     validUntil: extras.validUntil,
     amount: extras.amount,
     orderNumber: item.order_number?.trim() || item.contract_uuid?.trim() || extras.orderNumber,
+    cancelled: extras.cancelled,
   };
 }
 

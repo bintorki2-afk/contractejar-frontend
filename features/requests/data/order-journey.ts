@@ -24,6 +24,8 @@ export type OrderJourneyStep = {
   at: string | null;
   /** Employee name who did the step (server), if known. */
   by?: string | null;
+  /** Server: the current first step is really «بانتظار الدفع» (unpaid order). */
+  awaitingPayment?: boolean;
 };
 
 export type OrderJourneySideStateKey = "cancelled" | "refunded";
@@ -184,6 +186,13 @@ export function normalizeOrderJourney(raw: unknown): OrderJourneyStep[] | null {
       at: asString(row.at) || asString(row.created_at) || null,
       by: asString(row.by) || null,
     };
+    // Unpaid order (server `awaiting_payment`): the current first step reads
+    // «بانتظار الدفع», not «قيد المراجعة» with «تم استلام دفعتك» (QA ORDERS-RES-13).
+    if (asBoolean(row.awaiting_payment) && state === "current") {
+      step.awaitingPayment = true;
+      step.label = asLocalizedString(row.current_label) || "بانتظار الدفع";
+      step.description = "بعد الدفع يبدأ فريقنا مراجعة طلبك مباشرةً.";
+    }
 
     // A legacy 6-step payload yields two rows for the same key: keep one.
     const existingIndex = steps.findIndex((s) => s.key === key);

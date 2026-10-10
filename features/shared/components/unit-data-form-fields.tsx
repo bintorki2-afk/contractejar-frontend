@@ -259,7 +259,6 @@ export default function UnitDataFormFields({
               icon={<BedDouble className="size-4 text-brand-secondary" aria-hidden />}
               value={value.roomsCount}
               onChange={(roomsCount) => updateField("roomsCount", roomsCount)}
-              required
             />
             <UnitCountStepper
               label={labels.bathroomsCount.label}

@@ -115,16 +115,14 @@ export default function PricingCard({
         href={`/create-contract?id=${id}`}
         onClick={resetCreateContractDraft}
       >
-        <button
-          type="button"
-          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-extrabold text-white transition hover:bg-brand/90"
-        >
+        {/* QA WEB-16: the link's visual body, not a nested <button>. */}
+        <span className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-extrabold text-white transition hover:bg-brand/90">
           <span>{cta}</span>
           <ArrowLeft
             className="size-4 transition-transform duration-300 group-hover:rotate-45"
             aria-hidden="true"
           />
-        </button>
+        </span>
       </Link>
     </article>
   );

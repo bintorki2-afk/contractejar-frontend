@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "عقد إيجار",
-    short_name: "عقد إيجار",
+    name: "عقدي",
+    short_name: "عقدي",
     description: "جهّز عقد إيجارك السكني أو التجاري بسهولة وسرعة.",
     start_url: "/",
     scope: "/",

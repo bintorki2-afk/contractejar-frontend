@@ -1,14 +1,14 @@
 {
   "site": {
-    "metaTitle": "Ejar Contract | Lease documentation platform via Ejar",
+    "metaTitle": "Aqdi | Lease documentation platform via Ejar",
     "metaDescription": "Create a documented residential or commercial rental contract via the Ejar platform in minutes — simple steps, clear fees, and certified procedures that protect landlord and tenant rights.",
     "homeTitle": "Home",
     "aboutTitle": "About us",
-    "aboutDescription": "Learn about Rental Contract, our vision, mission, and values for documenting electronic rental contracts.",
+    "aboutDescription": "Learn about Aqdi, our vision, mission, and values for documenting electronic rental contracts.",
     "blogTitle": "Blog",
     "blogDescription": "Practical guides on leases in Saudi Arabia: landlord and tenant rights, Ejar documentation, termination, renewal and required documents.",
     "faqTitle": "FAQ",
-    "faqDescription": "Clear answers about documenting a lease with Ejar Contract: fees, documents, timing, order tracking and documentation in Ejar."
+    "faqDescription": "Clear answers about documenting a lease with Aqdi: fees, documents, timing, order tracking and documentation in Ejar."
   },
   "navbar": {
     "topBar": {
@@ -22,7 +22,7 @@
       "whatsappService": "Enjoy contract documentation service via WhatsApp"
     },
     "brand": {
-      "name": "Rental Contract",
+      "name": "Aqdi",
       "tagline": "Lease documentation platform"
     },
     "nav": {
@@ -39,11 +39,13 @@
       "track": "Track order",
       "lessorChange": "Lessor change"
     },
-    "cta": "Start with Rental Contract",
+    "cta": "Start with Aqdi",
     "profile": "Profile",
     "menu": "Menu",
     "myAccount": "My Account",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "login": "Log in",
+    "account": "My account"
   },
   "instrumentTypePopup": {
     "title": "Contract fees for {deedType}",
@@ -87,7 +89,14 @@
     "downloadApp": "Download the app now",
     "downloadOnThe": "Download On The",
     "googlePlay": "Google Play",
-    "appStore": "Apple Store"
+    "appStore": "Apple Store",
+    "nav": {
+      "sectionTitle": "My account",
+      "requests": "My orders",
+      "requestsHref": "/requests",
+      "properties": "My properties",
+      "propertiesHref": "/properties/my-properties"
+    }
   },
   "hero": {
     "badge": "Document your lease via the Ejar platform in minutes",
@@ -112,7 +121,7 @@
     "googlePlay": "Google Play",
     "appStore": "Apple Store",
     "whatsapp": "Contact via WhatsApp",
-    "visualAlt": "Rental Contract app showing a successfully issued lease contract",
+    "visualAlt": "Aqdi app showing a successfully issued lease contract",
     "compliantWith": "Compliant with official entities",
     "lessorChangeCta": "Lessor change",
     "lessorChangeHint": "New owner? Move the contracts to the new deed"
@@ -143,7 +152,7 @@
   },
   "services": {
     "title": "Our Services",
-    "description": "Use the Rental Contract app to document your residential and commercial contracts easily and securely.",
+    "description": "Use the Aqdi app to document your residential and commercial contracts easily and securely.",
     "downloadLabel": "Download the app now",
     "downloadOnThe": "Download On The",
     "googlePlay": "Google Play",
@@ -175,7 +184,7 @@
   "advantages": {
     "badge": "Our advantages",
     "titlePrefix": "Why ",
-    "titleAccent": "Rental Contract",
+    "titleAccent": "Aqdi",
     "titleSuffix": " !",
     "description": "Your documented contract via the Ejar network and the Real Estate General Authority in minutes.",
     "items": {
@@ -243,14 +252,14 @@
     "cta": "Contact via WhatsApp",
     "satisfaction": "⭐ 98% customer satisfaction",
     "responseTime": "Reply within 5 minutes",
-    "imageAlt": "Rental Contract WhatsApp support chat interface"
+    "imageAlt": "Aqdi WhatsApp support chat interface"
   },
   "appSection": {
     "eyebrow": "Mobile App",
     "titleLine1": "Document your contracts",
     "titleLine2": "from your smartphone",
-    "description": "Download the Rental Contract app and complete all your rental transactions from anywhere with an easy interface, instant notifications, and a seamless experience.",
-    "imageAlt": "A showcase of Rental Contract mobile app screens"
+    "description": "Download the Aqdi app and complete all your rental transactions from anywhere with an easy interface, instant notifications, and a seamless experience.",
+    "imageAlt": "A showcase of Aqdi mobile app screens"
   },
   "about": {
     "whoWeAre": {
@@ -284,23 +293,23 @@
     },
     "values": {
       "title": "Everything you need to know",
-      "description": "You can use the \"Rental Contract\" platform to document your residential and commercial contracts with ease.",
+      "description": "You can use the \"Aqdi\" platform to document your residential and commercial contracts with ease.",
       "vision": {
         "eyebrow": "Vision",
         "title": "Our vision..",
         "description": "To be the first choice in the real estate facilities sector and contribute to achieving Saudi Vision 2030 goals.",
-        "imageAlt": "Image representing Rental Contract vision"
+        "imageAlt": "Image representing Aqdi vision"
       },
       "mission": {
         "eyebrow": "Mission",
         "title": "Our mission",
         "description": "We provide trusted solutions focused on efficiency and effectiveness, while being a key factor in the success of our partners and employees.",
-        "imageAlt": "Image representing Rental Contract mission"
+        "imageAlt": "Image representing Aqdi mission"
       }
     },
     "coreValues": {
       "badge": "Our values",
-      "title": "Our values at Ejar Contract",
+      "title": "Our values at Aqdi",
       "description": "We commit to values that protect every party to the lease and keep documentation clear and secure.",
       "items": [
         {
@@ -329,7 +338,7 @@
     "beneficiaries": {
       "badge": "Beneficiary Customers",
       "title": "Who the service is for",
-      "description": "Ejar Contract serves every party to the lease in the Kingdom — individuals, businesses and real-estate offices.",
+      "description": "Aqdi serves every party to the lease in the Kingdom — individuals, businesses and real-estate offices.",
       "items": [
         {
           "id": "tenant",
@@ -419,7 +428,7 @@
       "saturdayHours": "Saturday from 9:00 AM to 2:00 PM",
       "email": ""
     },
-    "copyright": "All rights reserved Rental Contract {year} ©",
+    "copyright": "All rights reserved Aqdi {year} ©",
     "terms": "Terms and Conditions",
     "privacy": "Privacy Policy",
     "termsHref": "/terms",
@@ -430,13 +439,13 @@
     "terms": {
       "title": "Terms and Conditions",
       "metaTitle": "Terms and Conditions",
-      "metaDescription": "Read the terms and conditions for using Rental Contract electronic lease documentation platform.",
+      "metaDescription": "Read the terms and conditions for using Aqdi electronic lease documentation platform.",
       "empty": "Terms and conditions are not available at the moment."
     },
     "privacy": {
       "title": "Privacy Policy",
       "metaTitle": "Privacy Policy",
-      "metaDescription": "Read Rental Contract privacy policy and how we protect your data.",
+      "metaDescription": "Read Aqdi privacy policy and how we protect your data.",
       "empty": "Privacy policy is not available at the moment."
     },
     "updatedAt": "Last updated",
@@ -458,7 +467,7 @@
   },
   "notificationsPage": {
     "metaTitle": "Notifications",
-    "metaDescription": "View your Rental Contract notifications and contract status alerts.",
+    "metaDescription": "View your Aqdi notifications and contract status alerts.",
     "title": "Notifications",
     "subtitle": "Contract status alerts and notifications for your account.",
     "emptyTitle": "No notifications yet",
@@ -497,11 +506,11 @@
       },
       "sidebar": {
         "stats": {
-          "title": "Rental Contract Blog",
+          "title": "Aqdi Blog",
           "subtitle": "Your comprehensive real estate platform",
           "description": "We share with you the latest articles and tips in real estate, asset management, and creating professional contracts.",
           "statsHeading": "Ejar in numbers:",
-          "logoAlt": "Rental Contract logo",
+          "logoAlt": "Aqdi logo",
           "activeUsers": "+5M",
           "activeUsersLabel": "Active users",
           "annualContracts": "+2M",
@@ -552,7 +561,7 @@
           "title": "Weekly newsletter",
           "description": "The latest real estate articles and tips directly to your inbox.",
           "placeholder": "Write your email here..",
-          "subscribe": "Subscribe now with Rental Contract",
+          "subscribe": "Subscribe now with Aqdi",
           "submitEmailLabel": "Submit email"
         }
       },
@@ -675,8 +684,14 @@
   },
   "auth": {
     "hero": {
-      "imageAlt": "Rental Contract app showing a successfully issued lease contract",
-      "tagline": "Lease documentation platform"
+      "imageAlt": "Aqdi app showing a successfully issued lease contract",
+      "tagline": "Lease documentation platform",
+      "brand": "Aqdi",
+      "title": "Document your lease officially in minutes",
+      "subtitle": "Simple, trusted steps that protect every party's rights.",
+      "feature1": "Certified via the Ejar network",
+      "feature2": "Documented within minutes",
+      "feature3": "Protects every party's rights"
     },
     "login": {
       "back": "Back to home",
@@ -699,8 +714,12 @@
         "phoneRequired": "Mobile number is required",
         "phoneInvalid": "Please enter a valid Saudi mobile number",
         "passwordRequired": "Password is required",
-        "passwordMin": "Password must be at least 8 characters"
-      }
+        "passwordMin": "Password must be at least 8 characters",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@email.com"
     },
     "register": {
       "back": "Back to sign in",
@@ -773,8 +792,14 @@
       "backToLogin": "Back to sign in",
       "validation": {
         "phoneRequired": "Mobile number is required",
-        "phoneInvalid": "Please enter a valid Saudi mobile number"
-      }
+        "phoneInvalid": "Please enter a valid Saudi mobile number",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@email.com",
+      "sentTitle": "Check your email",
+      "sentHint": "If an account exists for this email, we've sent it a link to reset your password. Check your inbox (and spam folder)."
     },
     "resetPassword": {
       "back": "Go back",
@@ -847,6 +872,21 @@
         "otpRequired": "Code is required",
         "otpInvalid": "The code is 4 digits"
       }
+    },
+    "social": {
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "completing": "Signing you in...",
+      "error": "Couldn't sign you in. Please try again."
+    },
+    "verifyEmail": {
+      "back": "Back to log in",
+      "successTitle": "Your email is confirmed ✅",
+      "successHint": "Your account is active. You can now use all services.",
+      "invalidTitle": "Invalid confirmation link",
+      "invalidHint": "The link has expired or is incorrect. Log in and request a new confirmation link.",
+      "goLogin": "Go to log in",
+      "goHome": "Back to home"
     }
   },
   "properties": {
@@ -1111,7 +1151,7 @@
         "draftBadge": "Unpaid",
         "statusUpdatedToast": "Your request status was updated",
         "expectedDurationTitle": "Expected duration",
-        "expectedDurationBody": "After payment our employee receives your order during working hours (9:00 AM – 1:00 AM daily) and documents the contract in Ejar directly; you get a notification at every step. If we need an attachment or a correction, we send you a clear request.",
+        "expectedDurationBody": "After payment our employee receives your order during working hours and documents the contract in Ejar directly; you get a notification at every step. If we need an attachment or a correction, we send you a clear request.",
         "contactPrompt": "For more help, feel free to contact us",
         "whatsappCta": "Contact via WhatsApp",
         "whatsappHref": "https://wa.me/"
@@ -1122,7 +1162,7 @@
         "close": "Close",
         "loading": "Loading invoice...",
         "retry": "Retry",
-        "platformName": "Rental Contract",
+        "platformName": "Aqdi",
         "platformSubtitle": "Rental contract documentation platform",
         "customerLabel": "Customer",
         "requestNumberLabel": "Request number",
@@ -1158,7 +1198,9 @@
         "success": "Contract deleted successfully",
         "error": "Failed to delete contract"
       }
-    }
+    },
+    "noResults": "No requests match your search or filters.",
+    "clearSearch": "Clear search and filters"
   },
   "myProperties": {
     "backLabel": "Home",
@@ -1304,7 +1346,7 @@
     "stepper": {
       "journey": "Your rental journey just got easier.",
       "saveAlt": "Save",
-      "brand": "Rental Contract",
+      "brand": "Aqdi",
       "steps": {
         "deed": "Deed",
         "owner": "Owner",
@@ -2794,7 +2836,7 @@
         "copySuccess": "Order number copied",
         "copyError": "Could not copy the order number",
         "preparationDescription": "Our employee will receive your order and start working on it; the contract is documented in Ejar once payment is recorded",
-        "whatsappCta": "Rental Contract team is happy to hear from you",
+        "whatsappCta": "Aqdi team is happy to hear from you",
         "whatsappHref": "https://wa.me/"
       }
     },
@@ -2881,7 +2923,7 @@
       "verifyAndSubmit": "Verify and submit"
     },
     "uploadTooLarge": "The file is larger than 4 MB — take a lower-resolution photo or choose a smaller PDF.",
-    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF.",
+    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG or PDF.",
     "rentAmountWholeRiyals": "Only whole riyals are used — halalas after the decimal point are not added to the contract value."
   },
   "paymentStatus": {
@@ -2917,21 +2959,24 @@
     "lessorChangeTypeLabel": "Lessor change",
     "trackOrder": "Track order",
     "whatsappSupport": "Contact support on WhatsApp",
-    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the documentation status."
+    "whatsappSupportMessage": "Hello, I paid the fee for order {order} and would like to ask about the documentation status.",
+    "notFoundTitle": "We couldn't find this order",
+    "notFoundDescription": "Check the order number in the link, or track your order with its number and your mobile.",
+    "notFoundTrackLabel": "Track an order"
   },
   "startWithAqdi": {
     "dialog": {
-      "title": "Start with Rental Contract",
+      "title": "Start with Aqdi",
       "close": "Close",
       "mainTitle": "Electronic rental contract from the Ejar platform",
       "subtitle": "Now conclude your certified contract yourself through Ejar and the Real Estate General Authority.",
       "ejarLogoAlt": "Ejar logo",
-      "aqdiLogoAlt": "Rental Contract logo",
+      "aqdiLogoAlt": "Aqdi logo",
       "divider": "Choose the contract type to continue",
       "continue": "Continue",
       "newContract": {
         "title": "Create a rental contract",
-        "description": "Create a rental contract for a property not previously saved on the Rental Contract platform.",
+        "description": "Create a rental contract for a property not previously saved on the Aqdi platform.",
         "imageAlt": "Create a new rental contract"
       },
       "estateContract": {
@@ -3116,7 +3161,7 @@
     "badge": "Customer reviews",
     "titlePrefix": "What our",
     "titleAccent": "customers say",
-    "description": "Real experiences from customers who documented their contracts with Ejar Contract.",
+    "description": "Real experiences from customers who documented their contracts with Aqdi.",
     "summary": "Based on thousands of reviews",
     "contractType": {
       "residential": "Residential",
@@ -3124,7 +3169,7 @@
     },
     "empty": {
       "title": "Be the first to share your experience",
-      "description": "Document your contract with Ejar Contract, then leave a review to appear here and reassure others.",
+      "description": "Document your contract with Aqdi, then leave a review to appear here and reassure others.",
       "cta": "Create your contract"
     },
     "viewAll": "View all reviews",
@@ -3134,7 +3179,7 @@
   },
   "reviewsPage": {
     "metaTitle": "Customer Reviews",
-    "metaDescription": "Read real experiences from Ejar Contract customers documenting residential and commercial lease contracts, with ratings across Saudi cities.",
+    "metaDescription": "Read real experiences from Aqdi customers documenting residential and commercial lease contracts, with ratings across Saudi cities.",
     "title": "Customer reviews",
     "breadcrumbHome": "Home",
     "breadcrumb": "Reviews",
@@ -3150,7 +3195,7 @@
   },
   "guidePage": {
     "metaTitle": "How it works",
-    "metaDescription": "A step-by-step guide to documenting your residential or commercial lease online with Ejar Contract — requirements, steps, and tips.",
+    "metaDescription": "A step-by-step guide to documenting your residential or commercial lease online with Aqdi — requirements, steps, and tips.",
     "breadcrumbHome": "Home",
     "breadcrumb": "Guide",
     "title": "Your guide to documenting a lease",
@@ -3208,7 +3253,7 @@
   },
   "supportPage": {
     "metaTitle": "Support & Help",
-    "metaDescription": "Reach the Ejar Contract support team via WhatsApp or phone, and browse help topics and FAQs.",
+    "metaDescription": "Reach the Aqdi support team via WhatsApp or phone, and browse help topics and FAQs.",
     "breadcrumbHome": "Home",
     "breadcrumb": "Support & Help",
     "title": "How can we help?",

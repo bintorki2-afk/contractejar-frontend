@@ -38,41 +38,31 @@ export function buildUnitFieldsPayload(unitData: UnitDataState) {
     payload.contract_type = unitData.contractType;
   }
 
-  if (unitData.roomsCount !== "") {
-    const roomsCount = parseCount(unitData.roomsCount);
-    payload.tootal_rooms = roomsCount;
-    payload.number_of_rooms = roomsCount;
-  }
-
-  if (unitData.hallsCount !== "") {
-    payload.The_number_of_halls = parseCount(unitData.hallsCount);
-  }
-
-  if (unitData.kitchensCount !== "") {
-    payload.The_number_of_kitchens = parseCount(unitData.kitchensCount);
-  }
-
-  if (unitData.bathroomsCount !== "") {
-    const bathroomsCount = parseCount(unitData.bathroomsCount);
-    payload.The_number_of_toilets = bathroomsCount;
-    payload.The_number_of_the_toilet = bathroomsCount;
-  }
-
-  if (unitData.windowAcCount !== "") {
-    payload.window_ac = parseCount(unitData.windowAcCount);
-  }
-
-  if (unitData.splitAcCount !== "") {
-    payload.split_ac = parseCount(unitData.splitAcCount);
-  }
+  // QA PROPS-14 / ORDERS-RES-9: the steppers keep 0 as "" — an untouched
+  // counter is a real 0, so it is always sent (it used to be dropped and
+  // saved as NULL, shown as «-»). Rooms are optional (a shop or an office
+  // may have none), so the field no longer carries a misleading «*».
+  const roomsCount = parseCount(unitData.roomsCount);
+  payload.tootal_rooms = roomsCount;
+  payload.number_of_rooms = roomsCount;
+  payload.The_number_of_halls = parseCount(unitData.hallsCount);
+  payload.The_number_of_kitchens = parseCount(unitData.kitchensCount);
+  const bathroomsCount = parseCount(unitData.bathroomsCount);
+  payload.The_number_of_toilets = bathroomsCount;
+  payload.The_number_of_the_toilet = bathroomsCount;
+  payload.window_ac = parseCount(unitData.windowAcCount);
+  payload.split_ac = parseCount(unitData.splitAcCount);
 
   if (unitData.kitchenCabinetsInstalled) {
     payload.kitchen_tank = true;
   }
 
-  if (unitData.furnished && unitData.furnishingType !== "") {
+  // QA ORDERS-COM-2: «مؤثثة» without choosing new/used was silently dropped.
+  if (unitData.furnished) {
     payload.furnished = true;
-    payload.type_furnished = unitData.furnishingType === "new";
+    if (unitData.furnishingType !== "") {
+      payload.type_furnished = unitData.furnishingType === "new";
+    }
   }
 
   const electricityMeterNumber = unitData.electricityMeterNumber.trim();

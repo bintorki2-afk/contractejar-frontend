@@ -5,10 +5,9 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useHandleUnauthenticated } from "@/features/auth/hooks/use-handle-unauthenticated";
-import { startContract } from "@/features/create-contract/services/start-contract";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
+import { generateOrderReference } from "@/features/create-contract/utils/generate-order-reference";
 import type { PropertyUnitCardData } from "@/features/property-units/types/property-unit";
 import type { PropertyWithUnitsApiData } from "@/features/property-units/types/property-units-api";
 
@@ -21,14 +20,13 @@ function toContractTypeId(
 export function useStartContractFromUnit() {
   const router = useRouter();
   const t = useTranslations("propertyUnits.card");
-  const handleUnauthenticated = useHandleUnauthenticated();
   const startExistingPropertyContractFlow = useCreateContractDraftStore(
     (state) => state.startExistingPropertyContractFlow,
   );
   const [startingUnitIds, setStartingUnitIds] = useState<number[]>([]);
   const isStarting = startingUnitIds.length > 0;
 
-  async function handleStartContract(
+  function handleStartContract(
     selectedUnits: PropertyUnitCardData[],
     property: PropertyWithUnitsApiData,
   ) {
@@ -50,37 +48,23 @@ export function useStartContractFromUnit() {
     setStartingUnitIds(unitIds);
 
     try {
-      const result = await startContract({
-        contract_type: contractType,
-        is_real: true,
-        real_id: selectedUnits[0].propertyId,
-        unit_ids: unitIds,
-        instrument_type: property.instrument_type ?? undefined,
-      });
-
-      if (!result.ok) {
-        if (result.status === 401) {
-          handleUnauthenticated();
-          return;
-        }
-
-        toast.error(result.error || t("startContractError"));
-        return;
-      }
-
-      const resolvedUnitIds =
-        result.unitIds.length > 0 ? result.unitIds : unitIds;
-
+      // QA PROPS-8 — «المعالج مسودة أولاً»: nothing is created on the server
+      // until «إرسال الطلب». Calling `/contract/start` here left a «جديد»
+      // order behind on every click (7 clicks → 7 orders) and, because the
+      // session never recorded it as the server identity, the submit created
+      // a second one. The submit (`useSyncContractToServer`) starts the
+      // contract with `is_real`, `real_id` and `unit_ids` from this session.
       startExistingPropertyContractFlow({
         session: {
-          contractId: result.contractId,
-          uuid: result.uuid,
+          contractId: Date.now(),
+          uuid: globalThis.crypto?.randomUUID?.() ?? String(Date.now()),
           contractType,
           isReal: true,
           realId: selectedUnits[0].propertyId,
-          realUnitsId: result.realUnitsId ?? resolvedUnitIds[0],
-          unitIds: resolvedUnitIds,
-          unitsCount: result.unitsCount || resolvedUnitIds.length,
+          realUnitsId: unitIds[0],
+          unitIds,
+          unitsCount: unitIds.length,
+          orderReference: generateOrderReference(),
         },
         context: {
           property,

@@ -14,7 +14,7 @@ import { runWhenIdle } from "@/lib/perf/run-when-idle";
  * privacy-friendly. Loaded on the first interaction / a few seconds after load
  * so it never competes with the first paint (#27).
  */
-// Clarity project id for عقد إيجار (contractejar.com). Public by design — it
+// Clarity project id for عقدي (contractejar.com). Public by design — it
 // appears in the page source like any tracking id. An env var overrides it.
 const DEFAULT_CLARITY_ID = "yp4isdfowh";
 

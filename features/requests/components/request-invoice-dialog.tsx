@@ -28,7 +28,8 @@ const CUMULATIVE_LABELS = {
   method: "طريقة الدفع",
   reference: "المرجع",
   receipt: "إيصال الحوالة",
-  serverInvoice: "فتح الفاتورة الرسمية (PDF)",
+  // QA ORDERS-RES-11: the link opens a print page (save as PDF from there), not a .pdf file.
+  serverInvoice: "فتح الفاتورة الرسمية (طباعة / حفظ PDF)",
 };
 
 function formatTransactionDate(value: string | null) {

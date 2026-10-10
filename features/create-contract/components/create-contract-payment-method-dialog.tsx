@@ -308,7 +308,7 @@ export default function CreateContractPaymentMethodDialog({
                 <FlowSteps steps={labels.draft.steps} />
 
                 {labels.draft.note ? (
-                  <p className="mt-3 text-[11px] leading-relaxed text-[#6b7c76] dark:text-[#9eb5af]">
+                  <p className="mt-3 text-[11px] leading-relaxed text-[#5a6a64] dark:text-[#9eb5af]">
                     {labels.draft.note}
                   </p>
                 ) : null}

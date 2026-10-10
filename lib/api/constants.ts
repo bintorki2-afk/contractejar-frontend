@@ -11,9 +11,11 @@ export const GUEST_SESSION_COOKIE = "aqdi_guest";
 
 export const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30;
 
-// NOTE (test deployment): fall back to the Railway TEST backend when
-// NEXT_PUBLIC_BASE_URL is unset OR empty. A real env var still overrides this.
-// Revert to `?? ""` before shipping to production.
+// Fallback when NEXT_PUBLIC_BASE_URL is unset OR empty: the صقر ١ backend on
+// Railway (the live contractejar.com API — not a test server). A real env var
+// always overrides it. QA ORDERS-RES-16: before the move to aqdi.sa (Hostinger)
+// set NEXT_PUBLIC_BASE_URL explicitly there and drop this fallback (owner
+// decision — removing it now would break any deploy that relies on it).
 export const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ||
   "https://aqdi-new-backend-main-production.up.railway.app/api/v2";

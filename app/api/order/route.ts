@@ -99,7 +99,7 @@ type OrderPayload = {
 };
 
 function buildMessage(order: OrderPayload): string {
-  const lines: string[] = ["🆕 طلب جديد — عقد إيجار"];
+  const lines: string[] = ["🆕 طلب جديد — عقدي"];
 
   if (order.orderNumber) lines.push(`رقم الطلب: ${order.orderNumber}`);
   if (order.contractType) lines.push(`نوع العقد: ${order.contractType}`);
@@ -281,6 +281,18 @@ export async function POST(request: NextRequest) {
   const delivered = telegram || stored || emailed;
   const channels = { telegram, stored, emailed };
 
+  if (!delivered && !anyChannelConfigured) {
+    // QA ORDERS-RES-15: an environment with no notification channel (local,
+    // preview) is a configuration state, not a server error — the order was
+    // already saved on the backend. Answer 202 so the browser console stays
+    // clean; a configured-but-failing channel below is still a 502.
+    console.warn("[api/order] No order-notification channel configured", { channels });
+    return NextResponse.json(
+      { ok: true, delivered: false, reason: "no_channel_configured", channels },
+      { status: 202 },
+    );
+  }
+
   if (!delivered) {
     console.error("[api/order] No delivery channel succeeded", {
       anyChannelConfigured,
@@ -289,10 +301,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error: anyChannelConfigured ? "delivery_failed" : "server_not_configured",
+        error: "delivery_failed",
         channels,
       },
-      { status: anyChannelConfigured ? 502 : 500 },
+      { status: 502 },
     );
   }
 

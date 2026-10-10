@@ -44,7 +44,7 @@ export default function BlogListingPagination({
 
   return (
     <nav
-      aria-label="pagination"
+      aria-label="ترقيم الصفحات"
       className="flex max-w-full flex-wrap items-center justify-center gap-2 pt-4"
     >
       <button

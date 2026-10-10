@@ -119,11 +119,23 @@ export function printAttachment(url: string) {
   document.body.appendChild(iframe);
 }
 
+/**
+ * The customer-facing file name of an attachment URL, or "" when there is
+ * none worth showing. Signed backend links end in the *field key*
+ * (`…/deed-image/image_instrument?expires=…`) — showing «image_instrument»
+ * to a customer is a raw technical string (QA PROPS-20), so an extensionless
+ * snake_case segment yields "".
+ */
 export function fileNameFromUrl(url: string) {
   try {
     const path = new URL(url, "https://local.invalid").pathname;
     const name = path.split("/").filter(Boolean).pop();
-    return name ? decodeURIComponent(name) : "";
+    if (!name) return "";
+    const decoded = decodeURIComponent(name);
+    if (!decoded.includes(".") && /^[A-Za-z0-9_-]+$/.test(decoded)) {
+      return "";
+    }
+    return decoded;
   } catch {
     return "";
   }

@@ -4,7 +4,7 @@ import AccountDeleteContent from "@/features/auth/components/account-delete-cont
 
 export const metadata: Metadata = {
   title: "حذف الحساب",
-  description: "طلب حذف حساب عقد إيجار وبياناتك الشخصية.",
+  description: "طلب حذف حساب عقدي وبياناتك الشخصية.",
   robots: { index: false, follow: false },
 };
 

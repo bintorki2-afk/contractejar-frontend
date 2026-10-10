@@ -96,6 +96,10 @@ function Amount({ value }: { value: number }) {
   );
 }
 
+// QA PROPS-26: the server accepts WEBP for both deeds (`mimes:jpg,jpeg,png,webp,pdf`),
+// so the picker and its hint offer it too.
+const LESSOR_DEED_ACCEPT = "image/png,image/jpeg,image/webp,application/pdf";
+
 function StepBadge({
   index,
   label,
@@ -155,7 +159,7 @@ async function notifyLessorChangeOrder(
               label: labels.birthDate,
               value: `${dob.day}/${dob.month}/${dob.year} (${dob.calendarType === "hijri" ? "هجري" : "ميلادي"})`,
             },
-            { label: labels.fee, value: String(order.fee) },
+            { label: labels.fee, value: `${order.fee.toLocaleString("en-US")} ريال` },
             { label: labels.notes, value: draft.notes },
           ],
         },
@@ -198,6 +202,7 @@ export default function LessorChangeFlow({
 }: LessorChangeFlowProps) {
   const t = useTranslations("lessorChange.flow");
   const { info } = useLessorChangeInfo();
+  const lessorDeedLabels = { ...deedImageLabels, acceptedFormats: "png - jpeg - webp - pdf" };
   const authUser = useAuthStore((state) => state.user);
   const accountMobile = formatSaudiMobileForForm(authUser?.phone || authUser?.mobile || "");
   const isLoggedIn = authUser !== null && getSaudiNationalMobile(accountMobile) !== null;
@@ -516,7 +521,8 @@ export default function LessorChangeFlow({
             </div>
 
             <CreateContractDeedImageUpload
-              labels={deedImageLabels}
+              labels={lessorDeedLabels}
+              accept={LESSOR_DEED_ACCEPT}
               fieldLabel={t("oldDeedLabel")}
               value={draft.oldDeedFiles}
               onChange={(files) => update("oldDeedFiles", files)}
@@ -526,7 +532,8 @@ export default function LessorChangeFlow({
             />
 
             <CreateContractDeedImageUpload
-              labels={deedImageLabels}
+              labels={lessorDeedLabels}
+              accept={LESSOR_DEED_ACCEPT}
               fieldLabel={t("newDeedLabel")}
               value={draft.newDeedFiles}
               onChange={(files) => update("newDeedFiles", files)}

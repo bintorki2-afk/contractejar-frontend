@@ -123,10 +123,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     dateModified: article.date,
     image: `${SITE_URL}${article.coverImage}`,
     mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
-    author: { "@type": "Organization", name: "عقد إيجار" },
+    author: { "@type": "Organization", name: "عقدي" },
     publisher: {
       "@type": "Organization",
-      name: "عقد إيجار",
+      name: "عقدي",
       logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
     },
     inLanguage: "ar-SA",

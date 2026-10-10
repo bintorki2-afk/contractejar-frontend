@@ -58,7 +58,7 @@ export const GUIDE_TUTORIALS: GuideTutorial[] = [
   {
     id: "app",
     title: "التطبيق",
-    description: "جولة سريعة في تطبيق عقد إيجار: الطلبات، العقارات والإشعارات.",
+    description: "جولة سريعة في تطبيق عقدي: الطلبات، العقارات والإشعارات.",
     duration: "",
   },
 ];

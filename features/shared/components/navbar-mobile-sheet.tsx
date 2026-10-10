@@ -194,7 +194,7 @@ export default function NavbarMobileSheet({
         </SheetHeader>
 
         <div className="flex flex-col gap-5 py-4">
-          <nav aria-label="Main navigation" className="flex flex-col gap-1">
+          <nav aria-label="التنقل الرئيسي" className="flex flex-col gap-1">
             {primaryRows.map(renderRow)}
           </nav>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { fileNameFromUrl } from "@/features/shared/utils/attachment-preview-actions";
 import {
   Check,
   CloudDownload,
@@ -95,14 +96,14 @@ function ExistingFileRow({
   onChangeFile,
   onDelete,
 }: ExistingFileRowProps) {
-  const fileName = fileUrl.split("/").pop()?.split("?")[0] ?? labels.preview;
+  const fileName = fileNameFromUrl(fileUrl);
   const showThumbnail = isImageUrl(fileUrl);
 
   function handlePreview() {
     onPreview({
       url: fileUrl,
       isObjectUrl: false,
-      name: fileName,
+      name: fileName || labels.preview,
       isPdf: isPdfUrl(fileUrl),
       isImage: isImageUrl(fileUrl) || !isPdfUrl(fileUrl),
     });
@@ -110,7 +111,7 @@ function ExistingFileRow({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cfe8e0] bg-[#f3faf7] px-3 py-2.5 dark:border-[#2f403b] dark:bg-[#16352f]">
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      <div className="flex w-full min-w-0 items-center gap-2.5 sm:w-auto sm:flex-1">
         {showThumbnail ? (
           <button
             type="button"
@@ -205,7 +206,7 @@ function DeedFileRow({ file, labels, onDelete, onPreview }: DeedFileRowProps) {
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cfe8e0] bg-[#f3faf7] px-3 py-2.5 dark:border-[#2f403b] dark:bg-[#16352f]">
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      <div className="flex w-full min-w-0 items-center gap-2.5 sm:w-auto sm:flex-1">
         {previewUrl ? (
           <button
             type="button"

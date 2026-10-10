@@ -161,6 +161,8 @@ export type NotificationExtras = {
   requestId: number | null;
   /** دفعة هـ: معرّف الرسم (charge_payment_request / price_difference). */
   chargeId: number | null;
+  /** QA W-12: the charge was cancelled after this notification was sent. */
+  cancelled: boolean;
 };
 
 /** Reads coupon / validity / amount from the root or the `data` object. */
@@ -181,6 +183,7 @@ export function extractNotificationExtras(item: Record<string, unknown>): Notifi
     deepLink: asText(pick([item, data], ["deep_link", "fix_link"])),
     requestId: asAmount(pick([item, data], ["request_id", "data_request_id"])),
     chargeId: asAmount(pick([item, data], ["charge_id"])),
+    cancelled: pick([item, data], ["cancelled"]) === true,
   };
 }
 

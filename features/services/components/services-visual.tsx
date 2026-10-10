@@ -173,7 +173,7 @@ export default function ServicesVisual({
                     <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 3 5 6v5c0 4 3 6.5 7 8 4-1.5 7-4 7-8V6z" />
                     </svg>
-                    عقد إيجار
+                    عقدي
                   </span>
                 </div>
 

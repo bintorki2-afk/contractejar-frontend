@@ -28,6 +28,7 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<number | null>(null);
+  const openedByHover = useRef(false);
 
   // Close whenever the route changes (a menu item was followed).
   useEffect(() => {
@@ -78,7 +79,10 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
 
   function scheduleClose() {
     cancelClose();
-    closeTimer.current = window.setTimeout(() => setOpen(false), 150);
+    closeTimer.current = window.setTimeout(() => {
+      openedByHover.current = false;
+      setOpen(false);
+    }, 150);
   }
 
   const anyActive = items.some(
@@ -91,6 +95,9 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
       className="relative"
       onMouseEnter={() => {
         cancelClose();
+        // QA WEB-8: the click that follows a hover must not close what the
+        // hover just opened.
+        if (!open) openedByHover.current = true;
         setOpen(true);
       }}
       onMouseLeave={scheduleClose}
@@ -99,9 +106,17 @@ export default function NavbarMoreMenu({ label, items }: NavbarMoreMenuProps) {
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          if (openedByHover.current) {
+            openedByHover.current = false;
+            setOpen(true);
+            return;
+          }
+          setOpen((value) => !value);
+        }}
         className={cn(
-          "inline-flex items-center gap-1 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
+          // QA WEB-19: a ≥ 24px-tall hit area without shifting the navbar.
+          "-my-2 inline-flex min-h-10 items-center gap-1 py-2 font-bold outline-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2",
           open || anyActive ? "text-brand" : "text-black dark:text-white/85",
         )}
       >

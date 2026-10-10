@@ -44,7 +44,13 @@ export function buildPropertyActionHref(
   const unitParams = new URLSearchParams({
     propertyId: String(propertyId),
   });
-  const unitsHref = `/properties/my-properties/units?propertyId=${propertyId}&contract_type=${contractType}`;
+  // QA PROPS-5: properties saved before the wizard sent `contract_type` have
+  // none — never put the literal «null» in the URL; the units page then shows
+  // both tabs instead of a bogus type.
+  const knownType = contractType === "commercial" || contractType === "housing";
+  const unitsHref = knownType
+    ? `/properties/my-properties/units?propertyId=${propertyId}&contract_type=${contractType}`
+    : `/properties/my-properties/units?propertyId=${propertyId}`;
 
   switch (actionId) {
     case "view-edit":

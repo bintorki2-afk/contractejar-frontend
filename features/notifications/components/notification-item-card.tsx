@@ -125,7 +125,12 @@ export default function NotificationItemCard({
   /** Already formatted on the client (hydration-safe). */
   dateLabel: string;
 }) {
-  const meta = resolveNotificationKind(item.kind);
+  const kindMeta = resolveNotificationKind(item.kind);
+  // QA W-12: a cancelled charge no longer reads «رسوم بانتظار الدفع».
+  const meta =
+    item.cancelled && (kindMeta.key === "charge_payment_request" || kindMeta.key === "price_difference")
+      ? { ...kindMeta, tag: "أُلغيت الرسوم", tone: "brand" as const }
+      : kindMeta;
   const Icon = KIND_ICONS[meta.key] ?? Bell;
   const tone = TONE_STYLES[meta.tone];
   const showAmount = item.amount != null && (meta.key === "refund" || meta.key === "discount_applied");

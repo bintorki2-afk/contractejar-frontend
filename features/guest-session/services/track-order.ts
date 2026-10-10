@@ -44,6 +44,8 @@ export type TrackedOrder = {
   is_refunded?: boolean;
   created_at: string | null;
   updated_at: string | null;
+  /** QA WEB-11: last charge / data request / activity (server, additive). */
+  last_activity_at?: string | null;
 };
 
 type TrackOrderApiResponse = {

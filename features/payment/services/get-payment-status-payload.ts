@@ -42,6 +42,12 @@ export async function getPaymentStatusPayload(
         signal: AbortSignal.timeout(20000),
       },
     );
+    // QA ORDERS-RES-14 / WEB-28: an unknown order must not read as «فشلت
+    // عملية الدفع» with a retry button. A 404 (or `data.exists === false`)
+    // is passed on as a not-found marker.
+    if (response.status === 404) {
+      return { not_found: true };
+    }
     return await response.json().catch(() => null);
   } catch {
     return null;

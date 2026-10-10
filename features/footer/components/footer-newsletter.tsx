@@ -16,6 +16,9 @@ export default function FooterNewsletter({
     <form className="relative w-full">
       <Input
         type="email"
+        autoComplete="email"
+        // QA WEB-18: a placeholder is not a label for screen readers.
+        aria-label={placeholder}
         placeholder={placeholder}
         className={cn(
           "h-12 rounded-xl border-[#e5e5e5] dark:border-[#262d2c] bg-brand-background pe-14 ps-10 text-sm",

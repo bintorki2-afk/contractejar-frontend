@@ -15,6 +15,9 @@ export type RefundInfo = {
   partial: boolean;
   amount: number | null;
   at: string | null;
+  /** Server `payment_state.refund_pending`: refund approved, money not returned yet. */
+  pending?: boolean;
+  pendingAmount?: number | null;
 };
 
 const REFUNDED_CASES = new Set(["refunded", "refund", "returned", "return"]);
@@ -64,16 +67,25 @@ export function resolveRefundInfo(raw: unknown): RefundInfo {
     0,
   );
 
+  // QA WEB-5: «تم الاسترجاع · 0 ريال» — a zero is "no refund recorded yet",
+  // never an amount to show. The server's money state (`payment_state`) wins.
+  const paymentState = asRecord(row.payment_state);
+  const positive = (value: unknown) => {
+    const parsed = asAmount(value);
+    return parsed != null && parsed > 0 ? parsed : null;
+  };
   const amount =
-    asAmount(refund?.amount) ??
-    asAmount(row.refunded_amount) ??
-    asAmount(row.refund_amount) ??
+    positive(paymentState?.refunded_total) ??
+    positive(refund?.amount) ??
+    positive(row.refunded_amount) ??
+    positive(row.refund_amount) ??
     (refundsTotal > 0 ? refundsTotal : null);
 
   const refunded =
     cases.some((value) => REFUNDED_CASES.has(value)) ||
     refundState === "full" ||
     refundState === "refunded" ||
+    asText(paymentState?.status) === "refunded" ||
     row.is_refunded === true;
 
   const partial =
@@ -87,11 +99,22 @@ export function resolveRefundInfo(raw: unknown): RefundInfo {
       : null) ||
     null;
 
-  return { refunded, partial, amount: refunded || partial ? amount : null, at };
+  const result: RefundInfo = { refunded, partial, amount: refunded || partial ? amount : null, at };
+  if (paymentState?.refund_pending === true || paymentState?.refund_pending === 1) {
+    result.pending = true;
+    result.pendingAmount = positive(paymentState.refund_pending_amount);
+  }
+  return result;
 }
 
 /** «تم استرجاع 349 ريال» / «تم الاسترجاع». */
 export function formatRefundLabel(info: RefundInfo): string {
+  if (info.pending && info.amount == null) {
+    // QA WEB-5: approved but not yet returned — never «تم الاسترجاع».
+    return info.pendingAmount != null
+      ? `مسترجع — بانتظار إعادة المبلغ · ${info.pendingAmount.toLocaleString("en-US", { maximumFractionDigits: 2 })} ريال`
+      : "مسترجع — بانتظار إعادة المبلغ";
+  }
   const amount =
     info.amount != null
       ? `${info.amount.toLocaleString("en-US", { maximumFractionDigits: 2 })} ريال`

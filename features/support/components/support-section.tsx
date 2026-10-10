@@ -66,12 +66,12 @@ export default async function SupportSection({ content }: SupportSectionProps) {
           <div className="order-1 lg:order-2">
             <SupportVisual
               alt={resolved.imageAlt}
-              chatName="فريق دعم عقد إيجار"
+              chatName="فريق دعم عقدي"
               status="متصل الآن"
               messages={[
                 {
                   from: "in",
-                  text: "أهلاً بك في عقد إيجار 👋 كيف يمكنني مساعدتك في توثيق عقدك؟",
+                  text: "أهلاً بك في عقدي 👋 كيف يمكنني مساعدتك في توثيق عقدك؟",
                   time: "١:٣٠ ص",
                 },
                 {

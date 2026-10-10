@@ -70,7 +70,7 @@ export default function UnitOptionalCountField({
       >
         <button
           type="button"
-          aria-label="decrease"
+          aria-label={`إنقاص ${label}`}
           disabled={!enabled || currentCount <= 1}
           onClick={() => setCount(currentCount - 1)}
           className="inline-flex size-8 items-center justify-center rounded-full bg-[#1a1a1a] text-white disabled:opacity-40"
@@ -84,7 +84,7 @@ export default function UnitOptionalCountField({
 
         <button
           type="button"
-          aria-label="increase"
+          aria-label={`زيادة ${label}`}
           disabled={!enabled || currentCount >= max}
           onClick={() => setCount(currentCount + 1)}
           className="inline-flex size-8 items-center justify-center rounded-full bg-[#1a1a1a] text-white disabled:opacity-40"
