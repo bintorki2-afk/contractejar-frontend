@@ -64,16 +64,25 @@ export function resolveRefundInfo(raw: unknown): RefundInfo {
     0,
   );
 
+  // QA WEB-5: «تم الاسترجاع · 0 ريال» — a zero is "no refund recorded yet",
+  // never an amount to show. The server's money state (`payment_state`) wins.
+  const paymentState = asRecord(row.payment_state);
+  const positive = (value: unknown) => {
+    const parsed = asAmount(value);
+    return parsed != null && parsed > 0 ? parsed : null;
+  };
   const amount =
-    asAmount(refund?.amount) ??
-    asAmount(row.refunded_amount) ??
-    asAmount(row.refund_amount) ??
+    positive(paymentState?.refunded_total) ??
+    positive(refund?.amount) ??
+    positive(row.refunded_amount) ??
+    positive(row.refund_amount) ??
     (refundsTotal > 0 ? refundsTotal : null);
 
   const refunded =
     cases.some((value) => REFUNDED_CASES.has(value)) ||
     refundState === "full" ||
     refundState === "refunded" ||
+    asText(paymentState?.status) === "refunded" ||
     row.is_refunded === true;
 
   const partial =

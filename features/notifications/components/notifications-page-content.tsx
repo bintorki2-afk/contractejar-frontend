@@ -16,6 +16,7 @@ import {
 } from "@/features/notifications/stores/use-notifications-inbox-store";
 import { usePersistStoreHydrated } from "@/features/shared/hooks/use-persist-store-hydrated";
 import { cn } from "@/lib/utils";
+import { formatArDateTime } from "@/lib/utils/date-format";
 
 type NotificationsPageContentProps = {
   labels: NotificationsPageLabels;
@@ -24,15 +25,7 @@ type NotificationsPageContentProps = {
 };
 
 function formatDate(value: string | number | null) {
-  if (value == null) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("ar-SA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    // Fixed zone: the list is rendered on the server and in the browser.
-    timeZone: "Asia/Riyadh",
-  }).format(date);
+  return formatArDateTime(value);
 }
 
 export default function NotificationsPageContent({

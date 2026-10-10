@@ -48,6 +48,7 @@ import {
 } from "@/features/requests/data/order-journey";
 import { cn } from "@/lib/utils";
 import { digitsOnly } from "@/lib/utils/digits";
+import { formatArDateTime } from "@/lib/utils/date-format";
 
 const STEP_LABELS: Record<number, string> = {
   1: "الصك",
@@ -277,7 +278,11 @@ export default function TrackOrderForm({
                 )}
                 {result.status_label}
               </span>
-              {!isLessorChange ? <PaymentStateChip state={paymentState} /> : null}
+              {/* QA WEB-5: a refunded order must not also wear a green «مدفوع» chip;
+                  the chip shows only once the server's money state agrees. */}
+              {!isLessorChange && (!refund.refunded || paymentState?.status === "refunded") ? (
+                <PaymentStateChip state={paymentState} />
+              ) : null}
             </div>
           </div>
 
@@ -409,11 +414,8 @@ export default function TrackOrderForm({
                       {item.status_label}
                     </p>
                     {item.at ? (
-                      <p className="text-xs text-muted-foreground" dir="ltr">
-                        {new Date(item.at).toLocaleString("ar-SA-u-ca-gregory-nu-latn", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
+                      <p className="text-xs text-muted-foreground">
+                        <time dateTime={item.at}>{formatArDateTime(item.at)}</time>
                       </p>
                     ) : null}
                   </li>

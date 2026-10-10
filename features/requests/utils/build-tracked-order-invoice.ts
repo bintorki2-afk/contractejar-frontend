@@ -63,11 +63,13 @@ export function buildTrackedOrderInvoice(
 
   const state = normalizePaymentState(order.payment_state) ?? details.state;
   const paidTotal = state?.paid_total ?? 0;
+  // QA ORDERS-RES-5 / WEB-26: the server signs an `invoice_url` even before
+  // any payment, so a URL alone is not an invoice — an unpaid order showed
+  // «الفاتورة — 0 ريال». Only a recorded payment (or net money) is.
   const hasPayment =
     details.transactions.length > 0 ||
     paidTotal > 0 ||
-    (details.totals.net ?? 0) > 0 ||
-    Boolean(details.invoice_url);
+    (details.totals.net ?? 0) > 0;
   if (!hasPayment) {
     return null;
   }
@@ -88,6 +90,12 @@ export function buildTrackedOrderInvoice(
     }));
 
   const net = details.totals.net ?? paidTotal;
+  // «الإجمالي المستحق» must be what is owed, not what was paid (QA WEB-26):
+  // with money still outstanding (a pending charge) the bottom line is the
+  // server's `due` total; otherwise the cumulative net. No arithmetic here.
+  const outstanding = details.totals.outstanding ?? state?.outstanding ?? 0;
+  const dueTotal = details.totals.due ?? state?.due_total ?? null;
+  const bottomLine = outstanding > 0 && dueTotal != null && dueTotal > 0 ? dueTotal : net;
   const latestPaidAt =
     details.transactions
       .map((transaction) => transaction.paid_at)
@@ -108,8 +116,8 @@ export function buildTrackedOrderInvoice(
       contract_type_label: contractTypeLabel,
       items,
       total_due_label: labels.totalDueLabel,
-      total_amount: net,
-      total_amount_label: `${formatSar(net)} ريال`,
+      total_amount: bottomLine,
+      total_amount_label: `${formatSar(bottomLine)} ريال`,
       status: state?.status ?? (paidTotal > 0 ? "paid" : "unpaid"),
       status_label: state?.status_label ?? (paidTotal > 0 ? labels.paidStatusLabel : labels.unpaidStatusLabel),
       print_label: labels.printLabel,
