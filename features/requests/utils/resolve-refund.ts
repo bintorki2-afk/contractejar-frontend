@@ -15,6 +15,9 @@ export type RefundInfo = {
   partial: boolean;
   amount: number | null;
   at: string | null;
+  /** Server `payment_state.refund_pending`: refund approved, money not returned yet. */
+  pending?: boolean;
+  pendingAmount?: number | null;
 };
 
 const REFUNDED_CASES = new Set(["refunded", "refund", "returned", "return"]);
@@ -96,11 +99,22 @@ export function resolveRefundInfo(raw: unknown): RefundInfo {
       : null) ||
     null;
 
-  return { refunded, partial, amount: refunded || partial ? amount : null, at };
+  const result: RefundInfo = { refunded, partial, amount: refunded || partial ? amount : null, at };
+  if (paymentState?.refund_pending === true || paymentState?.refund_pending === 1) {
+    result.pending = true;
+    result.pendingAmount = positive(paymentState.refund_pending_amount);
+  }
+  return result;
 }
 
 /** «تم استرجاع 349 ريال» / «تم الاسترجاع». */
 export function formatRefundLabel(info: RefundInfo): string {
+  if (info.pending && info.amount == null) {
+    // QA WEB-5: approved but not yet returned — never «تم الاسترجاع».
+    return info.pendingAmount != null
+      ? `مسترجع — بانتظار إعادة المبلغ · ${info.pendingAmount.toLocaleString("en-US", { maximumFractionDigits: 2 })} ريال`
+      : "مسترجع — بانتظار إعادة المبلغ";
+  }
   const amount =
     info.amount != null
       ? `${info.amount.toLocaleString("en-US", { maximumFractionDigits: 2 })} ريال`

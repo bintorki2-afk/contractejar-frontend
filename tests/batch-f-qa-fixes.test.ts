@@ -206,3 +206,28 @@ describe("WEB-26 — server invoice («طلباتي») bottom line", () => {
     expect(invoice.total_amount_label).toBe("349 ريال");
   });
 });
+
+import { normalizeOrderJourney } from "@/features/requests/data/order-journey";
+
+describe("second pass — server fields from needs-frontend", () => {
+  it("WEB-5: refund_pending reads «بانتظار إعادة المبلغ», never «تم الاسترجاع»", () => {
+    const info = resolveRefundInfo({
+      status: "refunded",
+      payment_state: { status: "paid", refunded_total: 0, refund_pending: true, refund_pending_amount: 5047 },
+      refund: { status: "none", amount: 0 },
+    });
+    expect(info.pending).toBe(true);
+    expect(formatRefundLabel(info)).toBe("مسترجع — بانتظار إعادة المبلغ · 5,047 ريال");
+  });
+
+  it("ORDERS-RES-13: an unpaid order's current step reads «بانتظار الدفع»", () => {
+    const steps = normalizeOrderJourney([
+      { step: 1, key: "under_review", label: "قيد المراجعة", description: "تم استلام دفعتك وطلبك قيد المراجعة.", done: false, current: true, awaiting_payment: true, current_label: "بانتظار الدفع" },
+      { step: 2, key: "received_by_employee", label: "مستلم من الموظف", done: false, current: false },
+      { step: 3, key: "ejar_authenticated", label: "تم التوثيق", done: false, current: false },
+    ]);
+    expect(steps?.[0].label).toBe("بانتظار الدفع");
+    expect(steps?.[0].description).not.toMatch(/استلام دفعتك/);
+    expect(steps?.[0].awaitingPayment).toBe(true);
+  });
+});
