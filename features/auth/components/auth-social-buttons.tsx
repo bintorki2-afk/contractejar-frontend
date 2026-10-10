@@ -1,6 +1,6 @@
 "use client";
 
-import { FaApple, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 
 import { BASE_URL } from "@/lib/api/constants";
@@ -11,11 +11,11 @@ import { BASE_URL } from "@/lib/api/constants";
 const API_BASE_URL = BASE_URL;
 
 /**
- * Google / Apple sign-in. These are full-page navigations to the backend's
- * Socialite redirect route (OAuth is redirect-based, not fetch), which sends
- * the user to the provider and back to /auth/social-callback with a token.
+ * Google sign-in. This is a full-page navigation to the backend's Socialite
+ * redirect route (OAuth is redirect-based, not fetch), which sends the user to
+ * Google and back to /auth/social-callback with a token.
  *
- * The auth card is always light, so these use one light outline style (no dark
+ * The auth card is always light, so this uses one light outline style (no dark
  * variants) to stay consistent with the email/password inputs on the card.
  */
 export default function AuthSocialButtons() {
@@ -31,10 +31,11 @@ export default function AuthSocialButtons() {
         <span>{t("google")}</span>
       </a>
 
-      <a href={`${API_BASE_URL}/auth/web/apple/redirect`} className={baseClass}>
-        <FaApple className="size-[18px] text-black" aria-hidden="true" />
-        <span>{t("apple")}</span>
-      </a>
+      {/*
+        Apple sign-in is deferred until the Apple Services ID + signing key are
+        ready on the backend. Re-enable this button (and the FaApple import) once
+        the backend's apple provider is back in composer + configured.
+      */}
     </div>
   );
 }
