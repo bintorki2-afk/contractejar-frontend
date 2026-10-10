@@ -187,6 +187,6 @@ describe("data requests + fix deep-link routing (E4)", () => {
     expect(normalizeContractStepFix(undefined)).toBeNull();
     expect(
       normalizeContractStepFix({ fix_mode: true, changed_fields: ["image_instrument"], resolved_request_ids: ["3"], pending_data_requests: [], message: "تم الإرسال — سيراجعها الموظف." }),
-    ).toEqual({ fix_mode: true, changed_fields: ["image_instrument"], resolved_request_ids: [3], pending_data_requests: [], message: "تم الإرسال — سيراجعها الموظف." });
+    ).toEqual({ fix_mode: true, changed_fields: ["image_instrument"], resolved_request_ids: [3], pending_data_requests: [], message: "تم الإرسال — سيراجعها الموظف.", result: null, remaining_items: [] });
   });
 });

@@ -174,3 +174,16 @@ describe("WEB-21 — blog sources rel", () => {
     expect(sourceLinkRel("https://moj.gov.sa/x")).not.toContain("nofollow");
   });
 });
+
+import { normalizeContractStepFix, pickFixMessage } from "@/features/create-contract/types/contract-fix-api";
+
+describe("APP-7 / W-10 (website side) — fix outcome message", () => {
+  it("prefers what is still missing, then resolved, over a plain save", () => {
+    const saved = normalizeContractStepFix({ fix_mode: true, changed_fields: ["x"], resolved_request_ids: [], result: "saved", message: "تم حفظ تعديلك وإبلاغ الموظف." })!;
+    const partial = normalizeContractStepFix({ fix_mode: true, changed_fields: ["y"], resolved_request_ids: [], result: "partial", remaining_items: ["صورة الوكالة"], message: "استلمنا جزءاً من المطلوب — بقي: صورة الوكالة." })!;
+    const resolved = normalizeContractStepFix({ fix_mode: true, changed_fields: ["z"], resolved_request_ids: [3], result: "resolved", message: "تم الإرسال — سيراجعها الموظف." })!;
+    expect(pickFixMessage([saved, partial])).toBe(partial.message);
+    expect(pickFixMessage([saved, resolved])).toBe(resolved.message);
+    expect(partial.remaining_items).toEqual(["صورة الوكالة"]);
+  });
+});

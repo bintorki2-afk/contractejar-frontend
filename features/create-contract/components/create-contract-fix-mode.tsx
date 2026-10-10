@@ -15,7 +15,10 @@ import CreateContractOwnerStep from "@/features/create-contract/components/creat
 import CreateContractTenantStep from "@/features/create-contract/components/create-contract-tenant-step";
 import { loadContractForFix } from "@/features/create-contract/services/load-contract-for-fix";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
-import type { ContractStepFixPayload } from "@/features/create-contract/types/contract-fix-api";
+import {
+  pickFixMessage,
+  type ContractStepFixPayload,
+} from "@/features/create-contract/types/contract-fix-api";
 import {
   backendStepsForWizardStep,
   fixWizardStepFor,
@@ -223,8 +226,7 @@ export default function CreateContractFixMode({
         resolved,
       });
 
-      const message =
-        fixes.find((payload) => payload.message)?.message ?? "تم الإرسال — سيراجعها الموظف.";
+      const message = pickFixMessage(fixes) ?? "تم الإرسال — سيراجعها الموظف.";
       setResult({ message, resolved });
       setPhase("done");
       restoreDraftAfterFix();

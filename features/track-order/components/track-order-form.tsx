@@ -460,7 +460,7 @@ export default function TrackOrderForm({
           <OrderNotificationsList orderNumber={result.order_number} />
 
           <p className="text-xs text-muted-foreground">
-            {t("lastUpdate", { date: result.updated_at ?? "—" })}
+            {t("lastUpdate", { date: result.updated_at || formatArDateTime(result.last_activity_at) || "—" })}
           </p>
         </section>
       ) : null}

@@ -11,6 +11,9 @@ export type ContractStepFixPayload = {
   resolved_request_ids: number[];
   pending_data_requests: PendingDataRequest[];
   message: string | null;
+  /** Server outcome (additive): resolved · partial · saved · unchanged. */
+  result: "resolved" | "partial" | "saved" | "unchanged" | null;
+  remaining_items: string[];
 };
 
 export function normalizeContractStepFix(raw: unknown): ContractStepFixPayload | null {
@@ -28,5 +31,28 @@ export function normalizeContractStepFix(raw: unknown): ContractStepFixPayload |
       ? (row.pending_data_requests as PendingDataRequest[])
       : [],
     message: typeof row.message === "string" && row.message.trim() ? row.message.trim() : null,
+    result:
+      row.result === "resolved" || row.result === "partial" || row.result === "saved" || row.result === "unchanged"
+        ? row.result
+        : null,
+    remaining_items: Array.isArray(row.remaining_items)
+      ? row.remaining_items.filter((item): item is string => typeof item === "string" && item.trim() !== "")
+      : [],
   };
+}
+
+// «partial» first: what is still missing matters most to the customer.
+const RESULT_PRIORITY = ["partial", "resolved", "saved", "unchanged"] as const;
+
+/**
+ * One message for a fix submitted over several steps: the most meaningful
+ * server outcome wins (a step that only «saved» must not hide the step that
+ * resolved the request, or one that left items still missing).
+ */
+export function pickFixMessage(fixes: ContractStepFixPayload[]): string | null {
+  for (const result of RESULT_PRIORITY) {
+    const match = fixes.find((fix) => fix.result === result && fix.message);
+    if (match) return match.message;
+  }
+  return fixes.find((fix) => fix.message)?.message ?? null;
 }
