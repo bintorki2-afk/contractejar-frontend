@@ -185,14 +185,16 @@ export default function HeroMarquee() {
                     {/* dim — white in dark theme */}
                     <Image
                       data-dim
-                      data-base="0.45"
+                      data-base="0.75"
                       src={`/images/logos-white/${name}.png`}
                       alt=""
                       width={110}
                       height={36}
                       sizes="110px"
                       className="absolute inset-0 m-auto hidden h-auto max-h-9 w-auto max-w-full object-contain dark:block"
-                      style={{ opacity: 0.45 }}
+                      // QA WEB-20: 0.45 white on the deep-green dark theme
+                      // made the official logos all but vanish.
+                      style={{ opacity: 0.75 }}
                     />
                     {/* dim — grey in light theme */}
                     <Image

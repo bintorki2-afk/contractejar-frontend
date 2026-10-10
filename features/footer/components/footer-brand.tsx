@@ -22,7 +22,7 @@ export default async function FooterBrand({ description }: FooterBrandProps) {
         />
         <div className="space-y-2">
           <p className="text-4xl font-extrabold text-brand">{t("name")}</p>
-          <p className="font-medium text-gray-600 dark:text-white/60">{t("tagline")}...</p>
+          <p className="font-medium text-gray-600 dark:text-white/60">{t("tagline")}</p>
         </div>
       </Link>
       <p className="max-w-sm text-sm leading-7 text-muted-foreground">

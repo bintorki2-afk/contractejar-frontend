@@ -15,9 +15,10 @@ export default function HeroCtaButton({
   iconSrc,
   featured = false,
 }: HeroCtaButtonProps) {
+  // QA WEB-16: rendered inside a link, so it is the link's visual body — a
+  // <span>, not a nested interactive <button> (invalid HTML, unnamed link).
   return (
-    <button
-      type="button"
+    <span
       className={cn(
         "group flex h-12 w-full min-w-0 items-center gap-2.5 rounded-full bg-brand px-3 ps-4 pe-2.5 text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand/90 hover:shadow-lg hover:shadow-brand/25 active:translate-y-0 sm:h-14 sm:gap-3 sm:px-2 sm:pe-2 sm:ps-4 2xl:ps-5",
         // In dark mode the forest-green brand fill recedes into the deep
@@ -56,6 +57,6 @@ export default function HeroCtaButton({
           aria-hidden="true"
         />
       </span>
-    </button>
+    </span>
   );
 }

@@ -65,7 +65,7 @@ function Option({
       </span>
       <span>
         <span className="block text-[13px] font-bold text-[#12251f]">{title}</span>
-        <span className="block text-[11.5px] leading-snug text-[#6b7c76]">{desc}</span>
+        <span className="block text-[11.5px] leading-snug text-[#5a6a64]">{desc}</span>
       </span>
     </div>
   );
@@ -106,7 +106,7 @@ export function NationalAddressLinkHelp() {
           الصق
         </span>
       </div>
-      <p className="rounded-lg bg-[#f4f8f6] px-3 py-2 text-[12px] text-[#6b7c76]">
+      <p className="rounded-lg bg-[#f4f8f6] px-3 py-2 text-[12px] text-[#5a6a64]">
         يقبل روابط: <b className="text-brand">maps.app.goo.gl</b> أو{" "}
         <b className="text-brand">google.com/maps</b>
       </p>

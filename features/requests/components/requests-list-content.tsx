@@ -13,6 +13,7 @@ import RequestsHowItWorks from "@/features/requests/components/requests-how-it-w
 import RequestsOnboardingDialog from "@/features/requests/components/requests-onboarding-dialog";
 import type { RequestCardData } from "@/features/requests/types/request";
 import type { RequestLabels } from "@/features/requests/types/request-labels";
+import { toAsciiDigits } from "@/lib/utils/digits";
 
 type RequestsListContentProps = {
   labels: RequestLabels;
@@ -78,7 +79,8 @@ export default function RequestsListContent({
   });
 
   const filteredItems = useMemo(() => {
-    const query = search.trim().toLowerCase();
+    // QA WEB-27: «١١١» typed on an Arabic keyboard must match order 111…
+    const query = toAsciiDigits(search.trim()).toLowerCase();
 
     return items.filter((item) => {
       const matchesContractType =
@@ -125,6 +127,7 @@ export default function RequestsListContent({
             />
             <input
               type="search"
+              aria-label={labels.searchPlaceholder}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={labels.searchPlaceholder}
@@ -157,9 +160,22 @@ export default function RequestsListContent({
       />
 
       {filteredItems.length === 0 ? (
-        <p className="rounded-3xl bg-white px-6 py-12 text-center text-sm text-muted-foreground shadow-sm dark:border dark:border-[#262d2c] dark:bg-[#151c1b] dark:text-[#a3adac] dark:shadow-none">
-          {labels.emptyState}
-        </p>
+        <div className="space-y-3 rounded-3xl bg-white px-6 py-12 text-center text-sm text-muted-foreground shadow-sm dark:border dark:border-[#262d2c] dark:bg-[#151c1b] dark:text-[#a3adac] dark:shadow-none">
+          {/* …and a search/filter with no match is not an empty account. */}
+          <p role="status">{items.length > 0 ? t("noResults") : labels.emptyState}</p>
+          {items.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setFilters({ contractType: "all", requestType: "all" });
+              }}
+              className="text-sm font-bold text-brand underline underline-offset-2 dark:text-[#00a880]"
+            >
+              {t("clearSearch")}
+            </button>
+          ) : null}
+        </div>
       ) : (
         <RequestsGrid items={filteredItems} labels={labels.card} />
       )}

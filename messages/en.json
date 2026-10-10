@@ -1151,7 +1151,7 @@
         "draftBadge": "Unpaid",
         "statusUpdatedToast": "Your request status was updated",
         "expectedDurationTitle": "Expected duration",
-        "expectedDurationBody": "After payment our employee receives your order during working hours (9:00 AM – 1:00 AM daily) and documents the contract in Ejar directly; you get a notification at every step. If we need an attachment or a correction, we send you a clear request.",
+        "expectedDurationBody": "After payment our employee receives your order during working hours and documents the contract in Ejar directly; you get a notification at every step. If we need an attachment or a correction, we send you a clear request.",
         "contactPrompt": "For more help, feel free to contact us",
         "whatsappCta": "Contact via WhatsApp",
         "whatsappHref": "https://wa.me/"
@@ -1198,7 +1198,9 @@
         "success": "Contract deleted successfully",
         "error": "Failed to delete contract"
       }
-    }
+    },
+    "noResults": "No requests match your search or filters.",
+    "clearSearch": "Clear search and filters"
   },
   "myProperties": {
     "backLabel": "Home",
@@ -2921,7 +2923,7 @@
       "verifyAndSubmit": "Verify and submit"
     },
     "uploadTooLarge": "The file is larger than 4 MB — take a lower-resolution photo or choose a smaller PDF.",
-    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG, WEBP or PDF.",
+    "uploadInvalidType": "Unsupported file type — accepted formats: JPG, PNG or PDF.",
     "rentAmountWholeRiyals": "Only whole riyals are used — halalas after the decimal point are not added to the contract value."
   },
   "paymentStatus": {
