@@ -24,9 +24,19 @@ export type TrackedOrder = {
   status_color: string | null;
   status_client_explanation: string | null;
   timeline: Array<{ status_label: string; at: string | null }>;
-  /** ف2: the 6-step journey (contracts only). */
+  /** دفعة هـ: the 3-step journey (contracts only). */
   journey?: unknown;
   journey_sentence?: string | null;
+  /** دفعة هـ: ملغي / مسترجع — يحل محل تقدّم الرحلة. */
+  journey_side_state?: unknown;
+  /** دفعة هـ (E2/E5): حالة الدفع (5 حالات) — من الخادم فقط. */
+  payment_state?: unknown;
+  /** دفعة هـ (E5): رسوم إضافية / فرق سعر. */
+  charges?: unknown;
+  /** دفعة هـ (W-2): البنود + الإجماليات التراكمية + سجل الدفعات + `invoice_url` الموقّع. */
+  payment_details?: unknown;
+  /** دفعة هـ (E4): طلبات المرفق الناقص المفتوحة. */
+  pending_data_requests?: unknown;
   smart_link?: string | null;
   /** Batch D (B8): refund state — `{status: full|partial, amount, refunded_at}`. */
   refund?: { status?: string | null; amount?: number | string | null; refunded_at?: string | null } | null;

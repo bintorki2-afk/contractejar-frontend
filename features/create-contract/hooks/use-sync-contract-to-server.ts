@@ -5,45 +5,15 @@ import { useRef, useState } from "react";
 import { ensureGuestSession } from "@/features/guest-session/services/ensure-guest-session";
 import { setGuestContact } from "@/features/guest-session/services/set-guest-contact";
 import { startContract } from "@/features/create-contract/services/start-contract";
-import { submitContractStep1 } from "@/features/create-contract/services/submit-contract-step1";
-import { submitContractStep2 } from "@/features/create-contract/services/submit-contract-step2";
-import { submitContractStep3 } from "@/features/create-contract/services/submit-contract-step3";
-import { submitContractStep4 } from "@/features/create-contract/services/submit-contract-step4";
-import { submitContractStep5 } from "@/features/create-contract/services/submit-contract-step5";
-import { submitContractStep6 } from "@/features/create-contract/services/submit-contract-step6";
-import { getTenantRoles } from "@/features/create-contract/services/get-tenant-roles";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { ContractTypeId } from "@/features/create-contract/types/contract-type";
 import { toPropertyContractType } from "@/features/create-contract/types/contract-type";
 import {
-  deedTypeIsDeceasedOwner,
-  deedTypeIsWaqfOwner,
-} from "@/features/create-contract/types/deed-type";
-import { deedTypeSupportsManualEntry } from "@/features/shared/utils/supports-manual-deed-entry";
-import type { ContractStep3RepresentativeMode } from "@/features/create-contract/utils/build-contract-step3-form-data";
-import { isLeaseRenewalContract } from "@/features/create-contract/utils/is-lease-renewal-contract";
-import { isOwnerStepSkipped } from "@/features/create-contract/utils/is-owner-step-skipped";
-import { isSubleaseContract } from "@/features/create-contract/utils/is-sublease-contract";
-import { mapDeedTypeToInstrumentType } from "@/features/create-contract/utils/map-deed-type-to-instrument-type";
-import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
-import { persistedToFiles, type PersistedFile } from "@/lib/storage/persisted-files";
-import { MAX_SERVER_ACTION_UPLOAD_BYTES, totalBytes } from "@/lib/files/compress-image";
+  STEP_SYNCERS,
+  type SyncContractStage,
+} from "@/features/create-contract/utils/sync-contract-steps";
 
-// One step's attachments travel in one request (Vercel: 4.5 MB max) — say so
-// clearly instead of a failure the customer cannot act on.
-const STEP_UPLOAD_TOO_LARGE =
-  "حجم مرفقات هذه الخطوة أكبر من 4 ميجابايت مجتمعة. صوّر المستندات بدقة أقل أو أرسل ملفات PDF أصغر، ثم أعد الإرسال.";
-
-export type SyncContractStage =
-  | "session"
-  | "start"
-  | "deed"
-  | "address"
-  | "owner"
-  | "tenant"
-  | "units"
-  | "finance"
-  | "contact";
+export type { SyncContractStage } from "@/features/create-contract/utils/sync-contract-steps";
 
 export type SyncContractResult =
   | { ok: true; contractId: number; uuid: string }
@@ -53,22 +23,6 @@ export type SyncContractResult =
    * 4xx means the server rejected the data — the customer must fix it.
    */
   | { ok: false; stage: SyncContractStage; error: string; status: number };
-
-function firstFile(files: File[], persisted: PersistedFile[]): File | undefined {
-  if (files.length > 0 && files[0] instanceof File) {
-    return files[0];
-  }
-
-  return persistedToFiles(persisted)[0];
-}
-
-function allFiles(files: File[], persisted: PersistedFile[]): File[] {
-  if (files.length > 0 && files[0] instanceof File) {
-    return files;
-  }
-
-  return persistedToFiles(persisted);
-}
 
 /**
  * The same draft open in two tabs: tab A sends it (server contract #1 is saved
@@ -146,7 +100,6 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
     contactWhatsapp: string;
   }): Promise<SyncContractResult> {
     const store = useCreateContractDraftStore.getState();
-    const { deed, owner, tenant, financeData } = store;
 
     setIsSyncing(true);
 
@@ -194,185 +147,23 @@ export function useSyncContractToServer(contractType: ContractTypeId) {
         store.setServerContractIdentity({ contractId, uuid });
       }
 
-      const deedType = deed.selectedDeedType;
-      if (deedType === "") {
-        return { ok: false, stage: "deed", error: "missing deed type", status: 400 };
-      }
-
-      const skipState = { selectedDeedType: deedType };
-      const isLeaseRenewal = isLeaseRenewalContract(skipState);
-      const isSublease = isSubleaseContract(skipState);
-      const isDeceased = deedTypeIsDeceasedOwner(deedType);
-      const isWaqf = deedTypeIsWaqfOwner(deedType);
-
-      // 2) Deed (step1).
-      setStage("deed");
-      const deedPages = allFiles(deed.deedFiles, deed.deedPersistedFiles);
-      const useManual =
-        deed.useManualDeedEntry &&
-        deedTypeSupportsManualEntry(deedType) &&
-        isManualDeedEntryComplete(deed.manualDeedEntry);
-
-      const step1Files = [
-        ...deedPages,
-        firstFile(deed.deedFrontFiles, deed.deedFrontPersistedFiles),
-        firstFile(deed.deedBackFiles, deed.deedBackPersistedFiles),
-        isDeceased ? firstFile(deed.deedInheritanceFiles, deed.deedInheritancePersistedFiles) : undefined,
-        isDeceased ? firstFile(deed.deedHeirsPoaFiles, deed.deedHeirsPoaPersistedFiles) : undefined,
-        isWaqf ? firstFile(deed.deedEndowmentCertFiles, deed.deedEndowmentCertPersistedFiles) : undefined,
-        isWaqf ? firstFile(deed.deedTrusteeshipFiles, deed.deedTrusteeshipPersistedFiles) : undefined,
-        (isDeceased && deed.hasMinorHeirs) || (isWaqf && deed.isMultipleTrusteeshipDeedCopy)
-          ? firstFile(deed.deedGuardiansPoaFiles, deed.deedGuardiansPoaPersistedFiles)
-          : undefined,
+      // 2..7) Deed → address → owner → tenant → units → finance (shared with
+      // the fix mode of دفعة هـ, which sends one of these on its own).
+      const stages: Array<[SyncContractStage, number]> = [
+        ["deed", 1],
+        ["address", 2],
+        ["owner", 3],
+        ["tenant", 4],
+        ["units", 5],
+        ["finance", 6],
       ];
-      if (totalBytes(step1Files) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
-        return { ok: false, stage: "deed", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
-      }
-
-      const step1 = await submitContractStep1({
-        contractId,
-        instrumentType: mapDeedTypeToInstrumentType(deedType),
-        imageInstrument: deedPages[0],
-        imageInstrumentPages: deedPages.length > 1 ? deedPages.slice(1) : undefined,
-        imageInstrumentFront: firstFile(deed.deedFrontFiles, deed.deedFrontPersistedFiles),
-        imageInstrumentBack: firstFile(deed.deedBackFiles, deed.deedBackPersistedFiles),
-        imageInheritanceCertificate: isDeceased
-          ? firstFile(deed.deedInheritanceFiles, deed.deedInheritancePersistedFiles)
-          : undefined,
-        copyPowerOfAttorneyFromHeirsToAgent: isDeceased
-          ? firstFile(deed.deedHeirsPoaFiles, deed.deedHeirsPoaPersistedFiles)
-          : undefined,
-        copyOfTheEndowmentRegistrationCertificate: isWaqf
-          ? firstFile(deed.deedEndowmentCertFiles, deed.deedEndowmentCertPersistedFiles)
-          : undefined,
-        copyOfTheTrusteeshipDeed: isWaqf
-          ? firstFile(deed.deedTrusteeshipFiles, deed.deedTrusteeshipPersistedFiles)
-          : undefined,
-        isMultipleTrusteeshipDeedCopy: isWaqf ? deed.isMultipleTrusteeshipDeedCopy : undefined,
-        copyOfGuardiansPowerOfAttorneyForAgent:
-          (isDeceased && deed.hasMinorHeirs) || (isWaqf && deed.isMultipleTrusteeshipDeedCopy)
-            ? firstFile(deed.deedGuardiansPoaFiles, deed.deedGuardiansPoaPersistedFiles)
-            : undefined,
-        manualDeedEntry: useManual ? deed.manualDeedEntry : undefined,
-      });
-      if (!step1.ok) {
-        return { ok: false, stage: "deed", error: step1.error, status: step1.status };
-      }
-      store.setContractStep1Data(step1.data);
-
-      // 3) National address (step2) — not for sublease, and not when a lease
-      //    renewal keeps the same address.
-      const sendAddress =
-        !isSublease &&
-        !(isLeaseRenewal && deed.leaseRenewalAddressMode === "same") &&
-        deed.nationalAddressMethod !== "";
-
-      if (sendAddress && deed.nationalAddressMethod !== "") {
-        setStage("address");
-        const step2 = await submitContractStep2({
-          contractId,
-          addressMethod: deed.nationalAddressMethod,
-          latitude: deed.mapLocation.lat,
-          longitude: deed.mapLocation.lng,
-          imageAddress: firstFile(
-            deed.nationalAddressPhotoFiles,
-            deed.nationalAddressPhotoPersistedFiles,
-          ),
-          addressUrl: deed.nationalAddressLinkUrl.trim() || undefined,
-          manualAddress: deed.nationalAddressManual,
-        });
-        if (!step2.ok) {
-          return { ok: false, stage: "address", error: step2.error, status: step2.status };
+      for (const [stageName, stepNumber] of stages) {
+        setStage(stageName);
+        const outcome = await STEP_SYNCERS[stepNumber](useCreateContractDraftStore.getState(), contractId);
+        if (!outcome.ok) {
+          return { ok: false, stage: outcome.stage, error: outcome.error, status: outcome.status };
         }
-        store.setContractStep2Data(step2.data);
       }
-
-      // 4) Owner / representative (step3) — skipped for lease renewal & sublease.
-      if (!isOwnerStepSkipped(skipState)) {
-        setStage("owner");
-        const representativeMode: ContractStep3RepresentativeMode = isDeceased
-          ? "deceased"
-          : isWaqf
-            ? "waqf"
-            : null;
-        const agentFiles = allFiles(
-          owner.agentData.powerOfAttorneyFiles,
-          owner.agentPersistedFiles,
-        );
-        if (totalBytes(agentFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
-          return { ok: false, stage: "owner", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
-        }
-        const step3 = await submitContractStep3({
-          contractId,
-          ownerData: owner.ownerData,
-          agentData: { ...owner.agentData, powerOfAttorneyFiles: agentFiles },
-          representativeMode,
-        });
-        if (!step3.ok) {
-          return { ok: false, stage: "owner", error: step3.error, status: step3.status };
-        }
-        store.setContractStep3Data(step3.data);
-      }
-
-      // 5) Tenant (step4).
-      setStage("tenant");
-      const tenantData = tenant.tenantData;
-      const tenantOrgFiles = allFiles(
-        tenantData.organization.powerOfAttorneyFiles,
-        tenant.tenantPersistedFiles,
-      );
-      if (totalBytes(tenantOrgFiles) > MAX_SERVER_ACTION_UPLOAD_BYTES) {
-        return { ok: false, stage: "tenant", error: STEP_UPLOAD_TOO_LARGE, status: 413 };
-      }
-      const step4 = await submitContractStep4({
-        contractId,
-        tenantData: {
-          ...tenantData,
-          organization: {
-            ...tenantData.organization,
-            powerOfAttorneyFiles: tenantOrgFiles,
-          },
-        },
-        isLeaseRenewal,
-        notes:
-          isLeaseRenewal && tenant.leaseRenewalAddNotes
-            ? tenant.leaseRenewalNotes.trim() || undefined
-            : undefined,
-      });
-      if (!step4.ok) {
-        return { ok: false, stage: "tenant", error: step4.error, status: step4.status };
-      }
-      store.setContractStep4Data(step4.data);
-
-      // 6) Units (step5) — a lease renewal keeping the same unit sends nothing.
-      const sendUnits =
-        tenant.rentedUnits.length > 0 &&
-        !(isLeaseRenewal && (tenant.leaseRenewalUnitMode ?? "same") === "same");
-      if (sendUnits) {
-        setStage("units");
-        const step5 = await submitContractStep5({
-          contractId,
-          rentedUnits: tenant.rentedUnits,
-        });
-        if (!step5.ok) {
-          return { ok: false, stage: "units", error: step5.error, status: step5.status };
-        }
-        store.setContractStep5Data(step5.data);
-      }
-
-      // 7) Finance (step6).
-      setStage("finance");
-      let roles: Awaited<ReturnType<typeof getTenantRoles>> = [];
-      try {
-        roles = await getTenantRoles();
-      } catch {
-        // Roles are only needed to label deposit/fine; the ids still go through.
-      }
-      const step6 = await submitContractStep6({ contractId, financeData, roles });
-      if (!step6.ok) {
-        return { ok: false, stage: "finance", error: step6.error, status: step6.status };
-      }
-      store.setContractStep6Data(step6.data);
 
       // 8) Contact number for tracking / account merge (best-effort).
       setStage("contact");

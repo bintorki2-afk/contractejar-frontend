@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/dialog";
 import RequestCompletePaymentButton from "@/features/requests/components/request-complete-payment-button";
 import OrderNotificationsList from "@/features/notifications/components/order-notifications-list";
+import DataRequestBanner from "@/features/requests/components/data-request-banner";
+import OrderChargesList from "@/features/requests/components/order-charges-list";
 import OrderJourneySteps from "@/features/requests/components/order-journey-steps";
+import PaymentStateChip from "@/features/requests/components/payment-state-chip";
 import RefundBanner from "@/features/requests/components/refund-banner";
 import type { ContractPaymentMethodLabels } from "@/features/create-contract/hooks/use-contract-payment-method-flow";
 import { buildTemplateJourney } from "@/features/requests/data/order-journey";
@@ -40,6 +43,8 @@ type RequestReceiveContractDialogProps = {
   onOpenChange: (open: boolean) => void;
   contractId: number;
   contractUuid: string;
+  /** `residential` / `commercial` — for the fix-mode wizard link (E4). */
+  contractType?: "residential" | "commercial";
   actionType: RequestActionType;
   completePaymentLabel: string;
   completePaymentWithAmountLabel: string;
@@ -53,6 +58,7 @@ export default function RequestReceiveContractDialog({
   onOpenChange,
   contractId,
   contractUuid,
+  contractType = "residential",
   actionType,
   completePaymentLabel,
   completePaymentWithAmountLabel,
@@ -71,8 +77,8 @@ export default function RequestReceiveContractDialog({
   const subtitle = labels.subtitle.replace("{number}", String(requestId));
   const badgeLabel =
     detail?.journey_status_label || detail?.status_label || null;
-  // الخادم يعيد الرحلة الست (ف2)؛ عند غيابها نعرض القالب بحالة مشتقة من
-  // الدفع فقط (مدفوع ← الخطوتان الأوليان منجزتان).
+  // الخادم يعيد الرحلة الثلاثية (دفعة هـ)؛ عند غيابها نعرض القالب بحالة مشتقة من
+  // الدفع فقط (مدفوع ← «قيد المراجعة» منجزة).
   const journey =
     detail?.journey && detail.journey.length > 0
       ? detail.journey.map((step) => ({
@@ -81,10 +87,14 @@ export default function RequestReceiveContractDialog({
           description: step.description,
           state: step.state,
           at: step.at ?? null,
+          by: step.by ?? null,
         }))
       : detail
-        ? buildTemplateJourney(detail.is_completed ? 2 : 1)
+        ? buildTemplateJourney(detail.is_completed ? 1 : 0)
         : [];
+  const sideState = detail?.journey_side_state ?? null;
+  const pendingDataRequests = detail?.pending_data_requests ?? [];
+  const charges = detail?.charges ?? [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -111,7 +121,9 @@ export default function RequestReceiveContractDialog({
                 >
                   {badgeLabel}
                 </span>
-                {detail?.status_type === "draft" ? (
+                {detail?.payment_state ? (
+                  <PaymentStateChip state={detail.payment_state} />
+                ) : detail?.status_type === "draft" ? (
                   <span className="inline-flex items-center rounded-full bg-[#fff1e6] px-3 py-1 text-xs font-bold text-[#e67e22]">
                     {labels.draftBadge}
                   </span>
@@ -155,8 +167,31 @@ export default function RequestReceiveContractDialog({
           </div>
         ) : null}
 
+        {pendingDataRequests.length > 0 ? (
+          <DataRequestBanner
+            orderUuid={detail?.uuid || contractUuid}
+            contractId={contractId}
+            contractType={contractType}
+            requests={pendingDataRequests}
+            className="mb-4"
+          />
+        ) : null}
+
+        {charges.length > 0 ? (
+          <OrderChargesList
+            orderUuid={detail?.uuid || contractUuid}
+            charges={charges}
+            className="mb-4"
+          />
+        ) : null}
+
         {journey.length > 0 && !detail?.refund?.refunded ? (
-          <OrderJourneySteps steps={journey} showSentence />
+          <OrderJourneySteps
+            steps={journey}
+            showSentence
+            sentence={detail?.journey_sentence}
+            sideState={sideState}
+          />
         ) : null}
 
         {detail ? (

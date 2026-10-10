@@ -1,12 +1,15 @@
 /**
- * أنواع إشعارات العميل (دفعة د، item 54) — مصدر واحد لتصنيف الإشعار وعرضه.
+ * أنواع إشعارات العميل (دفعة د، item 54 + دفعة هـ) — مصدر واحد لتصنيف الإشعار وعرضه.
  *
  * الخادم يرسل `kind` (OfferResource) وحقولاً إضافية إما في الجذر أو داخل `data`:
  *  - `refund`            → `amount` (المبلغ المسترجع بالريال)
  *  - `discount_applied`  → `coupon_code` / `amount`
  *  - `offer` / `announcement` → `coupon_code` + `valid_until` (اختياريان)
- *  - `assigned`, `data_missing` (رابط للخطوة الناقصة), `status_changed`, `payment_success`,
- *    `draft_sent`, `notarized`, تذكيرات (`order_abandoned_*`, `awaiting_payment_2h`, `renewal_*`).
+ *  - `assigned`, `data_missing` (`deep_link` للخطوة الناقصة + `request_id`), `status_changed`,
+ *    `payment_success`, `notarized`, تذكيرات (`order_abandoned_*`, `awaiting_payment_2h`, `renewal_*`).
+ *  - دفعة هـ: `charge_payment_request` (رسوم إضافية بانتظار الدفع، `amount`)،
+ *    `price_difference` (فرق سعر بعد تعديل، `amount`). مرحلة «إرسال المسودة» أُلغيت
+ *    (E3): إشعارات `draft_sent` القديمة تُعرض كـ «تحديث الطلب».
  * أي نوع غير معروف يُعرض كإشعار عام.
  */
 
@@ -21,7 +24,8 @@ export type NotificationKindKey =
   | "data_missing"
   | "status_changed"
   | "payment_success"
-  | "draft_sent"
+  | "charge_payment_request"
+  | "price_difference"
   | "notarized"
   | "reminder"
   | "general";
@@ -42,7 +46,8 @@ const KIND_META: Record<NotificationKindKey, Omit<NotificationKindMeta, "key">> 
   data_missing: { tag: "بيانات ناقصة", tone: "warning" },
   status_changed: { tag: "تحديث الطلب", tone: "brand" },
   payment_success: { tag: "تم الدفع", tone: "success" },
-  draft_sent: { tag: "مسودة العقد", tone: "info" },
+  charge_payment_request: { tag: "رسوم بانتظار الدفع", tone: "warning" },
+  price_difference: { tag: "فرق سعر", tone: "warning" },
   notarized: { tag: "تم التوثيق", tone: "success" },
   reminder: { tag: "تذكير", tone: "warning" },
   general: { tag: "إشعار", tone: "brand" },
@@ -66,8 +71,14 @@ const ALIASES: Record<string, NotificationKindKey> = {
   lessor_change_status: "status_changed",
   payment_success: "payment_success",
   paid: "payment_success",
-  draft_sent: "draft_sent",
-  whatsapp_draft: "draft_sent",
+  charge_paid: "payment_success",
+  // تاريخية فقط (E3): لا مرحلة مسودة بعد الآن.
+  draft_sent: "status_changed",
+  whatsapp_draft: "status_changed",
+  charge_payment_request: "charge_payment_request",
+  extra_fee: "charge_payment_request",
+  price_difference: "price_difference",
+  data_request_resolved: "status_changed",
   notarized: "notarized",
   ejar_authenticated: "notarized",
   completed: "notarized",
@@ -90,7 +101,8 @@ export const ORDER_AFFECTING_KINDS: ReadonlySet<NotificationKindKey> = new Set([
   "data_missing",
   "status_changed",
   "payment_success",
-  "draft_sent",
+  "charge_payment_request",
+  "price_difference",
   "notarized",
 ]);
 
@@ -143,6 +155,12 @@ export type NotificationExtras = {
   orderNumber: string | null;
   /** Wizard step to complete (`data_missing`). */
   step: number | null;
+  /** دفعة هـ: رابط عميق `…/r/{order}?fix={id}&step={n}` (data_missing) أو رابط الدفع. */
+  deepLink: string | null;
+  /** دفعة هـ: معرّف طلب المرفق الناقص (data_missing). */
+  requestId: number | null;
+  /** دفعة هـ: معرّف الرسم (charge_payment_request / price_difference). */
+  chargeId: number | null;
 };
 
 /** Reads coupon / validity / amount from the root or the `data` object. */
@@ -157,9 +175,12 @@ export function extractNotificationExtras(item: Record<string, unknown>): Notifi
     couponCode: asText(pick(sources, ["coupon_code", "code", "promo_code"])) ??
       (typeof pick([item, data], ["coupon"]) === "string" ? asText(pick([item, data], ["coupon"])) : null),
     validUntil: asText(pick(sources, ["valid_until", "expires_at", "end_date", "valid_to", "expiry_date"])),
-    amount: asAmount(pick(sources, ["refund_amount", "refunded_amount", "amount", "discount_amount"])),
+    amount: asAmount(pick(sources, ["refund_amount", "refunded_amount", "amount", "charge_amount", "discount_amount"])),
     orderNumber: asText(pick([item, data], ["order_number", "contract_uuid", "uuid"])),
     step: stepValue != null && stepValue >= 1 && stepValue <= 7 ? Math.trunc(stepValue) : null,
+    deepLink: asText(pick([item, data], ["deep_link", "fix_link"])),
+    requestId: asAmount(pick([item, data], ["request_id", "data_request_id"])),
+    chargeId: asAmount(pick([item, data], ["charge_id"])),
   };
 }
 

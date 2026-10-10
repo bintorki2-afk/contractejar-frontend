@@ -1,6 +1,6 @@
 "use client";
 
-import { Printer, X } from "lucide-react";
+import { ExternalLink, Printer, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -10,15 +10,191 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PaymentStateChip from "@/features/requests/components/payment-state-chip";
 import { getContractInvoice } from "@/features/requests/services/get-contract-invoice";
 import type { ContractInvoice } from "@/features/requests/types/contract-invoice";
+import type { PaymentTransaction } from "@/features/requests/types/payment-state";
 import type { RequestInvoiceDialogLabels } from "@/features/requests/types/request-invoice-labels";
+import { formatSar } from "@/features/requests/utils/normalize-payment-state";
+
+/** تسميات القسم التراكمي وسجل الدفعات (دفعة هـ) — ثابتة بالعربية. */
+const CUMULATIVE_LABELS = {
+  original: "المدفوع الأصلي",
+  extra: "رسوم إضافية / فرق سعر",
+  refunded: "المسترجع",
+  net: "الصافي المدفوع",
+  outstanding: "المتبقي بانتظار الدفع",
+  transactions: "سجل الدفعات",
+  method: "طريقة الدفع",
+  reference: "المرجع",
+  receipt: "إيصال الحوالة",
+  serverInvoice: "فتح الفاتورة الرسمية (PDF)",
+};
+
+function formatTransactionDate(value: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Riyadh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
+/**
+ * الفاتورة التراكمية (دفعة هـ): الأصل + الإضافي − المسترجع = الصافي، مع
+ * المتبقي عند وجود رسوم معلّقة. يظهر فقط عندما توجد حركة بعد الدفعة الأصلية.
+ */
+function InvoiceCumulativeTotals({ invoice, print = false }: InvoiceDocumentProps & { print?: boolean }) {
+  if (!invoice.is_cumulative) {
+    return null;
+  }
+
+  const rows: Array<{ key: string; label: string; value: string; tone?: "refund" | "extra" | "due" }> = [
+    { key: "original", label: CUMULATIVE_LABELS.original, value: invoice.original_total_label },
+  ];
+  if ((invoice.totals.extra ?? 0) > 0) {
+    rows.push({ key: "extra", label: CUMULATIVE_LABELS.extra, value: `+ ${invoice.extra_total_label}`, tone: "extra" });
+  }
+  if ((invoice.totals.refunded ?? 0) > 0) {
+    rows.push({ key: "refunded", label: CUMULATIVE_LABELS.refunded, value: `- ${invoice.refunded_total_label}`, tone: "refund" });
+  }
+  if ((invoice.totals.outstanding ?? 0) > 0) {
+    rows.push({
+      key: "outstanding",
+      label: CUMULATIVE_LABELS.outstanding,
+      value: `${formatSar(invoice.totals.outstanding ?? 0)} ريال`,
+      tone: "due",
+    });
+  }
+
+  return (
+    <div
+      data-testid="invoice-cumulative"
+      className={
+        print
+          ? "mt-4 overflow-hidden rounded-2xl border border-brand/30"
+          : "mt-3 overflow-hidden rounded-2xl border border-[#ececec]"
+      }
+    >
+      {rows.map((row) => (
+        <div
+          key={row.key}
+          className="flex items-center justify-between gap-3 border-b border-[#f0f0f0] bg-white px-4 py-2.5 text-sm"
+        >
+          <span className="text-[#6f6f6f]">{row.label}</span>
+          <span
+            className={
+              row.tone === "refund"
+                ? "font-bold text-[#7c3aed]"
+                : row.tone === "due"
+                  ? "font-bold text-[#b45309]"
+                  : "font-bold text-[#222222]"
+            }
+          >
+            {row.value}
+          </span>
+        </div>
+      ))}
+      <div className="flex items-center justify-between gap-3 bg-brand-background-green/60 px-4 py-3">
+        <span className="text-sm font-bold text-[#3f4d4a]">{CUMULATIVE_LABELS.net}</span>
+        <span className={print ? "text-lg font-extrabold text-brand" : "text-sm font-extrabold text-brand"}>
+          {invoice.net_total_label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function transactionMeta(transaction: PaymentTransaction) {
+  return [
+    transaction.method_label,
+    transaction.card_last4 ? `•••• ${transaction.card_last4}` : null,
+    transaction.reference ? `${CUMULATIVE_LABELS.reference}: ${transaction.reference}` : null,
+    transaction.reason,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** سجل الدفعات: كل حركة (أصلية / رسوم إضافية / فرق سعر / حوالة / استرجاع) بمبلغها وطريقتها وتاريخها. */
+function InvoiceTransactions({ invoice, print = false }: InvoiceDocumentProps & { print?: boolean }) {
+  if (invoice.transactions.length === 0) {
+    return null;
+  }
+
+  return (
+    <div data-testid="invoice-transactions" className={print ? "mt-6" : "mt-4"}>
+      <p className="mb-2 text-sm font-extrabold text-[#222222]">{CUMULATIVE_LABELS.transactions}</p>
+      <div className="overflow-hidden rounded-2xl border border-[#ececec]">
+        {invoice.transactions.map((transaction, index) => {
+          const negative = transaction.amount < 0 || transaction.kind === "refund";
+          return (
+            <div
+              key={`${transaction.kind}-${transaction.id}`}
+              className={
+                index === 0
+                  ? "flex flex-wrap items-start justify-between gap-2 px-4 py-3 text-sm"
+                  : "flex flex-wrap items-start justify-between gap-2 border-t border-[#f0f0f0] px-4 py-3 text-sm"
+              }
+            >
+              <div className="min-w-0 space-y-0.5">
+                <p className="font-bold text-[#222222]">
+                  {transaction.kind_label}
+                  {transaction.status_label ? (
+                    <span className="ms-2 rounded-full bg-[#f3f3f3] px-2 py-0.5 text-[11px] font-semibold text-[#555555]">
+                      {transaction.status_label}
+                    </span>
+                  ) : null}
+                </p>
+                {transactionMeta(transaction) ? (
+                  <p className="text-xs text-[#8a8a8a]">{transactionMeta(transaction)}</p>
+                ) : null}
+                {transaction.paid_at ? (
+                  <p className="text-[11px] text-[#9a9a9a]" dir="ltr">
+                    {formatTransactionDate(transaction.paid_at)}
+                  </p>
+                ) : null}
+                {!print && transaction.receipt_url ? (
+                  <a
+                    href={transaction.receipt_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand underline-offset-2 hover:underline"
+                  >
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                    {CUMULATIVE_LABELS.receipt}
+                  </a>
+                ) : null}
+              </div>
+              <span className={negative ? "font-extrabold text-[#7c3aed]" : "font-extrabold text-[#222222]"}>
+                {negative ? "- " : ""}
+                {formatSar(Math.abs(transaction.amount))} ريال
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 type RequestInvoiceDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contractId: number;
   labels: RequestInvoiceDialogLabels;
+  /**
+   * دفعة هـ (W-2): فاتورة جاهزة من رد الخادم (مثل `payment_details` في
+   * `/contract/track`) — تُعرض كما هي بلا نداء `GET /invoices/{id}` الذي
+   * يتطلّب جلسة صاحب الطلب (صفحة التتبّع بلا حساب).
+   */
+  invoice?: ContractInvoice | null;
 };
 
 type InvoiceDocumentProps = {
@@ -179,19 +355,24 @@ function InvoiceDocument({ invoice, labels }: InvoiceDocumentProps) {
       ) : null}
 
       <InvoiceTotals invoice={invoice} labels={labels} />
+      <InvoiceCumulativeTotals invoice={invoice} labels={labels} />
+      <InvoiceTransactions invoice={invoice} labels={labels} />
 
-      {invoice.status_label ? (
-        <div className="mt-4 flex justify-center">
-          <span
-            className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-bold"
-            style={{
-              color: statusColor,
-              borderColor: statusColor,
-              backgroundColor: `${statusColor}14`,
-            }}
-          >
-            {invoice.status_label}
-          </span>
+      {invoice.status_label || invoice.payment_state ? (
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          {invoice.status_label ? (
+            <span
+              className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-bold"
+              style={{
+                color: statusColor,
+                borderColor: statusColor,
+                backgroundColor: `${statusColor}14`,
+              }}
+            >
+              {invoice.status_label}
+            </span>
+          ) : null}
+          <PaymentStateChip state={invoice.payment_state} />
         </div>
       ) : null}
     </div>
@@ -330,6 +511,8 @@ function InvoicePrintDocument({ invoice, labels }: InvoiceDocumentProps) {
         ) : null}
 
         <InvoiceTotals invoice={invoice} labels={labels} print />
+        <InvoiceCumulativeTotals invoice={invoice} labels={labels} print />
+        <InvoiceTransactions invoice={invoice} labels={labels} print />
 
         {invoice.status_label ? (
           <div className="mt-6 flex justify-center">
@@ -361,17 +544,19 @@ export default function RequestInvoiceDialog({
   onOpenChange,
   contractId,
   labels,
+  invoice: preloadedInvoice = null,
 }: RequestInvoiceDialogProps) {
-  const [isLoading, setIsLoading] = useState(open);
+  const [isLoading, setIsLoading] = useState(open && !preloadedInvoice);
   const [error, setError] = useState<string | null>(null);
-  const [invoice, setInvoice] = useState<ContractInvoice | null>(null);
+  const [fetchedInvoice, setFetchedInvoice] = useState<ContractInvoice | null>(null);
   const [wasOpen, setWasOpen] = useState(open);
+  const invoice = preloadedInvoice ?? fetchedInvoice;
 
   // Reset to a loading state during render when the dialog opens, so the
   // fetch effect below only sets state after the request resolves.
   if (open !== wasOpen) {
     setWasOpen(open);
-    if (open) {
+    if (open && !preloadedInvoice) {
       resetToLoading();
     }
   }
@@ -379,14 +564,14 @@ export default function RequestInvoiceDialog({
   function resetToLoading() {
     setIsLoading(true);
     setError(null);
-    setInvoice(null);
+    setFetchedInvoice(null);
   }
 
   // Bumped by the retry button to re-run the fetch effect.
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || preloadedInvoice) {
       return;
     }
 
@@ -401,17 +586,17 @@ export default function RequestInvoiceDialog({
 
         if (!result.ok) {
           setError(result.error || labels.loadError);
-          setInvoice(null);
+          setFetchedInvoice(null);
           return;
         }
 
-        setInvoice(result.data);
+        setFetchedInvoice(result.data);
         setError(null);
       })
       .catch(() => {
         if (!cancelled) {
           setError(labels.loadError);
-          setInvoice(null);
+          setFetchedInvoice(null);
         }
       })
       .finally(() => {
@@ -423,7 +608,7 @@ export default function RequestInvoiceDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, attempt, contractId, labels.loadError]);
+  }, [open, attempt, contractId, labels.loadError, preloadedInvoice]);
 
   function handlePrint() {
     if (!invoice) {
@@ -493,6 +678,18 @@ export default function RequestInvoiceDialog({
                 <Printer className="size-4 shrink-0" aria-hidden="true" />
                 {invoice.print_label}
               </button>
+            ) : null}
+
+            {invoice.invoice_url ? (
+              <a
+                href={invoice.invoice_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-[#e8e8e8] bg-white px-4 text-sm font-bold text-[#555555] transition-colors hover:bg-[#fafafa]"
+              >
+                <ExternalLink className="size-4 shrink-0" aria-hidden="true" />
+                {CUMULATIVE_LABELS.serverInvoice}
+              </a>
             ) : null}
           </>
         ) : null}

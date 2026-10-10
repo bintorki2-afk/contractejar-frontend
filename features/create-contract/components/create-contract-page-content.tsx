@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import type { CreateContractFixParams } from "@/features/create-contract/components/create-contract-fix-mode";
 import CreateContractWizard from "@/features/create-contract/components/create-contract-wizard";
 import ServicesPageBackConfig from "@/features/services/components/services-page-back-config";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
@@ -13,11 +14,14 @@ import { cn } from "@/lib/utils";
 type CreateContractPageContentProps = {
   labels: CreateContractLabels;
   contractType: ContractTypeId;
+  /** دفعة هـ (E4): وضع التصحيح — خطوة واحدة على طلب مدفوع. */
+  fix?: CreateContractFixParams | null;
 };
 
 export default function CreateContractPageContent({
   labels,
   contractType,
+  fix = null,
 }: CreateContractPageContentProps) {
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === "dark";
@@ -47,6 +51,7 @@ export default function CreateContractPageContent({
         <CreateContractWizard
           labels={labels}
           contractType={contractType}
+          fix={fix}
           isDarkMode={isDarkMode}
           onToggleDarkMode={toggleTheme}
         />

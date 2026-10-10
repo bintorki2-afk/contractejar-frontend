@@ -5,6 +5,7 @@ import {
   appendContractStep2Fields,
   type SubmitContractStep2Payload,
 } from "@/features/create-contract/utils/build-contract-step2-form-data";
+import { normalizeContractStepFix } from "@/features/create-contract/types/contract-fix-api";
 import { apiFormDataRequest } from "@/lib/api/api-request";
 
 type ContractStep2ApiResponse = {
@@ -12,6 +13,8 @@ type ContractStep2ApiResponse = {
   code: number;
   success: boolean;
   data?: ContractStep2ApiData;
+  /** دفعة هـ (E4): وضع التصحيح — الحقول المتغيّرة والطلبات المحلولة. */
+  fix?: unknown;
 };
 
 export async function submitContractStep2(payload: SubmitContractStep2Payload) {
@@ -35,5 +38,6 @@ export async function submitContractStep2(payload: SubmitContractStep2Payload) {
     ok: true as const,
     data: response.data.data,
     message: response.data.message,
+    fix: normalizeContractStepFix(response.data.fix),
   };
 }

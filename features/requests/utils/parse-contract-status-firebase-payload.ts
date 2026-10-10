@@ -15,8 +15,12 @@ const CONTRACT_EVENT_KINDS = new Set([
   "refund",
   "assigned",
   "payment_success",
-  "draft_sent",
   "notarized",
+  // دفعة هـ: رسوم/فرق سعر وطلب مرفق ناقص تغيّر ما يراه العميل على الطلب.
+  "charge_payment_request",
+  "price_difference",
+  "data_missing",
+  "data_request_resolved",
 ]);
 
 function asRecord(value: unknown): Record<string, string> | null {

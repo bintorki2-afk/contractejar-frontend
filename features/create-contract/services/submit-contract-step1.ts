@@ -4,6 +4,7 @@ import type { ContractInstrumentType } from "@/features/create-contract/types/in
 import type { ContractStep1ApiData } from "@/features/create-contract/types/contract-step1-api";
 import { appendManualDeedEntryFields } from "@/features/shared/types/manual-deed-entry";
 import type { ManualDeedEntryData } from "@/features/shared/types/manual-deed-entry";
+import { normalizeContractStepFix } from "@/features/create-contract/types/contract-fix-api";
 import { apiFormDataRequest } from "@/lib/api/api-request";
 
 type ContractStep1ApiResponse = {
@@ -11,6 +12,8 @@ type ContractStep1ApiResponse = {
   code: number;
   success: boolean;
   data?: ContractStep1ApiData;
+  /** دفعة هـ (E4): وضع التصحيح — الحقول المتغيّرة والطلبات المحلولة. */
+  fix?: unknown;
 };
 
 export type SubmitContractStep1Payload = {
@@ -114,5 +117,6 @@ export async function submitContractStep1(payload: SubmitContractStep1Payload) {
     ok: true as const,
     data: response.data.data,
     message: response.data.message,
+    fix: normalizeContractStepFix(response.data.fix),
   };
 }

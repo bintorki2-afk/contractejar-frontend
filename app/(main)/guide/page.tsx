@@ -92,7 +92,7 @@ export default async function GuidePage() {
           </ol>
         </section>
 
-        {/* رحلة الطلب بعد الإرسال (ف2) — نفس الخطوات الست التي يراها العميل في التتبّع */}
+        {/* رحلة الطلب بعد الإرسال (دفعة هـ) — نفس الخطوات الثلاث التي يراها العميل في التتبّع */}
         <section className="flex flex-col gap-6 rounded-3xl border border-border/60 bg-white p-7 shadow-sm dark:bg-white/[0.03]">
           <div className="flex flex-col gap-2">
             <h2 className="inline-flex items-center gap-2 text-2xl font-bold text-foreground">

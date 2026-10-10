@@ -14,7 +14,7 @@ function loadDocument(file, exportName) {
   // Inline the shared sentence import so the module evaluates standalone.
   source = source.replace(
     /import \{ ORDER_JOURNEY_SENTENCE \} from "@\/features\/requests\/data\/order-journey";/,
-    'const ORDER_JOURNEY_SENTENCE = "بعد الدفع نرسل لك مسودة العقد عبر واتساب للاطلاع عليها، ولا نوثّق العقد في إيجار إلا بعد اطلاعك على المسودة.";',
+    'const ORDER_JOURNEY_SENTENCE = "بعد الدفع يستلم موظفنا طلبك ويوثّق العقد في إيجار مباشرةً، وتصلك إشعارات بكل خطوة.";',
   );
   source = source.replace(/import type .* from "@\/content\/legal\/types";\n/, "");
   const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;

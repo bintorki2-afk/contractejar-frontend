@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getTranslations } from "next-intl/server";
 
+import type { CreateContractFixParams } from "@/features/create-contract/components/create-contract-fix-mode";
 import CreateContractPageContent from "@/features/create-contract/components/create-contract-page-content";
+import { parseFixParam, parseStepParam } from "@/features/requests/utils/parse-fix-param";
 import {
   contractPaperworkKeys,
   contractPaymentTypeKeys,
@@ -28,7 +30,8 @@ import {
 } from "@/features/create-contract/types/tenant-step";
 
 type CreateContractPageProps = {
-  searchParams: Promise<{ id?: string }>;
+  /** `fix` / `order` / `cid` / `step`: دفعة هـ (E4) — وضع التصحيح لطلب مدفوع. */
+  searchParams: Promise<{ id?: string; fix?: string; order?: string; cid?: string; step?: string }>;
 };
 
 export async function generateMetadata({
@@ -43,9 +46,16 @@ export async function generateMetadata({
 export default async function CreateContractPage({
   searchParams,
 }: CreateContractPageProps) {
-  const { id } = await searchParams;
+  const { id, fix, order, cid, step } = await searchParams;
   const contractType: ContractTypeId =
     id === "residential" ? "residential" : "commercial";
+  const fixRequestId = parseFixParam(fix);
+  const fixContractId = parseFixParam(cid);
+  const fixOrder = (order ?? "").replace(/[^0-9A-Za-z-]/g, "").slice(0, 64);
+  const fixParams: CreateContractFixParams | null =
+    fixRequestId != null && fixContractId != null && fixOrder
+      ? { requestId: fixRequestId, contractId: fixContractId, orderUuid: fixOrder, step: parseStepParam(step) }
+      : null;
 
   const queryClient = getQueryClient();
   const propertyContractType = toPropertyContractType(contractType);
@@ -1049,7 +1059,7 @@ export default async function CreateContractPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CreateContractPageContent labels={labels} contractType={contractType} />
+      <CreateContractPageContent labels={labels} contractType={contractType} fix={fixParams} />
     </HydrationBoundary>
   );
 }

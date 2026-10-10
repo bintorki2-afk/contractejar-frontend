@@ -2,9 +2,17 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
+import { parseChargeReturn } from "@/features/requests/utils/charge-return";
+import { buildInvoiceDialogLabels } from "@/features/requests/utils/invoice-dialog-labels";
+import { parseFixParam } from "@/features/requests/utils/parse-fix-param";
 import TrackOrderForm from "@/features/track-order/components/track-order-form";
 
-type Props = { params: Promise<{ order: string }> };
+type SearchParams = Record<string, string | string[] | undefined>;
+
+type Props = {
+  params: Promise<{ order: string }>;
+  searchParams: Promise<SearchParams>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { order } = await params;
@@ -20,11 +28,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Smart order link: `/r/{orderNumber}`. On a phone with the app installed the
  * OS opens the app instead (Universal / App Links via `.well-known`); here on
  * the web the order number is prefilled and only the mobile is asked for.
+ *
+ * دفعة هـ: the same link carries the Moyasar return after a charge payment
+ * (`?charge={cid}&status=success|failed&paid=1|0`) and the data-request deep
+ * link (`?fix={id}&step={n}`); both are shown on the result once the customer
+ * confirms the mobile.
  */
-export default async function SmartOrderLinkPage({ params }: Props) {
-  const { order } = await params;
-  const t = await getTranslations("trackPage");
+export default async function SmartOrderLinkPage({ params, searchParams }: Props) {
+  const [{ order }, query, t, tInvoice] = await Promise.all([
+    params,
+    searchParams,
+    getTranslations("trackPage"),
+    getTranslations("requests.card.invoiceDialog"),
+  ]);
+  const invoiceLabels = buildInvoiceDialogLabels(tInvoice);
   const safeOrder = decodeURIComponent(order).replace(/[^0-9A-Za-z-]/g, "").slice(0, 64);
+  const chargeReturn = parseChargeReturn({
+    charge: query.charge ?? null,
+    status: query.status ?? null,
+    paid: query.paid ?? null,
+  });
+  const fixRequestId = parseFixParam(query.fix);
+
+  const subtitle =
+    chargeReturn?.status === "success" && chargeReturn.paid
+      ? t("smartLinkSubtitleChargePaid", { order: safeOrder })
+      : fixRequestId != null
+        ? t("smartLinkSubtitleFix", { order: safeOrder })
+        : t("smartLinkSubtitle", { order: safeOrder });
 
   return (
     <main className="py-14 md:py-20">
@@ -40,11 +71,17 @@ export default async function SmartOrderLinkPage({ params }: Props) {
             {t("smartLinkHeading")}
           </h1>
           <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground">
-            {t("smartLinkSubtitle", { order: safeOrder })}
+            {subtitle}
           </p>
         </div>
 
-        <TrackOrderForm initialOrder={safeOrder} autoSubmitWhenReady />
+        <TrackOrderForm
+          initialOrder={safeOrder}
+          autoSubmitWhenReady
+          chargeReturn={chargeReturn}
+          fixRequestId={fixRequestId}
+          invoiceLabels={invoiceLabels}
+        />
       </div>
     </main>
   );

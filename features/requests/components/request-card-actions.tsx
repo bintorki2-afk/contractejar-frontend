@@ -75,6 +75,7 @@ export default function RequestCardActions({
         actionType={card.actionType}
         contractId={card.contractId}
         contractUuid={card.uuid}
+        contractType={card.contractType}
         completePaymentLabel={labels.completePayment}
         completePaymentWithAmountLabel={labels.completePaymentWithAmount}
         completePaymentLoadingLabel={labels.completePaymentLoading}

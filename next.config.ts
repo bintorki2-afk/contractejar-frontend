@@ -24,7 +24,9 @@ const CSP = [
   "base-uri 'self'",
   "frame-ancestors 'self'",
   "form-action 'self' https://*.moyasar.com",
-  "img-src 'self' data: blob: https:",
+  // Signed deed/address previews (`/contracts/{id}/deed-image/…`) come from the
+  // API origin — same local-only exception as connect-src.
+  `img-src 'self' data: blob: https:${localApiOrigin ? ` ${localApiOrigin}` : ""}`,
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // clarity.ms: Microsoft Clarity session recordings (features/analytics/clarity-script.tsx).

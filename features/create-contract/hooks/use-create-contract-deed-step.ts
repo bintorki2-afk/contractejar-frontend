@@ -12,7 +12,7 @@ import {
   DEFAULT_NATIONAL_ADDRESS_LOCATION,
 } from "@/features/create-contract/types/national-address";
 import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
-import { resolveContractAssetUrl } from "@/features/create-contract/utils/build-existing-contract-draft";
+import { resolveExistingDeedImages } from "@/features/create-contract/utils/resolve-existing-deed-images";
 import { isManualDeedEntryComplete } from "@/features/shared/types/manual-deed-entry";
 import { deedTypeSupportsManualEntry } from "@/features/shared/utils/supports-manual-deed-entry";
 
@@ -24,6 +24,10 @@ export function useCreateContractDeedStep() {
   const contractStep1Data = useCreateContractDraftStore(
     (state) => state.contractStep1Data,
   );
+  const contractStep2Data = useCreateContractDraftStore(
+    (state) => state.contractStep2Data,
+  );
+  const isFixMode = useCreateContractDraftStore((state) => state.fixMode !== null);
   const isDeedAlreadySubmitted = useCreateContractDraftStore(
     (state) => (state.contractStep1Data?.step ?? 0) >= 2,
   );
@@ -84,34 +88,27 @@ export function useCreateContractDeedStep() {
   );
   const setMapLocation = useCreateContractDraftStore((state) => state.setMapLocation);
 
-  const existingInstrumentImageUrl = resolveContractAssetUrl(
-    existingPropertyContext?.property.image_instrument,
-  );
-  const existingInstrumentFrontImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.image_instrument_from_the_front,
-  );
-  const existingInstrumentBackImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.image_instrument_from_the_back,
-  );
-  const existingInheritanceImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.Image_inheritance_certificate,
-  );
-  const existingHeirsPoaImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.copy_power_of_attorney_from_heirs_to_agent,
-  );
-  const existingEndowmentCertImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.copy_of_the_endowment_registration_certificate,
-  );
-  const existingTrusteeshipImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.copy_of_the_trusteeship_deed,
-  );
-  const existingGuardiansPoaImageUrl = resolveContractAssetUrl(
-    contractStep1Data?.copy_of_guardians_power_of_attorney_for_agent,
-  );
-  const existingAddressImageUrl = resolveContractAssetUrl(
-    existingPropertyContext?.property.image_address,
-  );
+  // دفعة هـ (W-1): الصور الحالية من سياق العقار المحفوظ أو من بيانات الخطوة
+  // 1/2 المحمّلة من الخادم (وضع التصحيح / استكمال طلب) — لا من السياق فقط.
+  const existingImages = resolveExistingDeedImages({
+    property: existingPropertyContext?.property,
+    step1: contractStep1Data,
+    step2: contractStep2Data,
+  });
+  const existingInstrumentImageUrl = existingImages.instrument;
+  const existingInstrumentFrontImageUrl = existingImages.instrumentFront;
+  const existingInstrumentBackImageUrl = existingImages.instrumentBack;
+  const existingInheritanceImageUrl = existingImages.inheritance;
+  const existingHeirsPoaImageUrl = existingImages.heirsPoa;
+  const existingEndowmentCertImageUrl = existingImages.endowmentCert;
+  const existingTrusteeshipImageUrl = existingImages.trusteeship;
+  const existingGuardiansPoaImageUrl = existingImages.guardiansPoa;
+  const existingAddressImageUrl = existingImages.address;
   const isInstrumentTypeLocked = existingPropertyContext !== null;
+  // وضع التصحيح: «مكتمل» يعني وجود الصورة فعلاً (الحالية أو بديل مرفوع)،
+  // لا مجرد أن الخطوة أُرسلت سابقاً — فلا شارة «مكتمل» فوق صندوق فارغ.
+  const submittedDeedCountsAsComplete = isDeedAlreadySubmitted && !isFixMode;
+  const submittedAddressCountsAsComplete = isAddressAlreadySubmitted && !isFixMode;
   const isLeaseRenewal = deedTypeIsLeaseRenewal(deed.selectedDeedType);
   const isSublease = deedTypeIsSublease(deed.selectedDeedType);
   const needsFrontBack = deedTypeNeedsFrontBack(deed.selectedDeedType);
@@ -144,7 +141,7 @@ export function useCreateContractDeedStep() {
 
   const isDeedComplete =
     isInstrumentTypeLocked ||
-    isDeedAlreadySubmitted ||
+    submittedDeedCountsAsComplete ||
     (deed.selectedDeedType !== "" &&
       (isLeaseRenewal
         ? hasSingleImage
@@ -187,7 +184,7 @@ export function useCreateContractDeedStep() {
 
   const isAddressComplete =
     isInstrumentTypeLocked ||
-    isAddressAlreadySubmitted ||
+    submittedAddressCountsAsComplete ||
     isSublease ||
     (isLeaseRenewal
       ? deed.leaseRenewalAddressMode === "same" ||
@@ -253,6 +250,7 @@ export function useCreateContractDeedStep() {
     existingAddressImageUrl,
     isInstrumentTypeLocked,
     isDeedAlreadySubmitted,
+    isFixMode,
     isLeaseRenewal,
     isSublease,
   };

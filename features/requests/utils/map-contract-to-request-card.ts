@@ -5,6 +5,11 @@ import type {
 } from "@/features/requests/types/request";
 import type { ContractListItem } from "@/features/requests/types/contract-list-item";
 import { normalizeContractStatusSnapshot } from "@/features/requests/utils/normalize-contract-status";
+import {
+  normalizeCharges,
+  normalizePaymentState,
+  normalizePendingDataRequests,
+} from "@/features/requests/utils/normalize-payment-state";
 import { formatRefundLabel, resolveRefundInfo } from "@/features/requests/utils/resolve-refund";
 
 type ContractCardLabels = {
@@ -184,6 +189,9 @@ export function mapContractToRequestCard(
     paymentStatusLabel:
       snapshot.journey_status_label || snapshot.status_label || null,
     payableAmount: resolvePayableAmount(contract),
+    paymentState: normalizePaymentState(contract.payment_state),
+    charges: normalizeCharges(contract.charges),
+    pendingDataRequests: normalizePendingDataRequests(contract.pending_data_requests),
     isIncompleteDraft,
     showViewEdit: contract.step !== 7,
     showDownloadInvoice: !isIncompleteDraft,

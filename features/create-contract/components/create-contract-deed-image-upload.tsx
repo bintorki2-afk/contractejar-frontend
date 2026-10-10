@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import CreateContractFieldError from "@/features/create-contract/components/create-contract-field-error";
 import CreateContractFieldLabel from "@/features/create-contract/components/create-contract-field-label";
+import { useCreateContractDraftStore } from "@/features/create-contract/stores/use-create-contract-draft-store";
 import type { CreateContractLabels } from "@/features/create-contract/types/create-contract-labels";
 import { cn } from "@/lib/utils";
 type CreateContractDeedImageUploadProps = {
@@ -34,6 +35,12 @@ type CreateContractDeedImageUploadProps = {
   value: File[];
   onChange: (files: File[]) => void;
   existingImageUrl?: string | null;
+  /**
+   * كيف تُعرض الصورة الموجودة على الخادم: `attached` («تم الإرفاق» + تغيير/إزالة)
+   * أو `current` («الصورة الحالية — ارفع بديلاً»، وضع التصحيح). الافتراضي يُشتق
+   * من وضع التصحيح في المخزن.
+   */
+  existingImageMode?: "attached" | "current";
   fieldLabel?: string;
   single?: boolean;
   variant?: "default" | "dropzone" | "dashed" | "dashed-pill";
@@ -218,11 +225,96 @@ function ExistingImageRow({
   );
 }
 
+/** دفعة هـ (W-1): نصوص حالة «الصورة الحالية» في وضع التصحيح — ثابتة بالعربية. */
+const CURRENT_IMAGE_LABELS = {
+  title: "الصورة الحالية",
+  hint: "هذه الصورة المرفوعة في طلبك — ارفع بديلاً إذا كان المطلوب تصحيحها.",
+  replace: "ارفع بديلاً",
+};
+
+/**
+ * وضع التصحيح: الصورة المرفوعة سابقاً على الخادم تظهر بمصغّرة وعنوان
+ * «الصورة الحالية» وزر «ارفع بديلاً» (لا «تم الإرفاق» ولا «إزالة» — الحذف لا
+ * يصل الخادم أصلاً). الروابط موقّعة من الخادم، لذا `<img>` عادي.
+ */
+function CurrentImageRow({
+  url,
+  labels,
+  onPreview,
+  onReplace,
+}: {
+  url: string;
+  labels: CreateContractLabels["deed"]["deedImage"];
+  onPreview: () => void;
+  onReplace: () => void;
+}) {
+  const [thumbFailed, setThumbFailed] = useState(false);
+
+  return (
+    <div
+      data-testid="current-image"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#cfe8e0] bg-[#f3faf7] px-3 py-2.5 dark:border-[#2f403b] dark:bg-[#16352f]"
+    >
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <button
+          type="button"
+          onClick={onPreview}
+          aria-label={labels.preview}
+          className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#cfe8e0] bg-white dark:border-[#2f403b] dark:bg-[#1a2421]"
+        >
+          {thumbFailed ? (
+            <ImageIcon className="size-6 text-[#bdbdbd] dark:text-[#6b7d78]" aria-hidden="true" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={url}
+              alt={CURRENT_IMAGE_LABELS.title}
+              className="size-full object-cover"
+              onError={() => setThumbFailed(true)}
+            />
+          )}
+        </button>
+
+        <div className="min-w-0 space-y-0.5">
+          <p className="inline-flex items-center gap-1.5 text-sm font-bold text-brand dark:text-[#48c0b8]">
+            <Check className="size-4 shrink-0" aria-hidden="true" />
+            <span>{CURRENT_IMAGE_LABELS.title}</span>
+          </p>
+          <p className="text-xs leading-relaxed text-[#6f6f6f] dark:text-[#9eb5af]">
+            {CURRENT_IMAGE_LABELS.hint}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <button
+          type="button"
+          onClick={onPreview}
+          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#e7f4ef] px-3 text-sm font-bold text-brand dark:bg-[#0f2a24] dark:text-[#48c0b8]"
+        >
+          <Eye className="size-4 shrink-0" aria-hidden="true" />
+          <span>{labels.preview}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onReplace}
+          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand px-3 text-sm font-bold text-white hover:bg-brand/90"
+        >
+          <RefreshCw className="size-4 shrink-0" aria-hidden="true" />
+          <span>{CURRENT_IMAGE_LABELS.replace}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function CreateContractDeedImageUpload({
   labels,
   value,
   onChange,
   existingImageUrl = null,
+  existingImageMode,
   fieldLabel,
   single = false,
   variant = "default",
@@ -236,6 +328,10 @@ export default function CreateContractDeedImageUpload({
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [previewExistingUrl, setPreviewExistingUrl] = useState<string | null>(null);
   const [existingImageCleared, setExistingImageCleared] = useState(false);
+  // دفعة هـ (W-1): في وضع التصحيح تُعرض الصورة الموجودة على الخادم كـ«الصورة
+  // الحالية — ارفع بديلاً» بدل «تم الإرفاق».
+  const isFixMode = useCreateContractDraftStore((state) => state.fixMode !== null);
+  const resolvedExistingMode = existingImageMode ?? (isFixMode ? "current" : "attached");
   const showExistingImage =
     value.length === 0 && Boolean(existingImageUrl) && !existingImageCleared;
   const showInvalid = invalid && value.length === 0 && !showExistingImage;
@@ -399,13 +495,22 @@ export default function CreateContractDeedImageUpload({
       {showInvalid ? <CreateContractFieldError message={t("fieldRequired")} /> : null}
 
       {showExistingImage && existingImageUrl ? (
-        <ExistingImageRow
-          url={existingImageUrl}
-          labels={labels}
-          onPreview={() => setPreviewExistingUrl(existingImageUrl)}
-          onChangeFile={handleChangeFile}
-          onDelete={handleDeleteExisting}
-        />
+        resolvedExistingMode === "current" ? (
+          <CurrentImageRow
+            url={existingImageUrl}
+            labels={labels}
+            onPreview={() => setPreviewExistingUrl(existingImageUrl)}
+            onReplace={handleChangeFile}
+          />
+        ) : (
+          <ExistingImageRow
+            url={existingImageUrl}
+            labels={labels}
+            onPreview={() => setPreviewExistingUrl(existingImageUrl)}
+            onChangeFile={handleChangeFile}
+            onDelete={handleDeleteExisting}
+          />
+        )
       ) : null}
 
       {value.length > 0 ? (
