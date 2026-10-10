@@ -43,7 +43,9 @@
     "profile": "Profile",
     "menu": "Menu",
     "myAccount": "My Account",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "login": "Log in",
+    "account": "My account"
   },
   "instrumentTypePopup": {
     "title": "Contract fees for {deedType}",
@@ -87,7 +89,14 @@
     "downloadApp": "Download the app now",
     "downloadOnThe": "Download On The",
     "googlePlay": "Google Play",
-    "appStore": "Apple Store"
+    "appStore": "Apple Store",
+    "nav": {
+      "sectionTitle": "My account",
+      "requests": "My orders",
+      "requestsHref": "/requests",
+      "properties": "My properties",
+      "propertiesHref": "/properties/my-properties"
+    }
   },
   "hero": {
     "badge": "Document your lease via the Ejar platform in minutes",
@@ -676,7 +685,13 @@
   "auth": {
     "hero": {
       "imageAlt": "Rental Contract app showing a successfully issued lease contract",
-      "tagline": "Lease documentation platform"
+      "tagline": "Lease documentation platform",
+      "brand": "Ejar Contract",
+      "title": "Document your lease officially in minutes",
+      "subtitle": "Simple, trusted steps that protect every party's rights.",
+      "feature1": "Certified via the Ejar network",
+      "feature2": "Documented within minutes",
+      "feature3": "Protects every party's rights"
     },
     "login": {
       "back": "Back to home",
@@ -699,8 +714,12 @@
         "phoneRequired": "Mobile number is required",
         "phoneInvalid": "Please enter a valid Saudi mobile number",
         "passwordRequired": "Password is required",
-        "passwordMin": "Password must be at least 8 characters"
-      }
+        "passwordMin": "Password must be at least 8 characters",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@email.com"
     },
     "register": {
       "back": "Back to sign in",
@@ -773,8 +792,14 @@
       "backToLogin": "Back to sign in",
       "validation": {
         "phoneRequired": "Mobile number is required",
-        "phoneInvalid": "Please enter a valid Saudi mobile number"
-      }
+        "phoneInvalid": "Please enter a valid Saudi mobile number",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email"
+      },
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@email.com",
+      "sentTitle": "Check your email",
+      "sentHint": "If an account exists for this email, we've sent it a link to reset your password. Check your inbox (and spam folder)."
     },
     "resetPassword": {
       "back": "Go back",
@@ -847,6 +872,21 @@
         "otpRequired": "Code is required",
         "otpInvalid": "The code is 4 digits"
       }
+    },
+    "social": {
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "completing": "Signing you in...",
+      "error": "Couldn't sign you in. Please try again."
+    },
+    "verifyEmail": {
+      "back": "Back to log in",
+      "successTitle": "Your email is confirmed ✅",
+      "successHint": "Your account is active. You can now use all services.",
+      "invalidTitle": "Invalid confirmation link",
+      "invalidHint": "The link has expired or is incorrect. Log in and request a new confirmation link.",
+      "goLogin": "Go to log in",
+      "goHome": "Back to home"
     }
   },
   "properties": {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 
 import { buildInvoiceDialogLabels } from "@/features/requests/utils/invoice-dialog-labels";
@@ -24,9 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * summary only (no identity data, no attachments).
  */
 export default async function TrackOrderPage() {
-  const [t, tInvoice] = await Promise.all([
+  const [t, tInvoice, locale, messages] = await Promise.all([
     getTranslations("trackPage"),
     getTranslations("requests.card.invoiceDialog"),
+    getLocale(),
+    getMessages(),
   ]);
   const invoiceLabels = buildInvoiceDialogLabels(tInvoice);
 
@@ -55,7 +58,11 @@ export default async function TrackOrderPage() {
           </p>
         </div>
 
-        <TrackOrderForm invoiceLabels={invoiceLabels} />
+        {/* QA-F C7: دفع الرسوم من التتبع يفتح حوار OTP من createContract (نطاق رسائل خاص بالخدمات)
+            — بدون هذا المزوّد تظهر مفاتيح برمجية خام بدل النصوص. */}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <TrackOrderForm invoiceLabels={invoiceLabels} />
+        </NextIntlClientProvider>
       </div>
     </main>
   );
